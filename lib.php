@@ -17,7 +17,7 @@ defined('INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->docroot . 'module/objectfs/lib_old.php');
+require_once($CFG->docroot . 'module/objectfs/s3_lib.php');
 require_once($CFG->docroot . 'artefact/lib.php');
 require_once($CFG->docroot . 'artefact/file/lib.php');
 
