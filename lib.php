@@ -11,15 +11,15 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//namespace module_objectfs; // This stuff is weird for mahara, have to comment so far
+//namespace module_objectfs;
 
 defined('INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->docroot . 'module/objectfs/lib_old.php'); // Need to adjust to mahara. SOrt of
-require_once($CFG->docroot . 'artefact/lib.php'); // This needs to be adjusted to mahara. SOrt of. This is probably retarded
-require_once($CFG->docroot . 'artefact/file/lib.php'); // This needs to be adjusted to mahara. SOrt of
+require_once($CFG->docroot . 'module/objectfs/lib_old.php');
+require_once($CFG->docroot . 'artefact/lib.php');
+require_once($CFG->docroot . 'artefact/file/lib.php');
 
 abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
@@ -60,14 +60,14 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
     protected function get_object_path_from_storedfile($file) {
         if ($this->preferremote) {
-            $location = $this->get_actual_object_location_by_id($file->get('id')); // get_contenthash - what it is in mahara, just $file->id?
+            $location = $this->get_actual_object_location_by_id($file->get('id'));
             if ($location == OBJECT_LOCATION_DUPLICATED) {
                 return $this->get_remote_path_from_storedfile($file);
             }
         }
 
         if ($this->is_file_readable_locally_by_storedfile($file)) {
-            $path = $this->get_path(); // Is this right for mahara?
+            $path = $this->get_path();
         } else {
             // We assume it is remote, not checking if it's readable.
             $path = $this->get_remote_path_from_storedfile($file);
@@ -115,8 +115,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * @param ArtefactTypeFile $file The file to serve.
      * @return string full path to pool file with file content
      */
-    protected function get_remote_path_from_storedfile(\ArtefactTypeFile $file) { //// Adjust for mahara. Not sure if this is right class
-        return $this->get_remote_path_from_id($file->get('id')); // Adjust for mahara
+    protected function get_remote_path_from_storedfile(\ArtefactTypeFile $file) {
+        return $this->get_remote_path_from_id($file->get('id'));
     }
 
     /**
@@ -134,7 +134,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     }
 
     public function get_actual_object_location_by_id($contentid) {
-        $this->set('fileid', $contentid); // Super chamancy for mahara???
+        $this->set('fileid', $contentid);
         $localpath = $this->get_path();
         $remotepath = $this->get_remote_path_from_id($contentid);
 
@@ -157,26 +157,6 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         $resource = "object: $contentid";
         $lockfactory = \core\lock\lock_config::get_lock_factory('tool_objectfs_object'); // Need to adjust to mahara
         $lock = $lockfactory->get_lock($resource, $timeout); // Need to adjust to mahara
-
-        $giveuptime = time() + $timeout;
-        do {
-            $locked = get_record('config', 'field', '_cron_lock_module_objectfs_cron_$contentid');
-            if ($locked) {
-                usleep(rand(10000, 250000)); // Sleep between 10 and 250 milliseconds.
-            } else {
-                
-            }
-            // Try until the giveup time.
-        } while (!$locked && time() < $giveuptime);
-
-        if (!get_record('config', 'field', '_cron_lock_search_elasticsearch_cron')) {
-            $start = time();
-            insert_record('config', (object) array('field' => '_cron_lock_module_objectfs_cron', 'value' => $start));
-            $lock = true;
-        } else {
-            $lock = false;
-        }
-
         return $lock;
     }
 
@@ -262,7 +242,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         // There is no going back.
         if ($location === OBJECT_LOCATION_DUPLICATED) {
             $localpath = $this->get_local_path_from_id($contentid);
-            $objectvalid = $this->remoteclient->verify_remote_object($contentid, $localpath); // Might need to adjust to mahara
+            $objectvalid = $this->remoteclient->verify_remote_object($contentid, $localpath);
             if ($objectvalid) {
                 return unlink($localpath);
             }
@@ -280,9 +260,9 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * @param \ArtefactTypeFile $file The file to serve.
      * @return void
      */
-    public function readfile(\ArtefactTypeFile $file) { // Might need to adjust to mahara. Not sure if this is right class
+    public function readfile(\ArtefactTypeFile $file) {
         $path = $this->get_object_path_from_storedfile($file);
-        readfile_allow_large($path, $file->describe_size());  // Might need to adjust to mahara, should it be describe_size()???
+        readfile_allow_large($path, $file->describe_size());
     }
 
     /**
@@ -296,7 +276,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * @return string The full file content
      */
     public function get_content(\ArtefactTypeFile $file) {
-        if (!$file->describe_size()) { // Might need to adjust to mahara, should it be describe_size()???
+        if (!$file->describe_size()) {
             // Directories are empty. Empty files are not worth fetching.
             return '';
         }
@@ -330,9 +310,9 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * @param int $type Type of file handle (FILE_HANDLE_xx constant)
      * @return resource file handle
      */
-    public function get_content_file_handle(\ArtefactTypeFile $file, $type = \ArtefactTypeFile::FILE_HANDLE_FOPEN) {// Might need to adjust to mahara
+    public function get_content_file_handle(\ArtefactTypeFile $file, $type = \ArtefactTypeFile::FILE_HANDLE_FOPEN) {
         // Most object repo streams do not support gzopen.
-        if ($type == \ArtefactTypeFile::FILE_HANDLE_GZOPEN) {// Might need to adjust to mahara, what is that property?
+        if ($type == \ArtefactTypeFile::FILE_HANDLE_GZOPEN) {
             $path = $this->get_local_path_from_storedfile($file, true);
         } else {
             $path = $this->get_object_path_from_storedfile($file);
