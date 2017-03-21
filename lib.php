@@ -21,6 +21,9 @@ require_once($CFG->docroot . 'module/objectfs/s3_lib.php');
 require_once($CFG->docroot . 'artefact/lib.php');
 require_once($CFG->docroot . 'artefact/file/lib.php');
 
+require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
+
+
 abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
     private $remoteclient;
@@ -154,10 +157,28 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
     protected function acquire_object_lock($contentid) {
         $timeout = 600; // 10 minutes before giving up.
-        $resource = "object: $contentid";
-        $lockfactory = \core\lock\lock_config::get_lock_factory('tool_objectfs_object'); // Need to adjust to mahara
-        $lock = $lockfactory->get_lock($resource, $timeout); // Need to adjust to mahara
+
+        $giveuptime = time() + $timeout;
+        $lock = false;
+
+        do {
+            $lockedalready = get_record('config', 'field', '_cron_lock_module_objectfs_cron_'.$contentid);
+            if ($lockedalready) {
+                usleep(rand(10000, 250000)); // Sleep between 10 and 250 milliseconds.
+            } else {
+                insert_record('config', (object) array('field' => '_cron_lock_module_objectfs_cron_'.$contentid, 'value' => time()));
+                $lock = true;
+            }
+            // Try until the giveup time.
+        } while (!$lock && time() < $giveuptime);
+
         return $lock;
+    }
+
+    protected function release_object_lock($contentid) {
+
+        delete_records('config', 'field', '_cron_lock_module_objectfs_cron_'.$contentid);
+
     }
 
     public function copy_object_from_remote_to_local_by_id($contentid) {
@@ -173,22 +194,22 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             $localpath = $this->get_local_path_from_id($contentid);
             $remotepath = $this->get_remote_path_from_id($contentid);
 
-//            $objectlock = $this->acquire_object_lock($contentid);
+            $objectlock = $this->acquire_object_lock($contentid);
 
             // Lock is still held by something.
-//            if (!$objectlock) {
-//                return false;
-//            }
+            if (!$objectlock) {
+                return false;
+            }
 
             // While waiting for lock, file was moved.
             if (is_readable($localpath)) {
-//                $objectlock->release(); // Might need to adjust to mahara
+                $this->release_object_lock($contentid);
                 return true;
             }
 
             $result = copy($remotepath, $localpath);
 
-//            $objectlock->release(); // Might need to adjust to mahara
+            $this->release_object_lock($contentid);
 
             return $result;
         }
@@ -208,22 +229,22 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             $localpath = $this->get_local_path_from_id($contentid);
             $remotepath = $this->get_remote_path_from_id($contentid);
 
-//            $objectlock = $this->acquire_object_lock($contentid); // Dunno for mahara so far
+            $objectlock = $this->acquire_object_lock($contentid); // Dunno for mahara so far
 
             // Lock is still held by something.
-//            if (!$objectlock) {
-//                return false;
-//            }
+            if (!$objectlock) {
+                return false;
+            }
 
             // While waiting for lock, file was moved.
             if (is_readable($remotepath)) {
-                $objectlock->release(); // Might need to adjust to mahara
+                $this->release_object_lock($contentid);
                 return true;
             }
 
             $result = copy($localpath, $remotepath);
 
-//            $objectlock->release(); // Might need to adjust to mahara
+            $this->release_object_lock($contentid);
 
             return $result;
         }
@@ -366,6 +387,39 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         if ((int)$this->filepermissions !== $currentperms) {
             chmod($trashfile, $this->filepermissions);
         }
+    }
+
+    /**
+     * Scheduled tasks for S3
+     */
+    public static function get_cron() {
+
+        return array(
+            (object)array(
+                'callfunction' => 'cron',
+                'hour'         => '*',
+                'minute'       => '*',
+            ),
+        );
+    }
+
+   /**
+    * Push to S3
+    */
+    public static function cron() {
+        //$config = get_objectfs_config();
+
+        $timestamp = date('Y-m-d H:i:s');
+        set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
+
+//        if (isset($config->enabletasks) && $config->enabletasks) {
+            $filesystem = new s3_file_system_ArtefactTypeFile();
+            $pusher = new pusher($filesystem, $config);
+            $candidateids = $pusher->get_candidate_objects();
+            $pusher->execute($candidateids);
+//        } else {
+//            log_debug(get_string('not_enabled', 'module_objectfs'));
+//        }
     }
 
 }

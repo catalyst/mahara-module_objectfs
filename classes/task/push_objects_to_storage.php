@@ -1,19 +1,4 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  * Task that pushes files to S3.
  *
@@ -23,11 +8,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace module_objectfs\tool_objectfs\task;
+namespace module_objectfs\task;
 
 use module_objectfs\object_manipulator\pusher;
-use module_objectfs\object_file_system;  // WHat is this for mahara?
-use module_objectfs\s3_file_system;  // WHat is this for mahara?
+use module_objectfs\PluginModuleObjectfs;
+use module_objectfs\s3_file_system;
 
 
 defined('INTERNAL') || die();
@@ -42,7 +27,7 @@ class push_objects_to_storage extends \core\task\scheduled_task {  // No idea so
      * Get task name
      */
     public function get_name() {
-        return get_string('push_objects_to_storage_task', 'tool_objectfs');
+        return get_string('push_objects_to_storage_task', 'module_objectfs');
     }
 
     /**
@@ -54,10 +39,10 @@ class push_objects_to_storage extends \core\task\scheduled_task {  // No idea so
         if (isset($config->enabletasks) && $config->enabletasks) {
             $filesystem = new s3_file_system();
             $pusher = new pusher($filesystem, $config);
-            $candidatehashes = $pusher->get_candidate_objects();
-            $pusher->execute($candidatehashes);
+            $candidateids = $pusher->get_candidate_objects();
+            $pusher->execute($candidateids);
         } else {
-            log_debug(get_string('not_enabled', 'tool_objectfs'));
+            log_debug(get_string('not_enabled', 'module_objectfs'));
         }
     }
 }

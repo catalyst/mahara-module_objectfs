@@ -30,9 +30,10 @@ namespace module_objectfs;
 
 defined('INTERNAL') || die();
 
+global $CFG;
+
 require_once($CFG->docroot . 'module/objectfs/lib.php');
 
-use module_objectfs\PluginModuleObjectfs;
 use module_objectfs\client\s3_client;
 
 

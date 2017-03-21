@@ -13,20 +13,22 @@ defined('INTERNAL') || die();
 
 function xmldb_module_objectfs_upgrade($oldversion) {
 
-    if ($oldversion < 2017030300) {
+    if ($oldversion < 2017030301) {
 
-        $table = new XMLDBTable('artefact_file_objectfs_report_data');
-        $dbman->rename_table($table, 'artefact_file_objectfs_reports');  // WHaT is this in mahara???
+        $table = new XMLDBTable('module_objectfs_report_data');
+        rename_table($table, 'module_objectfs_reports');  // WHaT is this in mahara???
 
-        $table = new XMLDBTable('artefact_file_objectfs_reports');
+        $table = new XMLDBTable('module_objectfs_reports');
 
         // Changing type of field reporttype on table tool_objectfs_reports to char.
         $table->addFieldInfo('reporttype', XMLDB_TYPE_CHAR, '15', null, XMLDB_NOTNULL, null, null, 'id');
+        $field = $table->fields[0]; // Fix this!!!!!!!!!!!
 
         // Launch change of type for field reporttype.
         change_field_type($table, $field);
 
-        upgrade_plugin_savepoint(true, 2017030300, 'error', 'objectfs'); // Not sure what it is for mahara?
+        //upgrade_plugin_savepoint(true, 2017030301, 'module', 'objectfs'); // Not sure what it is for mahara?
+        //set_config_plugin('module', 'objectfs', );
     }
 
     return true;
