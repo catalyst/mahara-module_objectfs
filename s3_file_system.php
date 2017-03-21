@@ -26,18 +26,18 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace module_objectfs;
+//namespace module_objectfs;
 
 defined('INTERNAL') || die();
 
 global $CFG;
 
 require_once($CFG->docroot . 'module/objectfs/lib.php');
+require_once($CFG->docroot . 'module/objectfs/classes/client/s3_client.php');
 
 use module_objectfs\client\s3_client;
 
-
-class s3_file_system_ArtefactTypeFile extends \PluginModuleObjectfs {
+class s3_file_system_ArtefactTypeFile extends PluginModuleObjectfs {
 
     protected function get_remote_client($config) {
         $s3client = new s3_client($config);

@@ -21,8 +21,7 @@ require_once($CFG->docroot . 'module/objectfs/s3_lib.php');
 require_once($CFG->docroot . 'artefact/lib.php');
 require_once($CFG->docroot . 'artefact/file/lib.php');
 
-require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
-
+use module_objectfs\object_manipulator\pusher;
 
 abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
@@ -396,9 +395,9 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         return array(
             (object)array(
-                'callfunction' => 'cron',
+                'callfunction' => 'push_objects_to_storage',
                 'hour'         => '*',
-                'minute'       => '*',
+                'minute'       => '*/5',
             ),
         );
     }
@@ -406,8 +405,13 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
    /**
     * Push to S3
     */
-    public static function cron() {
+    public static function push_objects_to_storage() {
+        global $CFG;
+        require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/pusher.php');
+
         //$config = get_objectfs_config();
+        $config = new stdClass();
 
         $timestamp = date('Y-m-d H:i:s');
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
