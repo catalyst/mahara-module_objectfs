@@ -22,6 +22,8 @@ require_once($CFG->docroot . 'artefact/lib.php');
 require_once($CFG->docroot . 'artefact/file/lib.php');
 
 use module_objectfs\object_manipulator\pusher;
+use module_objectfs\object_manipulator\puller;
+use module_objectfs\object_manipulator\deleter;
 
 abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
@@ -399,6 +401,16 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                 'hour'         => '*',
                 'minute'       => '*/5',
             ),
+            (object)array(
+                'callfunction' => 'pull_objects_from_storage',
+                'hour'         => '*',
+                'minute'       => '*/5',
+            ),
+            (object)array(
+                'callfunction' => 'delete_local_objects',
+                'hour'         => '*',
+                'minute'       => '*/5',
+            ),
         );
     }
 
@@ -421,6 +433,54 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             $pusher = new pusher($filesystem, $config);
             $candidateids = $pusher->get_candidate_objects();
             $pusher->execute($candidateids);
+//        } else {
+//            log_debug(get_string('not_enabled', 'module_objectfs'));
+//        }
+    }
+
+    /**
+     * Pull from S3
+     */
+    public static function pull_objects_from_storage() {
+        global $CFG;
+        require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/puller.php');
+
+        //$config = get_objectfs_config();
+        $config = new stdClass();
+
+        $timestamp = date('Y-m-d H:i:s');
+        set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
+
+//        if (isset($config->enabletasks) && $config->enabletasks) {
+        $filesystem = new s3_file_system_ArtefactTypeFile();
+        $puller = new puller($filesystem, $config);
+        $candidateids = $puller->get_candidate_objects();
+        $puller->execute($candidateids);
+//        } else {
+//            log_debug(get_string('not_enabled', 'module_objectfs'));
+//        }
+    }
+
+    /**
+     * Delete from local
+     */
+    public static function delete_local_objects() {
+        global $CFG;
+        require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/deleter.php');
+
+        //$config = get_objectfs_config();
+        $config = new stdClass();
+
+        $timestamp = date('Y-m-d H:i:s');
+        set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
+
+//        if (isset($config->enabletasks) && $config->enabletasks) {
+        $filesystem = new s3_file_system_ArtefactTypeFile();
+        $deleter = new deleter($filesystem, $config);
+        $candidateids = $deleter->get_candidate_objects();
+        $deleter->execute($candidateids);
 //        } else {
 //            log_debug(get_string('not_enabled', 'module_objectfs'));
 //        }
