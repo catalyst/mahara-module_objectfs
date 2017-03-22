@@ -109,7 +109,7 @@ class deleter extends manipulator {
 
         foreach ($files as $file) {
             if (time() >= $this->finishtime) {
-//                break;
+                break;
             }
 
             $success = $this->filesystem->delete_object_from_local_by_id($file->artefact);

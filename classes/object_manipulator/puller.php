@@ -86,7 +86,7 @@ class puller extends manipulator {
 
         foreach ($files as $file) {
             if (time() >= $this->finishtime) {
-//                break;
+                break;
             }
 
             $success = $this->filesystem->copy_object_from_remote_to_local_by_id($file->artefact);

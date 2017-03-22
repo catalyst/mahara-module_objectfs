@@ -103,7 +103,7 @@ class pusher extends manipulator {
 
         foreach ($files as $file) {
             if (time() >= $this->finishtime) {
-//                break;
+                break;
             }
 
             $success = $this->filesystem->copy_object_from_local_to_remote_by_id($file->artefact);

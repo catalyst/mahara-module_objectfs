@@ -21,6 +21,3 @@ interface object_client {
     public function test_connection();
     public function permissions_check();
 }
-/*interface object_client {
-    public function __construct();
-}*/
