@@ -35,7 +35,7 @@ class puller extends manipulator {
      */
     public function __construct($filesystem, $config) {
         parent::__construct($filesystem, $config);
-//        $this->sizethreshold = $config->sizethreshold;
+        $this->sizethreshold = $config->sizethreshold;
     }
 
     /**
@@ -46,7 +46,7 @@ class puller extends manipulator {
      * @return array candidate contentids
      */
     public function get_candidate_objects() {
-/*        $sql = 'SELECT af.artefact,
+        $sql = 'SELECT af.artefact,
                        MAX(af.size) AS filesize
                   FROM {artefact_file_files} af
              LEFT JOIN {artefact} a ON af.artefact = a.id
@@ -57,18 +57,7 @@ class puller extends manipulator {
                 HAVING MAX(af.size) <= ?
                        AND (o.location = ?)';
 
-        $params = array($this->sizethreshold, OBJECT_LOCATION_REMOTE);*/
-
-        $sql = 'SELECT af.artefact,
-                       MAX(af.size) AS filesize
-                  FROM {artefact_file_files} af
-             LEFT JOIN {artefact} a ON af.artefact = a.id
-             LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
-              GROUP BY af.artefact,
-                       af.size,
-                       o.location';
-
-        $params = array();
+        $params = array($this->sizethreshold, OBJECT_LOCATION_REMOTE);
 
         $starttime = time();
         $files = get_records_sql_array($sql, $params);
@@ -77,6 +66,10 @@ class puller extends manipulator {
 
         $logstring = "File puller query took $duration seconds to find $count files \n";
         log_debug($logstring);
+
+        if ($files == false ) {
+            $files = array();
+        }
 
         return $files;
     }

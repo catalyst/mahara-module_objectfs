@@ -63,7 +63,7 @@ class deleter extends manipulator {
             return array();
         }
 
-/*        $sql = 'SELECT af.artefact,
+        $sql = 'SELECT af.artefact,
                        MAX(af.size) AS filesize
                   FROM {artefact_file_files} af
              LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
@@ -71,18 +71,10 @@ class deleter extends manipulator {
                        AND o.location = ?
               GROUP BY af.artefact,
                        af.size,
-                       o.location';*/
-        $sql = 'SELECT af.artefact,
-                       MAX(af.size) AS filesize
-                  FROM {artefact_file_files} af
-             LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
-              GROUP BY af.artefact,
-                       af.size,
                        o.location';
 
-//        $consistancythrehold = time() - $this->consistencydelay;
-//        $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED);
-        $params = array();
+        $consistancythrehold = time() - $this->consistencydelay;
+        $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED);
 
         $starttime = time();
         $files = get_records_sql_array($sql, $params);
@@ -91,6 +83,10 @@ class deleter extends manipulator {
 
         $logstring = "File deleter query took $duration seconds to find $count files \n";
         log_debug($logstring);
+
+        if ($files == false ) {
+            $files = array();
+        }
 
         return $files;
     }

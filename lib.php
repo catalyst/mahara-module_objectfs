@@ -422,20 +422,19 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
         require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/pusher.php');
 
-        //$config = get_objectfs_config();
-        $config = new stdClass();
+        $config = get_objectfs_config();
 
         $timestamp = date('Y-m-d H:i:s');
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
-//        if (isset($config->enabletasks) && $config->enabletasks) {
+        if (isset($config->enabletasks) && $config->enabletasks) {
             $filesystem = new s3_file_system_ArtefactTypeFile();
             $pusher = new pusher($filesystem, $config);
             $candidateids = $pusher->get_candidate_objects();
             $pusher->execute($candidateids);
-//        } else {
-//            log_debug(get_string('not_enabled', 'module_objectfs'));
-//        }
+        } else {
+            log_debug(get_string('not_enabled', 'module_objectfs'));
+        }
     }
 
     /**
@@ -446,20 +445,19 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
         require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/puller.php');
 
-        //$config = get_objectfs_config();
-        $config = new stdClass();
+        $config = get_objectfs_config();
 
         $timestamp = date('Y-m-d H:i:s');
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
-//        if (isset($config->enabletasks) && $config->enabletasks) {
-        $filesystem = new s3_file_system_ArtefactTypeFile();
-        $puller = new puller($filesystem, $config);
-        $candidateids = $puller->get_candidate_objects();
-        $puller->execute($candidateids);
-//        } else {
-//            log_debug(get_string('not_enabled', 'module_objectfs'));
-//        }
+        if (isset($config->enabletasks) && $config->enabletasks) {
+            $filesystem = new s3_file_system_ArtefactTypeFile();
+            $puller = new puller($filesystem, $config);
+            $candidateids = $puller->get_candidate_objects();
+            $puller->execute($candidateids);
+        } else {
+            log_debug(get_string('not_enabled', 'module_objectfs'));
+        }
     }
 
     /**
@@ -470,20 +468,19 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
         require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/deleter.php');
 
-        //$config = get_objectfs_config();
-        $config = new stdClass();
+        $config = get_objectfs_config();
 
         $timestamp = date('Y-m-d H:i:s');
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
-//        if (isset($config->enabletasks) && $config->enabletasks) {
-        $filesystem = new s3_file_system_ArtefactTypeFile();
-        $deleter = new deleter($filesystem, $config);
-        $candidateids = $deleter->get_candidate_objects();
-        $deleter->execute($candidateids);
-//        } else {
-//            log_debug(get_string('not_enabled', 'module_objectfs'));
-//        }
+        if (isset($config->enabletasks) && $config->enabletasks) {
+            $filesystem = new s3_file_system_ArtefactTypeFile();
+            $deleter = new deleter($filesystem, $config);
+            $candidateids = $deleter->get_candidate_objects();
+            $deleter->execute($candidateids);
+        } else {
+            log_debug(get_string('not_enabled', 'module_objectfs'));
+        }
     }
 
 }

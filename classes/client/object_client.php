@@ -12,7 +12,7 @@ namespace module_objectfs\client;
 
 defined('INTERNAL') || die();
 
-/*interface object_client {
+interface object_client {
     public function __construct($config);
     public function register_stream_wrapper();
     public function get_remote_md5_from_id($contentid);
@@ -20,7 +20,7 @@ defined('INTERNAL') || die();
     public function verify_remote_object($contentid, $localpath);
     public function test_connection();
     public function permissions_check();
-}*/
-interface object_client {
-    public function __construct();
 }
+/*interface object_client {
+    public function __construct();
+}*/

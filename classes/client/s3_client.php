@@ -29,20 +29,11 @@ class s3_client implements object_client {
     protected $client;
     protected $bucket;
 
-/*    public function __construct($config) {
+    public function __construct($config) {
         $this->bucket = $config->bucket;
         $this->client = S3Client::factory(array(
             'credentials' => array('key' => $config->key, 'secret' => $config->secret),
             'region' => $config->region,
-            'version' => AWS_API_VERSION
-        ));
-    }*/
-
-    public function __construct() {
-        $this->bucket = 'testmahara';
-        $this->client = S3Client::factory(array(
-            'credentials' => array('key' => 'AKIAIRPBEPF7TC7CLZXQ', 'secret' => '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'),
-            'region' => 'ap-southeast-2',
             'version' => AWS_API_VERSION
         ));
     }

@@ -42,8 +42,8 @@ class pusher extends manipulator {
      */
     public function __construct($filesystem, $config) {
         parent::__construct($filesystem, $config);
-//        $this->sizethreshold = $config->sizethreshold;
-//        $this->minimumage = $config->minimumage;
+        $this->sizethreshold = $config->sizethreshold;
+        $this->minimumage = $config->minimumage;
     }
 
     /**
@@ -56,7 +56,7 @@ class pusher extends manipulator {
      * @return array candidate contentids
      */
     public function get_candidate_objects() {
-/*        $sql = 'SELECT af.artefact,
+        $sql = 'SELECT af.artefact,
                        MAX(af.size) AS filesize
                   FROM {artefact_file_files} af
              LEFT JOIN {artefact} a ON af.artefact = a.id
@@ -77,31 +77,17 @@ class pusher extends manipulator {
         $params = array($maxcreatedtimestamp, $this->sizethreshold, OBJECT_LOCATION_LOCAL);
 
         $starttime = time();
-        $files = get_records_sql_array($sql, $params); // This might need adjustment for mahara.
+        $files = get_records_sql_array($sql, $params);
         $duration = time() - $starttime;
         $count = count($files);
 
         $logstring = "File pusher query took $duration seconds to find $count files \n";
         log_debug($logstring);
-        return $files;*/
-        $sql = 'SELECT af.artefact,
-                       MAX(af.size) AS filesize
-                  FROM {artefact_file_files} af
-             LEFT JOIN {artefact} a ON af.artefact = a.id
-             LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
-              GROUP BY af.artefact,
-                       af.size,
-                       o.location';
 
-        $params = array();
+        if ($files == false ) {
+            $files = array();
+        }
 
-        $starttime = time();
-        $files = get_records_sql_array($sql, $params); // This might need adjustment for mahara.
-        $duration = time() - $starttime;
-        $count = count($files);
-
-        $logstring = "File pusher query took $duration seconds to find $count files \n";
-        log_debug($logstring);
         return $files;
     }
 

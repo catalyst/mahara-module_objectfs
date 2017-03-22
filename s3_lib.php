@@ -44,11 +44,11 @@ function set_objectfs_config($config) {
 
 function get_objectfs_config() {
     $config = new stdClass;
-    $config->enabletasks = 0;
-    $config->key = '';
-    $config->secret = '';
-    $config->bucket = '';
-    $config->region = 'us-east-1';
+    $config->enabletasks = 1; // hard coded!!!!!!!!!!!!!!
+    $config->key = 'AKIAIRPBEPF7TC7CLZXQ'; // hard coded!!!!!!!!!!!!!!
+    $config->secret = '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'; // hard coded!!!!!!!!!!!!!!
+    $config->bucket = 'testmahara'; // hard coded!!!!!!!!!!!!!!
+    $config->region = 'ap-southeast-2'; // hard coded!!!!!!!!!!!!!!default should be different?
     $config->sizethreshold = 1024 * 10;
     $config->minimumage = 7 * 24 * 60 * 60;
     $config->deletelocal = 0;
