@@ -57,13 +57,17 @@ class pusher extends manipulator {
      */
     public function get_candidate_objects() {
         $sql = 'SELECT af.artefact,
-                       MAX(af.size) AS filesize
+                       MAX(af.size) AS filesize,
+                       a.title,
+                       o.contenthash
                   FROM {artefact_file_files} af
              LEFT JOIN {artefact} a ON af.artefact = a.id
              LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
               GROUP BY af.artefact,
                        af.size,
-                       o.location
+                       o.location,
+                       a.title,
+                       o.contenthash
                 HAVING MIN(a.ctime) <= ?
                        AND MAX(af.size) > ?
                        AND MAX(af.size) < 5000000000
@@ -106,7 +110,11 @@ class pusher extends manipulator {
                 break;
             }
 
-            $success = $this->filesystem->copy_object_from_local_to_remote_by_id($file->artefact);
+            if (is_null($file->contenthash)) {
+                $contenthash = hash('sha256', $file->title); // Not sure??????????
+            }
+
+            $success = $this->filesystem->copy_object_from_local_to_remote_by_id($file->artefact, $contenthash);
 
             if ($success) {
                 $location = OBJECT_LOCATION_DUPLICATED;
@@ -114,7 +122,7 @@ class pusher extends manipulator {
                 $location = $this->filesystem->get_actual_object_location_by_id($file->artefact);
             }
 
-            update_object_record($file->artefact, $location);
+            update_object_record($file->artefact, $location, $contenthash);
 
             $objectcount++;
             $totalfilesize += $file->filesize;

@@ -49,6 +49,48 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         return array();
     }
 
+    public static function can_be_disabled() {
+        return false;
+    }
+
+    public static function is_usable() {
+        return true;
+    }
+
+    public static function get_event_subscriptions() {
+        return array();
+    }
+
+    public static function get_activity_types() {
+        return array();
+    }
+
+    public static function postinst($fromversion) {
+        $t = new StdClass;
+        $t->name = 'file_s3_file_system';
+        $t->plugin = 'file';
+
+        if (!record_exists('artefact_installed_type', 'plugin', $t->name, 'name', $t->plugin)) {
+            insert_record('artefact_installed_type', $t);
+        }
+    }
+
+    public static function menu_items() { // All these default methods need some sense??????????
+        return array();
+    }
+
+    public static function admin_menu_items() {
+        return array();
+    }
+
+    /**
+     * Is plugin deprecated - going to be obsolete / removed
+     * @return bool
+     */
+    public static function is_deprecated() {
+        return false;
+    }
+
     public function __construct() {
         parent::__construct(); // Setup filedir.
 
@@ -58,6 +100,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         $this->remoteclient->register_stream_wrapper();
 
         $this->preferremote = $config->preferremote;
+        unset($this->dirty); // Why I need to do this, otherwise it will try to update artefact table in commit()???
     }
 
     protected abstract function get_remote_client($config);
@@ -105,6 +148,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                 update_object_record($contentid, OBJECT_LOCATION_DUPLICATED);
             }
         }
+
+        unset($this->dirty);
 
         return $path;
     }
@@ -230,7 +275,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             $localpath = $this->get_local_path_from_id($contentid);
             $remotepath = $this->get_remote_path_from_id($contentid);
 
-            $objectlock = $this->acquire_object_lock($contentid); // Dunno for mahara so far
+            $objectlock = $this->acquire_object_lock($contentid);
 
             // Lock is still held by something.
             if (!$objectlock) {
@@ -255,6 +300,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     public function delete_object_from_local_by_id($contentid) {
         $location = $this->get_actual_object_location_by_id($contentid);
 
+        unset($this->dirty);
         // Already deleted.
         if ($location === OBJECT_LOCATION_REMOTE) {
             return true;
@@ -282,7 +328,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * @param \ArtefactTypeFile $file The file to serve.
      * @return void
      */
-    public function readfile(\ArtefactTypeFile $file) {
+    public function serve_file(\ArtefactTypeFile $file) {
         $path = $this->get_object_path_from_storedfile($file);
         readfile_allow_large($path, $file->describe_size());
     }
@@ -428,7 +474,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
         if (isset($config->enabletasks) && $config->enabletasks) {
-            $filesystem = new s3_file_system_ArtefactTypeFile();
+            $filesystem = new ArtefactTypeFile_s3_file_system();
             $pusher = new pusher($filesystem, $config);
             $candidateids = $pusher->get_candidate_objects();
             $pusher->execute($candidateids);
@@ -451,7 +497,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
         if (isset($config->enabletasks) && $config->enabletasks) {
-            $filesystem = new s3_file_system_ArtefactTypeFile();
+            $filesystem = new ArtefactTypeFile_s3_file_system();
             $puller = new puller($filesystem, $config);
             $candidateids = $puller->get_candidate_objects();
             $puller->execute($candidateids);
@@ -474,7 +520,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
         if (isset($config->enabletasks) && $config->enabletasks) {
-            $filesystem = new s3_file_system_ArtefactTypeFile();
+            $filesystem = new ArtefactTypeFile_s3_file_system();
             $deleter = new deleter($filesystem, $config);
             $candidateids = $deleter->get_candidate_objects();
             $deleter->execute($candidateids);

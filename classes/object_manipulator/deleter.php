@@ -44,9 +44,8 @@ class deleter extends manipulator {
      */
     public function __construct($filesystem, $config) {
         parent::__construct($filesystem, $config);
-//        $this->consistencydelay = $config->consistencydelay;
-//        $this->deletelocal = $config->deletelocal;
-        $this->deletelocal = 1;
+        $this->consistencydelay = $config->consistencydelay;
+        $this->deletelocal = $config->deletelocal;
     }
 
     /**
@@ -63,7 +62,7 @@ class deleter extends manipulator {
             return array();
         }
 
-        $sql = 'SELECT af.artefact,
+/*        $sql = 'SELECT af.artefact,
                        MAX(af.size) AS filesize
                   FROM {artefact_file_files} af
              LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
@@ -74,7 +73,18 @@ class deleter extends manipulator {
                        o.location';
 
         $consistancythrehold = time() - $this->consistencydelay;
-        $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED);
+        $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED);*/
+
+        $sql = 'SELECT af.artefact,
+                       MAX(af.size) AS filesize
+                  FROM {artefact_file_files} af
+             LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
+                           GROUP BY af.artefact,
+                       af.size,
+                       o.location';
+
+        $params = array();
+
 
         $starttime = time();
         $files = get_records_sql_array($sql, $params);

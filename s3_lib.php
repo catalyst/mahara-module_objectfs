@@ -19,14 +19,15 @@ define('OBJECTFS_REPORT_OBJECT_LOCATION', 0);
 define('OBJECTFS_REPORT_LOG_SIZE', 1);
 define('OBJECTFS_REPORT_MIME_TYPE', 2);
 
-function update_object_record($contentid, $location) {
+function update_object_record($contentid, $location, $contenthash) {
 
     $logrecord = new \stdClass();
     $logrecord->contentid = $contentid;
     $logrecord->timeduplicated = time();
     $logrecord->location = $location;
+    $logrecord->contenthash = $contenthash;
 
-    $existing = get_record('module_objectfs_objects', 'contentid', $contentid);
+    $existing = get_record('module_objectfs_objects', 'contentid', $contentid); // should it be hash????????
 
     if ($existing) {
         $logrecord->id = $existing->id;
@@ -44,14 +45,14 @@ function set_objectfs_config($config) {
 
 function get_objectfs_config() {
     $config = new stdClass;
-    $config->enabletasks = 1; // hard coded!!!!!!!!!!!!!!
+    $config->enabletasks = 0; // hard coded!!!!!!!!!!!!!!
     $config->key = 'AKIAIRPBEPF7TC7CLZXQ'; // hard coded!!!!!!!!!!!!!!
     $config->secret = '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'; // hard coded!!!!!!!!!!!!!!
     $config->bucket = 'testmahara'; // hard coded!!!!!!!!!!!!!!
     $config->region = 'ap-southeast-2'; // hard coded!!!!!!!!!!!!!!default should be different?
-    $config->sizethreshold = 1024 * 10;
-    $config->minimumage = 7 * 24 * 60 * 60;
-    $config->deletelocal = 0;
+    $config->sizethreshold = 1024; // hardcoded!!!
+    $config->minimumage = 60; //7 * 24 * 60 * 60;
+    $config->deletelocal = 0; // hardcoded!!!!!!!
     $config->consistencydelay = 10 * 60;
     $config->maxtaskruntime = 60;
     $config->logging = 0;

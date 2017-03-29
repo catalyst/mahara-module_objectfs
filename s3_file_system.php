@@ -37,7 +37,7 @@ require_once($CFG->docroot . 'module/objectfs/classes/client/s3_client.php');
 
 use module_objectfs\client\s3_client;
 
-class s3_file_system_ArtefactTypeFile extends PluginModuleObjectfs {
+class ArtefactTypeFile_s3_file_system extends PluginModuleObjectfs {
 
     protected function get_remote_client($config) {
         $s3client = new s3_client($config);
