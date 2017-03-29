@@ -19,13 +19,15 @@ define('OBJECTFS_REPORT_OBJECT_LOCATION', 0);
 define('OBJECTFS_REPORT_LOG_SIZE', 1);
 define('OBJECTFS_REPORT_MIME_TYPE', 2);
 
-function update_object_record($contentid, $location, $contenthash) {
+function update_object_record($contentid, $location, $contenthash = null) {
 
     $logrecord = new \stdClass();
     $logrecord->contentid = $contentid;
     $logrecord->timeduplicated = time();
     $logrecord->location = $location;
-    $logrecord->contenthash = $contenthash;
+    if ($contenthash) {
+        $logrecord->contenthash = $contenthash;
+    }
 
     $existing = get_record('module_objectfs_objects', 'contentid', $contentid); // should it be hash????????
 
@@ -52,7 +54,7 @@ function get_objectfs_config() {
     $config->region = 'ap-southeast-2'; // hard coded!!!!!!!!!!!!!!default should be different?
     $config->sizethreshold = 1024; // hardcoded!!!
     $config->minimumage = 60; //7 * 24 * 60 * 60;
-    $config->deletelocal = 0; // hardcoded!!!!!!!
+    $config->deletelocal = 1; // hardcoded!!!!!!!
     $config->consistencydelay = 10 * 60;
     $config->maxtaskruntime = 60;
     $config->logging = 0;

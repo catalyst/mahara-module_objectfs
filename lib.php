@@ -11,8 +11,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//namespace module_objectfs;
-
 defined('INTERNAL') || die();
 
 global $CFG;
@@ -75,7 +73,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         }
     }
 
-    public static function menu_items() { // All these default methods need some sense??????????
+    public static function menu_items() { // All these default methods need to make some sense, need them to install plugin, some mahara stuff??????????
         return array();
     }
 
@@ -92,7 +90,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     }
 
     public function __construct() {
-        parent::__construct(); // Setup filedir.
+        parent::__construct(-1, array("id" => -1)); // Setup filedir. // This should be fixed properly, need file id before creating filesystem
 
         $config = get_objectfs_config();
 
@@ -100,7 +98,6 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         $this->remoteclient->register_stream_wrapper();
 
         $this->preferremote = $config->preferremote;
-        unset($this->dirty); // Why I need to do this, otherwise it will try to update artefact table in commit()???
     }
 
     protected abstract function get_remote_client($config);
@@ -148,8 +145,6 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                 update_object_record($contentid, OBJECT_LOCATION_DUPLICATED);
             }
         }
-
-        unset($this->dirty);
 
         return $path;
     }
@@ -300,7 +295,6 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     public function delete_object_from_local_by_id($contentid) {
         $location = $this->get_actual_object_location_by_id($contentid);
 
-        unset($this->dirty);
         // Already deleted.
         if ($location === OBJECT_LOCATION_REMOTE) {
             return true;

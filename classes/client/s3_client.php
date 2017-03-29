@@ -43,7 +43,7 @@ class s3_client implements object_client {
         $this->client->registerStreamWrapper();
     }
 
-    public function get_remote_md5_from_id($contentid) {
+    public function get_remote_md5_from_id($contentid) { // This needs to be fixed, no hash for mahara
         try {
             $key = $this->get_remote_filepath_from_id($contentid);
             $result = $this->client->headObject(array(
@@ -58,7 +58,7 @@ class s3_client implements object_client {
         return $md5;
     }
 
-    public function verify_remote_object($contentid, $localpath) {
+    public function verify_remote_object($contentid, $localpath) { // This needs to be fixed, no hash for mahara
         $localmd5 = md5_file($localpath);
         $remotemd5 = $this->get_remote_md5_from_id($contentid);
         if ($localmd5 === $remotemd5) {
