@@ -63,6 +63,86 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         return array();
     }
 
+    public static function has_config() {
+        return true;
+    }
+
+    public static function get_config_options() {
+
+        $regionoptions = array( 'us-east-1'          => 'us-east-1',
+                                'us-east-2'         => 'us-east-2',
+                                'us-west-1'         => 'us-west-1',
+                                'us-west-2'         => 'us-west-2',
+                                'ap-northeast-2'    => 'ap-northeast-2',
+                                'ap-southeast-1'    => 'ap-southeast-1',
+                                'ap-southeast-2'    => 'ap-southeast-2',
+                                'ap-northeast-1'    => 'ap-northeast-1',
+                                'eu-central-1'      => 'eu-central-1',
+                                'eu-west-1'         => 'eu-west-1');
+
+        $config = array(
+            'elements' => array(
+                'sizethreshold' => array(
+                    'title'        => get_string('settings:sizethreshold', 'module.objectfs'),
+                    'description'  => get_string('settings:sizethreshold_help', 'module.objectfs'),
+                    'type'         => 'text',
+                ),
+                'minimumage' => array(
+                    'title'        => get_string('settings:minimumage', 'module.objectfs'),
+                    'description'  => get_string('settings:minimumage_help', 'module.objectfs'),
+                    'type'         => 'text',
+                ),
+                'deletelocal' => array(
+                    'title'        => get_string('settings:deletelocal', 'module.objectfs'),
+                    'description'  => get_string('settings:deletelocal_help', 'module.objectfs'),
+                    'type'         => 'checkbox',
+                ),
+                'consistencydelay' => array(
+                    'title'        => get_string('settings:consistencydelay', 'module.objectfs'),
+                    'description'  => get_string('settings:consistencydelay_help', 'module.objectfs'),
+                    'type'         => 'text',
+                ),
+                'key' => array(
+                    'title'        => get_string('settings:key', 'module.objectfs'),
+                    'description'  => get_string('settings:key_help', 'module.objectfs'),
+                    'type'         => 'text',
+                ),
+                'secret' => array(
+                    'title'        => get_string('settings:secret', 'module.objectfs'),
+                    'description'  => get_string('settings:secret_help', 'module.objectfs'),
+                    'type'         => 'text',
+                ),
+                'bucket' => array(
+                    'title'        => get_string('settings:bucket', 'module.objectfs'),
+                    'description'  => get_string('settings:bucket_help', 'module.objectfs'),
+                    'type'         => 'text',
+                ),
+                'region' => array(
+                    'title'        => get_string('settings:region', 'module.objectfs'),
+                    'description'  => get_string('settings:region_help', 'module.objectfs'),
+                    'type'         => 'select',
+                    'options'     => $regionoptions,
+                ),
+            ),
+        );
+
+        return $config;
+    }
+
+    public static function validate_config_options($form, $values) {
+    }
+
+    public static function save_config_options(Pieform $form, $values) {
+        set_config_plugin('module', 'objectfs', 'sizethreshold', $values['sizethreshold']);
+        set_config_plugin('module', 'objectfs', 'minimumage', $values['minimumage']);
+        set_config_plugin('module', 'objectfs', 'deletelocal', $values['deletelocal']);
+        set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
+        set_config_plugin('module', 'objectfs', 'key', $values['key']);
+        set_config_plugin('module', 'objectfs', 'secret', $values['secret']);
+        set_config_plugin('module', 'objectfs', 'bucket', $values['bucket']);
+        set_config_plugin('module', 'objectfs', 'region', $values['region']);
+    }
+
     public static function postinst($fromversion) {
         $t = new StdClass;
         $t->name = 'file_s3_file_system';

@@ -47,24 +47,29 @@ function set_objectfs_config($config) {
 
 function get_objectfs_config() {
     $config = new stdClass;
-    $config->enabletasks = 0; // hard coded!!!!!!!!!!!!!!
-    $config->key = 'AKIAIRPBEPF7TC7CLZXQ'; // hard coded!!!!!!!!!!!!!!
-    $config->secret = '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'; // hard coded!!!!!!!!!!!!!!
-    $config->bucket = 'testmahara'; // hard coded!!!!!!!!!!!!!!
-    $config->region = 'ap-southeast-2'; // hard coded!!!!!!!!!!!!!!default should be different?
-    $config->sizethreshold = 1024; // hardcoded!!!
-    $config->minimumage = 60; //7 * 24 * 60 * 60;
-    $config->deletelocal = 1; // hardcoded!!!!!!!
+    $config->enabletasks = 0;
+    $config->key = '';
+    $config->secret = '';
+    $config->bucket = '';
+    $config->region = 'ap-southeast-2';
+    $config->sizethreshold = 1024 * 10;
+    $config->minimumage = 7 * 24 * 60 * 60;
+    $config->deletelocal = 0;
     $config->consistencydelay = 10 * 60;
     $config->maxtaskruntime = 60;
     $config->logging = 0;
     $config->preferremote = 0;
 
-    $storedconfig = get_config('module_objectfs'); // Needs to be adjusted to mahara
+    $keys = array('enabletasks', 'key', 'secret', 'bucket', 'region', 'sizethreshold', 'minimumage',
+        'deletelocal', 'consistencydelay', 'maxtaskruntime', 'logging', 'preferredmode');
+
+    foreach ($keys as $key) {
+        $storedconfig->$key = get_config_plugin('module', 'objectfs', $key);
+    }
 
     // Override defaults if set.
-//    foreach ($storedconfig as $key => $value) {
-//        $config->$key = $value;
-//    }
+    foreach ($storedconfig as $key => $value) {
+        $config->$key = $value;
+    }
     return $config;
 }
