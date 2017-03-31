@@ -63,13 +63,32 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         return array();
     }
 
+    /**
+     * API-Function: Add a menu item for site admin users.
+     */
+    public static function admin_menu_items() {
+        if (!is_plugin_active('objectfs', 'module')) {
+            return array();
+        }
+        $items['adminhome/objectfs'] = array(
+            'path'   => 'adminhome/objectfs',
+            'url'    => 'module/objectfs/objectfs.php',
+            'title'  => get_string('object_status:page', 'module.objectfs'),
+            'weight' => 40,
+        );
+        if (defined('MENUITEM') && isset($items[MENUITEM])) {
+            $items[MENUITEM]['selected'] = true;
+        }
+        return $items;
+    }
+
     public static function has_config() {
         return true;
     }
 
     public static function get_config_options() {
 
-        $regionoptions = array( 'us-east-1'          => 'us-east-1',
+        $regionoptions = array( 'us-east-1'         => 'us-east-1',
                                 'us-east-2'         => 'us-east-2',
                                 'us-west-1'         => 'us-west-1',
                                 'us-west-2'         => 'us-west-2',
@@ -154,10 +173,6 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     }
 
     public static function menu_items() { // All these default methods need to make some sense, need them to install plugin, some mahara stuff??????????
-        return array();
-    }
-
-    public static function admin_menu_items() {
         return array();
     }
 
