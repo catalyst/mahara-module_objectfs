@@ -101,6 +101,10 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         $config = array(
             'elements' => array(
+                'report' => array(
+                    'type'         => 'html',
+                    'value'        => '<a href="/module/objectfs/objectfs.php">Object status</a>',
+                ),
                 'sizethreshold' => array(
                     'title'        => get_string('settings:sizethreshold', 'module.objectfs'),
                     'description'  => get_string('settings:sizethreshold_help', 'module.objectfs'),

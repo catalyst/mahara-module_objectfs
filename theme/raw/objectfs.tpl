@@ -36,6 +36,9 @@
           <td>{$sitedata.error.objectsum|display_size}</td>
         </tr>
 
+        <tr>
+          <td><a href="{$WWWROOT}admin/extensions/pluginconfig.php?plugintype=module&pluginname=objectfs">Settings</a></td>
+        </tr>
       </table>
 
     </div>
