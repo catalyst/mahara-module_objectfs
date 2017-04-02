@@ -22,6 +22,9 @@ $locations = array('local'      => OBJECT_LOCATION_LOCAL,
                    'remote'     => OBJECT_LOCATION_REMOTE,
                    'error'      => OBJECT_LOCATION_ERROR);
 
+$totalcount = 0;
+$totalsum = 0;
+
 foreach ($locations as $key => $value) {
 
     if ($value == OBJECT_LOCATION_LOCAL) {
@@ -43,7 +46,13 @@ foreach ($locations as $key => $value) {
     $sitedata[$key]['objectcount'] = $result->objectcount;
     $sitedata[$key]['objectsum'] = $result->objectsum;
 
+    $totalcount += $result->objectcount;
+    $totalsum += $result->objectsum;
+
 }
+
+$sitedata['totalcount'] = $totalcount;
+$sitedata['totalsum'] = $totalsum;
 
 $sitedata['name'] = 'Mahara';
 

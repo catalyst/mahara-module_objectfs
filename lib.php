@@ -123,6 +123,18 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'type'         => 'checkbox',
                     'defaultvalue' => get_config_plugin('module', 'objectfs', 'deletelocal'),
                 ),
+                'enabletasks' => array(
+                    'title'        => get_string('settings:enabletasks', 'module.objectfs'),
+                    'description'  => get_string('settings:enabletasks_help', 'module.objectfs'),
+                    'type'         => 'checkbox',
+                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'enabletasks'),
+                ),
+                'maxtaskruntime' => array(
+                    'title'        => get_string('settings:maxtaskruntime', 'module.objectfs'),
+                    'description'  => get_string('settings:maxtaskruntime_help', 'module.objectfs'),
+                    'type'         => 'text',
+                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'maxtaskruntime'),
+                ),
                 'consistencydelay' => array(
                     'title'        => get_string('settings:consistencydelay', 'module.objectfs'),
                     'description'  => get_string('settings:consistencydelay_help', 'module.objectfs'),

@@ -63,6 +63,7 @@ function get_objectfs_config() {
     $keys = array('enabletasks', 'key', 'secret', 'bucket', 'region', 'sizethreshold', 'minimumage',
         'deletelocal', 'consistencydelay', 'maxtaskruntime', 'logging', 'preferredmode');
 
+    $storedconfig = new stdClass();
     foreach ($keys as $key) {
         $storedconfig->$key = get_config_plugin('module', 'objectfs', $key);
     }

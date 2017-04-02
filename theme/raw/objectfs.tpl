@@ -37,6 +37,12 @@
         </tr>
 
         <tr>
+          <td>{str tag=object_status:location:total section=module.objectfs}</td>
+          <td>{$sitedata.totalcount}</td>
+          <td>{$sitedata.totalsum|display_size}</td>
+        </tr>
+
+        <tr>
           <td><a href="{$WWWROOT}admin/extensions/pluginconfig.php?plugintype=module&pluginname=objectfs">Settings</a></td>
         </tr>
       </table>
