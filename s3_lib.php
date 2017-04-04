@@ -70,7 +70,9 @@ function get_objectfs_config() {
 
     // Override defaults if set.
     foreach ($storedconfig as $key => $value) {
-        $config->$key = $value;
+        if ($value) {
+            $config->$key = $value;
+        }
     }
     return $config;
 }

@@ -179,6 +179,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'sizethreshold', $values['sizethreshold']);
         set_config_plugin('module', 'objectfs', 'minimumage', $values['minimumage']);
         set_config_plugin('module', 'objectfs', 'deletelocal', $values['deletelocal']);
+        set_config_plugin('module', 'objectfs', 'maxtaskruntime', $values['maxtaskruntime']);
         set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
         set_config_plugin('module', 'objectfs', 'key', $values['key']);
         set_config_plugin('module', 'objectfs', 'secret', $values['secret']);
@@ -249,21 +250,11 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      *
      * The $fetchifnotfound allows you to determine the expected path of the file.
      *
-     * @param int $contentid The content id
      * @param bool $fetchifnotfound Whether to attempt to fetch from the remote path if not found.
      * @return string The full path to the content file
      */
-    protected function get_local_path_from_id($contentid, $fetchifnotfound = false) {
-        $path = parent::get_path();
-
-        if ($fetchifnotfound && !is_readable($path)) {
-            $fetched = $this->copy_object_from_remote_to_local_by_id($contentid);
-
-            if ($fetched) {
-                // We want this file to be deleted again later.
-                update_object_record($contentid, OBJECT_LOCATION_DUPLICATED);
-            }
-        }
+    protected function get_local_path_from_id($fetchifnotfound = null) {
+        $path = parent::get_path($fetchifnotfound);
 
         return $path;
     }
@@ -298,7 +289,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
     public function get_actual_object_location_by_id($contentid) {
         $this->set('fileid', $contentid);
-        $localpath = $this->get_path();
+        $localpath = $this->get_local_path_from_id(2); // fix this !!!!!!!!!!1
         $remotepath = $this->get_remote_path_from_id($contentid);
 
         $localreadable = is_readable($localpath);
@@ -351,7 +342,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         if ($location === OBJECT_LOCATION_REMOTE) {
 
-            $localpath = $this->get_local_path_from_id($contentid);
+            $localpath = $this->get_local_path_from_id(2);
             $remotepath = $this->get_remote_path_from_id($contentid);
 
             $objectlock = $this->acquire_object_lock($contentid);
@@ -362,7 +353,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             }
 
             // While waiting for lock, file was moved.
-            if (is_readable($localpath)) {
+            if (($localpath !== $remotepath) && is_readable($localpath)) {
                 $this->release_object_lock($contentid);
                 return true;
             }
@@ -386,7 +377,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         if ($location === OBJECT_LOCATION_LOCAL) {
 
-            $localpath = $this->get_local_path_from_id($contentid);
+            $localpath = $this->get_local_path_from_id();
             $remotepath = $this->get_remote_path_from_id($contentid);
 
             $objectlock = $this->acquire_object_lock($contentid);
@@ -422,7 +413,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         // We want to be very sure it is remote if we're deleting objects.
         // There is no going back.
         if ($location === OBJECT_LOCATION_DUPLICATED) {
-            $localpath = $this->get_local_path_from_id($contentid);
+            $localpath = $this->get_local_path_from_id();
             $objectvalid = $this->remoteclient->verify_remote_object($contentid, $localpath);
             if ($objectvalid) {
                 return unlink($localpath);
@@ -526,7 +517,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         $trashpath  = $this->get_trash_fulldir_from_id($contentid);
         $trashfile  = $this->get_trash_fullpath_from_id($contentid);
-        $contentfile = $this->get_local_path_from_id($contentid);
+        $contentfile = $this->get_local_path_from_id();
 
         if (!is_dir($trashpath)) {
             mkdir($trashpath, $this->dirpermissions, true);
