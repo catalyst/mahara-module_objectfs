@@ -63,8 +63,10 @@ $string['settings:maxtaskruntime_help'] = 'Background tasks handle the transfer 
 $string['settings:preferremote'] = 'Prefer remote objects';
 $string['settings:preferremote_help'] = 'If a file is stored both locally and in remote object storage, read from remote. This is setting is mainly for testing purposes and introduces overhead to check the location.';
 
+$string['settings:connection'] = 'Test connection to the AWS S3 bucket.';
 $string['settings:connectionsuccess'] = 'Could establish connection to the AWS S3 bucket.';
 $string['settings:connectionfailure'] = 'Could not establish connection to the AWS S3 bucket.';
+$string['settings:permissions'] = 'Test file permissions in the AWS S3 bucket.';
 $string['settings:writefailure'] = 'Could not write object to the S3 bucket. ';
 $string['settings:readfailure'] = 'Could not read object from the S3 bucket. ';
 $string['settings:deletesuccess'] = 'Could delete object from the S3 bucket - It is not recommended for the AWS user to have delete permissions. ';

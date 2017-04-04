@@ -19,6 +19,7 @@ require_once($CFG->docroot . 'module/objectfs/s3_lib.php');
 require_once($CFG->docroot . 'artefact/lib.php');
 require_once($CFG->docroot . 'artefact/file/lib.php');
 
+use module_objectfs\client\s3_client;
 use module_objectfs\object_manipulator\pusher;
 use module_objectfs\object_manipulator\puller;
 use module_objectfs\object_manipulator\deleter;
@@ -87,6 +88,50 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     }
 
     public static function get_config_options() {
+        global $CFG;
+        require_once($CFG->docroot . 'module/objectfs/classes/client/s3_client.php');
+
+        $configtemp = get_objectfs_config();
+
+        if (isset($_POST)) {
+            foreach ($_POST as $key => $value) {
+                foreach ($configtemp as $key1 => $value1) {
+                    if ($key == $key1) {
+                        $configtemp->$key1 = $value;
+                    }
+                }
+            }
+        }
+
+        $client = new s3_client($configtemp);
+        $connection = $client->test_connection();
+
+        if ($connection) {
+            $connection = get_string('settings:connectionsuccess', 'module.objectfs');
+            $permissions = $client->permissions_check();
+
+            $errormsg = '';
+            if (!$permissions[AWS_CAN_WRITE_OBJECT]) {
+                $errormsg .= get_string('settings:writefailure', 'module.objectfs');
+            }
+
+            if (!$permissions[AWS_CAN_READ_OBJECT]) {
+                $errormsg .= get_string('settings:readfailure', 'module.objectfs');
+            }
+
+            if ($permissions[AWS_CAN_DELETE_OBJECT]) {
+                $errormsg .= get_string('settings:deletesuccess', 'module.objectfs');
+            }
+
+            if (strlen($errormsg) > 0) {
+                $permissionsmsg = $errormsg;
+            } else {
+                $permissionsmsg = get_string('settings:permissioncheckpassed', 'module.objectfs');
+            }
+
+        } else {
+            $connection = get_string('settings:connectionfailure', 'module.objectfs');
+        }
 
         $regionoptions = array( 'us-east-1'         => 'us-east-1',
                                 'us-east-2'         => 'us-east-2',
@@ -101,6 +146,16 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         $config = array(
             'elements' => array(
+                'connectiontest' => array(
+                    'title'        => get_string('settings:connection', 'module.objectfs'),
+                    'type'         => 'html',
+                    'value' => $connection,
+                ),
+                'permissionstest' => array(
+                    'title'        => get_string('settings:permissions', 'module.objectfs'),
+                    'type'         => 'html',
+                    'value' => $permissionsmsg,
+                ),
                 'report' => array(
                     'type'         => 'html',
                     'value'        => '<a href="/module/objectfs/objectfs.php">Object status</a>',
