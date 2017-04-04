@@ -73,6 +73,10 @@ class deleter extends manipulator {
                        o.location';
 
         $consistancythrehold = time() - $this->consistencydelay;
+
+        // Time created should be converted in D/M/Y format for mahara.
+        $consistancythrehold = db_format_timestamp($consistancythrehold);
+
         $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED);*/
 
         $sql = 'SELECT af.artefact,

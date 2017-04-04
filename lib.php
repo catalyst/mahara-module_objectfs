@@ -289,7 +289,13 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
     public function get_actual_object_location_by_id($contentid) {
         $this->set('fileid', $contentid);
-        $localpath = $this->get_local_path_from_id(2); // fix this !!!!!!!!!!1
+
+        /* This part I don't like, mahara doesn't have is_file_readable_locally_by_hash, only is_readable($filepath)
+        so here we have to use get_path() to check if file is readable and then
+        we use it again in copy_object_from_remote_to_local_by_id
+        */
+
+        $localpath = $this->get_local_path_from_id(2); // This is a bit dodgy!!!!!!!!, see get_path()!
         $remotepath = $this->get_remote_path_from_id($contentid);
 
         $localreadable = is_readable($localpath);
@@ -342,7 +348,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         if ($location === OBJECT_LOCATION_REMOTE) {
 
-            $localpath = $this->get_local_path_from_id(2);
+            $localpath = $this->get_local_path_from_id(2);  // This is a bit dodgy, see get_path()!
             $remotepath = $this->get_remote_path_from_id($contentid);
 
             $objectlock = $this->acquire_object_lock($contentid);
