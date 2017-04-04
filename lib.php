@@ -128,9 +128,16 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             } else {
                 $permissionsmsg = get_string('settings:permissioncheckpassed', 'module.objectfs');
             }
-
+            $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
+                                       'type'  => 'html',
+                                       'value' => $permissionsmsg,
+                );
         } else {
             $connection = get_string('settings:connectionfailure', 'module.objectfs');
+            $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
+                                       'type'  => 'html',
+                                       'value' => $connection,
+            );
         }
 
         $regionoptions = array( 'us-east-1'         => 'us-east-1',
@@ -151,11 +158,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'type'         => 'html',
                     'value' => $connection,
                 ),
-                'permissionstest' => array(
-                    'title'        => get_string('settings:permissions', 'module.objectfs'),
-                    'type'         => 'html',
-                    'value' => $permissionsmsg,
-                ),
+                'permissionstest' => $permissionsoutput,
                 'report' => array(
                     'type'         => 'html',
                     'value'        => '<a href="/module/objectfs/objectfs.php">Object status</a>',
