@@ -62,7 +62,7 @@ class deleter extends manipulator {
             return array();
         }
 
-/*        $sql = 'SELECT af.artefact,
+        $sql = 'SELECT af.artefact,
                        MAX(af.size) AS filesize
                   FROM {artefact_file_files} af
              LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
@@ -74,21 +74,7 @@ class deleter extends manipulator {
 
         $consistancythrehold = time() - $this->consistencydelay;
 
-        // Time created should be converted in D/M/Y format for mahara.
-        $consistancythrehold = db_format_timestamp($consistancythrehold);
-
-        $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED);*/
-
-        $sql = 'SELECT af.artefact,
-                       MAX(af.size) AS filesize
-                  FROM {artefact_file_files} af
-             LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
-                           GROUP BY af.artefact,
-                       af.size,
-                       o.location';
-
-        $params = array();
-
+        $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED);
 
         $starttime = time();
         $files = get_records_sql_array($sql, $params);

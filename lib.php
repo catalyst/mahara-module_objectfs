@@ -237,6 +237,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'sizethreshold', $values['sizethreshold']);
         set_config_plugin('module', 'objectfs', 'minimumage', $values['minimumage']);
         set_config_plugin('module', 'objectfs', 'deletelocal', $values['deletelocal']);
+        set_config_plugin('module', 'objectfs', 'enabletasks', $values['enabletasks']);
         set_config_plugin('module', 'objectfs', 'maxtaskruntime', $values['maxtaskruntime']);
         set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
         set_config_plugin('module', 'objectfs', 'key', $values['key']);
