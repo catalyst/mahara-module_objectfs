@@ -46,6 +46,9 @@ Using this plugin we can configure production to have full read write to the rem
 4. Clone [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws
 4. Install the plugins through the mahara GUI.
 5. Configure the plugin. See [Mahara configuration](#mahara-configuration)
+```
+$cfg->alternative_file_system = 1;
+```
 
 ## Currently supported object stores
 
