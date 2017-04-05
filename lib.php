@@ -151,18 +151,38 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                                 'eu-central-1'      => 'eu-central-1',
                                 'eu-west-1'         => 'eu-west-1');
 
-        $config = array(
+        $config = array();
+
+        $config['generalsettings'] = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:generalheader', 'module.objectfs'),
+            'collapsible' => true,
             'elements' => array(
-                'connectiontest' => array(
-                    'title'        => get_string('settings:connection', 'module.objectfs'),
-                    'type'         => 'html',
-                    'value' => $connection,
-                ),
-                'permissionstest' => $permissionsoutput,
                 'report' => array(
                     'type'         => 'html',
                     'value'        => '<a href="/module/objectfs/objectfs.php">Object status</a>',
                 ),
+                'enabletasks' => array(
+                    'title'        => get_string('settings:enabletasks', 'module.objectfs'),
+                    'description'  => get_string('settings:enabletasks_help', 'module.objectfs'),
+                    'type'         => 'checkbox',
+                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'enabletasks'),
+                ),
+                'maxtaskruntime' => array(
+                    'title'        => get_string('settings:maxtaskruntime', 'module.objectfs'),
+                    'description'  => get_string('settings:maxtaskruntime_help', 'module.objectfs'),
+                    'type'         => 'text',
+                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'maxtaskruntime'),
+                ),
+            ),
+        );
+
+        $config['transfersettings'] = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:filetransferheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => true,
+            'elements' => array(
                 'sizethreshold' => array(
                     'title'        => get_string('settings:sizethreshold', 'module.objectfs'),
                     'description'  => get_string('settings:sizethreshold_help', 'module.objectfs'),
@@ -181,24 +201,27 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'type'         => 'checkbox',
                     'defaultvalue' => get_config_plugin('module', 'objectfs', 'deletelocal'),
                 ),
-                'enabletasks' => array(
-                    'title'        => get_string('settings:enabletasks', 'module.objectfs'),
-                    'description'  => get_string('settings:enabletasks_help', 'module.objectfs'),
-                    'type'         => 'checkbox',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'enabletasks'),
-                ),
-                'maxtaskruntime' => array(
-                    'title'        => get_string('settings:maxtaskruntime', 'module.objectfs'),
-                    'description'  => get_string('settings:maxtaskruntime_help', 'module.objectfs'),
-                    'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'maxtaskruntime'),
-                ),
                 'consistencydelay' => array(
                     'title'        => get_string('settings:consistencydelay', 'module.objectfs'),
                     'description'  => get_string('settings:consistencydelay_help', 'module.objectfs'),
                     'type'         => 'text',
                     'defaultvalue' => get_config_plugin('module', 'objectfs', 'consistencydelay'),
                 ),
+            ),
+        );
+
+        $config['sssfssettings'] = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:filetransferheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => true,
+            'elements' => array(
+                'connectiontest' => array(
+                    'title'        => get_string('settings:connection', 'module.objectfs'),
+                    'type'         => 'html',
+                    'value' => $connection,
+                ),
+                'permissionstest' => $permissionsoutput,
                 'key' => array(
                     'title'        => get_string('settings:key', 'module.objectfs'),
                     'description'  => get_string('settings:key_help', 'module.objectfs'),
@@ -227,7 +250,10 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             ),
         );
 
-        return $config;
+        return array(
+            'elements' => $config,
+        );
+
     }
 
     public static function validate_config_options($form, $values) {
