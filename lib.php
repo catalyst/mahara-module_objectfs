@@ -174,6 +174,12 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'type'         => 'text',
                     'defaultvalue' => get_config_plugin('module', 'objectfs', 'maxtaskruntime'),
                 ),
+                'preferremote' => array(
+                    'title'        => get_string('settings:preferremote', 'module.objectfs'),
+                    'description'  => get_string('settings:preferremote_help', 'module.objectfs'),
+                    'type'         => 'checkbox',
+                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'preferremote'),
+                ),
             ),
         );
 
@@ -264,6 +270,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'minimumage', $values['minimumage']);
         set_config_plugin('module', 'objectfs', 'deletelocal', $values['deletelocal']);
         set_config_plugin('module', 'objectfs', 'enabletasks', $values['enabletasks']);
+        set_config_plugin('module', 'objectfs', 'preferremote', $values['preferremote']);
         set_config_plugin('module', 'objectfs', 'maxtaskruntime', $values['maxtaskruntime']);
         set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
         set_config_plugin('module', 'objectfs', 'key', $values['key']);
@@ -315,14 +322,15 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             }
         }
 
-        if ($this->is_file_readable_locally_by_storedfile($file)) {
-            $path = $this->get_path();
+        $path = $this->get_path(2);  // Dodgy stuff, fix this!!!!!!!
+        if (is_readable($path)) {
+            return $path;
         } else {
             // We assume it is remote, not checking if it's readable.
             $path = $this->get_remote_path_from_storedfile($file);
+            return $path;
         }
 
-        return $path;
     }
 
     /**
@@ -504,7 +512,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         // We want to be very sure it is remote if we're deleting objects.
         // There is no going back.
         if ($location === OBJECT_LOCATION_DUPLICATED) {
-            $localpath = $this->get_local_path_from_id();
+            $localpath = $this->get_local_path_from_id(2); // This is dodgy
             $objectvalid = $this->remoteclient->verify_remote_object($contentid, $localpath);
             if ($objectvalid) {
                 return unlink($localpath);
