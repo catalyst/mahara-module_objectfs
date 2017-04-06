@@ -346,8 +346,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * @param bool $fetchifnotfound Whether to attempt to fetch from the remote path if not found.
      * @return string The full path to the content file
      */
-    protected function get_local_path_from_id($fetchifnotfound = null) {
-        $path = parent::get_path($fetchifnotfound);
+    protected function get_local_path_from_id() {
+        $path = parent::get_local_path();
 
         return $path;
     }
@@ -388,7 +388,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         we use it again in copy_object_from_remote_to_local_by_id
         */
 
-        $localpath = $this->get_local_path_from_id(2); // This is a bit dodgy!!!!!!!!, see get_path()!
+        $localpath = $this->get_local_path_from_id();
         $remotepath = $this->get_remote_path_from_id($contentid);
 
         $localreadable = is_readable($localpath);
@@ -441,7 +441,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         if ($location === OBJECT_LOCATION_REMOTE) {
 
-            $localpath = $this->get_local_path_from_id(2);  // This is a bit dodgy, see get_path()!
+            $localpath = $this->get_local_path_from_id();
             $remotepath = $this->get_remote_path_from_id($contentid);
 
             $objectlock = $this->acquire_object_lock($contentid);

@@ -12,16 +12,37 @@ class objectfs_file_system extends remote_file_system {
         $this->client->register_stream_wrapper();
     }
 
-    public function get_path($fileartifact, $data = array()) {
+    public function get_path($fileartifact, $data = array(), $fetchifnotfound = false) {
         $localpath = $fileartifact->get_local_path($data);
 
-        error_log($this->client->get_remote_fullpath_from_id($fileartifact->get('id')));
         if (is_readable($localpath)) {
             return $localpath;
         }
 
-        return $this->client->get_remote_fullpath_from_id();
+        if ($fetchifnotfound) {
+            $this->ensure_local($fileartifact);
+            return $localpath;
+        } else {
+            return $this->client->get_remote_fullpath_from_id($fileartifact->get('id'));
+        }
     }
+
+    public function ensure_local($fileartifact, $data = array()) {
+        global $CFG;
+        require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
+
+        $temp = new ArtefactTypeFile_s3_file_system();
+        $success = $temp->copy_object_from_remote_to_local_by_id($fileartifact->get('id'));
+
+        if ($success) {
+            $location = OBJECT_LOCATION_DUPLICATED;
+        } else {
+            $location = $temp->get_actual_object_location_by_id($fileartifact->get('id'));
+        }
+
+        update_object_record($fileartifact->get('id'), $location);
+    }
+
 }
 
 
