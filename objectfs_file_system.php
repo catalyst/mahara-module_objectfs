@@ -24,6 +24,7 @@ class objectfs_file_system extends remote_file_system {
 
     public function ensure_local($fileartefact) {
 
+        $fileid = $fileartefact->get('fileid');
         $success = $this->copy_object_from_remote_to_local($fileartefact);
 
         if ($success) {
@@ -32,7 +33,7 @@ class objectfs_file_system extends remote_file_system {
             $location = $this->get_actual_object_location($fileartefact);
         }
 
-        update_object_record($fileartefact->get('id'), $location);
+        update_object_record($fileid, $location);
     }
 
     /**
