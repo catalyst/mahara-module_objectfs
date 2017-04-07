@@ -114,12 +114,13 @@ class pusher extends manipulator {
                 $contenthash = hash('sha256', $file->title); // Not sure??????????
             }
 
-            $success = $this->filesystem->copy_object_from_local_to_remote_by_id($file->artefact, $contenthash);
+            $this->filesystem->set('fileid', $file->artefact);
+            $success = $this->filesystem->get('remotefilesystem')->copy_object_from_local_to_remote($this->filesystem);
 
             if ($success) {
                 $location = OBJECT_LOCATION_DUPLICATED;
             } else {
-                $location = $this->filesystem->get_actual_object_location_by_id($file->artefact);
+                $location = $this->filesystem->get('remotefilesystem')->get_actual_object_location($this->filesystem);
             }
 
             update_object_record($file->artefact, $location, $contenthash);

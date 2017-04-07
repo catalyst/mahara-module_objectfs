@@ -89,12 +89,13 @@ class puller extends manipulator {
                 break;
             }
 
-            $success = $this->filesystem->copy_object_from_remote_to_local_by_id($file->artefact);
+            $this->filesystem->set('fileid', $file->artefact);
+            $success = $this->filesystem->get('remotefilesystem')->copy_object_from_remote_to_local($this->filesystem);
 
             if ($success) {
                 $location = OBJECT_LOCATION_DUPLICATED;
             } else {
-                $location = $this->filesystem->get_actual_object_location_by_id($file->artefact);
+                $location = $this->filesystem->get('remotefilesystem')->get_actual_object_location($this->filesystem);
             }
 
             update_object_record($file->artefact, $location);
