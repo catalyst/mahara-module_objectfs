@@ -1,6 +1,7 @@
 <?php
 
 //require_once(dirname(dirname(dirname(__FILE__))).'/init.php');
+global $CFG;
 require_once($CFG->docroot . '/artefact/file/remote_file_system.php');
 require_once($CFG->docroot . '/module/objectfs/classes/client/s3_client.php');
 
@@ -22,6 +23,26 @@ class objectfs_file_system extends remote_file_system {
         }
     }
 
+    public function is_file_readable_locally($fileartefact, $data = array()) {
+        $localpath = $fileartefact->get_local_path($data);
+
+        if (is_readable($localpath)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function is_file_readable_remotely($fileartefact, $data = array()) {
+        $remotepath = $this->client->get_remote_fullpath_from_id($fileartefact->get('id'));
+
+        if (is_readable($remotepath)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public function ensure_local($fileartefact) {
 
         $fileid = $fileartefact->get('fileid');
@@ -34,6 +55,25 @@ class objectfs_file_system extends remote_file_system {
         }
 
         update_object_record($fileid, $location);
+    }
+
+
+    protected function get_object_path_from_storedfile($file) {
+/*        if ($this->preferremote) {
+            $location = $this->get_actual_object_location_by_hash($file->get_contenthash());
+            if ($location == OBJECT_LOCATION_DUPLICATED) {
+                return $this->get_remote_path_from_storedfile($file);
+            }
+        }*/
+
+        if (is_readable($this->get_local_path_from_id($file))) {
+            $path = $this->get_local_path_from_id($file);
+        } else {
+            // We assume it is remote, not checking if it's readable.
+            $path = $this->get_remote_path_from_id($file->get('fileid'));
+        }
+
+        return $path;
     }
 
     /**
@@ -204,6 +244,43 @@ class objectfs_file_system extends remote_file_system {
         return false;
     }
 
+    /**
+    *   We adjust this method from the parent to never delete remote objects
+    **/
+    public function delete($fileartefact) {
+
+        if (empty($fileartefact)) {
+            return;
+        }
+        $file = $fileartefact->get_path();
+
+        // We never delete remote objects.
+        if (($this->get_actual_object_location($fileartefact) == 1) || ($this->get_actual_object_location($fileartefact) == 2)) {
+            return;
+        }
+
+        if (is_file($file)) {
+            $size = filesize($file);
+            // Only delete the file on disk if no other artefacts point to it
+            if (count_records('artefact_file_files', 'fileid', $fileartefact->get('id')) == 1) {
+                unlink($file);
+            }
+            global $USER;
+            // Deleting other users' files won't lower their quotas yet...
+            if (!$fileartefact->get('institution') && $USER->id == $fileartefact->get('owner')) {
+                $USER->quota_remove($size);
+                $USER->commit();
+            }
+            if (!empty($fileartefact->get('group'))) {
+                require_once('group.php');
+                group_quota_remove($fileartefact->get('group'), $size);
+            }
+        }
+
+        delete_records('artefact_attachment', 'attachment', $fileartefact->get('id'));
+        delete_records('artefact_file_files', 'artefact', $fileartefact->get('id'));
+        delete_records('site_menu', 'file', $fileartefact->get('id'));
+        $fileartefact->delete_local();
+    }
+
 }
-
-

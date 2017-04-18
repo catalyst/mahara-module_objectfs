@@ -110,7 +110,7 @@ class pusher extends manipulator {
                 break;
             }
 
-            if (is_null($file->contenthash)) {
+            if (!isset($file->contenthash) || is_null($file->contenthash)) {
                 $contenthash = hash('sha256', $file->title); // Not sure??????????
             }
 
