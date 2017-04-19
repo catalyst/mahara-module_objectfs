@@ -22,6 +22,9 @@ $string['object_status:location'] = 'Object location';
 $string['object_status:files'] = 'Objects';
 $string['object_status:size'] = 'Total size';
 
+$string['object_status:fileranges'] = 'Object file ranges';
+$string['object_status:mimetypes'] = 'Object mime types';
+
 $string['object_status:location:error'] = 'Missing from filedir and remote storage';
 $string['object_status:location:duplicated'] = 'Duplicated in filedir and remote storage';
 $string['object_status:location:local'] = 'Only in filedir';
