@@ -17,21 +17,24 @@
 /**
  * Object location report builder.
  *
- * @package   tool_objectfs
- * @author    Kenneth Hendricks <kennethhendricks@catalyst-au.net>
+ * @package   module_objectfs
+ * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
  * @copyright Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_objectfs\report;
+namespace module_objectfs\report;
 
-defined('MOODLE_INTERNAL') || die();
+defined('INTERNAL') || die();
+
+require_once($CFG->docroot . '/module/objectfs/classes/report/objectfs_report_builder.php');
 
 class location_report_builder extends objectfs_report_builder {
 
+    function __construct() {
+    }
+
     public function build_report() {
-        global $DB;
-        $report = new objectfs_report('location');
 
         $locations = array(OBJECT_LOCATION_LOCAL,
                            OBJECT_LOCATION_DUPLICATED,
@@ -41,36 +44,38 @@ class location_report_builder extends objectfs_report_builder {
         $totalcount = 0;
         $totalsum = 0;
 
-        foreach ($locations as $location) {
+        foreach ($locations as $key => $value) {
 
-            if ($location == OBJECT_LOCATION_LOCAL) {
+            if ($value == OBJECT_LOCATION_LOCAL) {
                 $localsql = ' or o.location IS NULL';
             } else {
                 $localsql = '';
             }
 
-            $sql = 'SELECT COALESCE(count(sub.contenthash) ,0) AS objectcount,
-                           COALESCE(SUM(sub.filesize) ,0) AS objectsum
-                      FROM (SELECT f.contenthash, MAX(f.filesize) AS filesize
-                              FROM {files} f
-                              LEFT JOIN {tool_objectfs_objects} o on f.contenthash = o.contenthash
-                              GROUP BY f.contenthash, f.filesize, o.location
-                              HAVING o.location = ?' . $localsql .') AS sub
-                     WHERE sub.filesize != 0';
+            $sql = 'SELECT count(sub.artefact) as objectcount, SUM(sub.filesize) as objectsum
+              FROM (SELECT af.artefact, MAX(af.size) AS filesize
+                      FROM artefact_file_files af
+                      LEFT JOIN module_objectfs_objects o on af.artefact = o.contentid
+                      GROUP BY af.artefact, af.size, o.location
+                      HAVING o.location = ?' . $localsql .' ) AS sub 
+              WHERE sub.filesize != 0';
 
-            $result = $DB->get_record_sql($sql, array($location));
+            $result = get_record_sql($sql, array($value));
 
-            $result->datakey = $location;
-
-            $report->add_row($result->datakey, $result->objectcount, $result->objectsum);
+            $sitedata['rows'][$key]['objectcount'] = $result->objectcount;
+            $sitedata['rows'][$key]['objectsum'] = $result->objectsum;
 
             $totalcount += $result->objectcount;
             $totalsum += $result->objectsum;
+
         }
 
-        $report->add_row('total', $totalcount, $totalsum);
+        $sitedata['rows']['total']['objectcount'] = $totalcount;
+        $sitedata['rows']['total']['objectcount'] = $totalsum;
 
-        return $report;
+        $sitedata['reporttype'] = 'location';
+
+        return $sitedata;
     }
 
 }

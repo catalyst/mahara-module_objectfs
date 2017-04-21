@@ -43,8 +43,9 @@ foreach ($locations as $key => $value) {
 
     $result = get_record_sql($sql, array($value));
 
-    $sitedata[$key]['objectcount'] = $result->objectcount;
-    $sitedata[$key]['objectsum'] = $result->objectsum;
+    $sitedata['location'][$key][0] = get_string('object_status:location:' . $key, 'module.objectfs');
+    $sitedata['location'][$key][1] = $result->objectcount;
+    $sitedata['location'][$key][2] = $result->objectsum;
 
     $totalcount += $result->objectcount;
     $totalsum += $result->objectsum;
@@ -53,9 +54,6 @@ foreach ($locations as $key => $value) {
 
 $sitedata['totalcount'] = $totalcount;
 $sitedata['totalsum'] = $totalsum;
-
-$sitedata['name'] = 'Mahara';
-
 
 
 $sql = 'SELECT log as datakey,
@@ -68,10 +66,12 @@ $sql = 'SELECT log as datakey,
 
 $stats = get_records_sql_array($sql);
 
-compress_small_log_sizes($stats);
-foreach ($stats as $key => $value) {
-    $sizerange = get_size_range_from_logsize($value->datakey); // Turn logsize into a byte range.
-    $sitedata['logsize'][$key] = array($sizerange, $value->objectcount, $value->objectsum);
+if ($stats) {
+    compress_small_log_sizes($stats);
+    foreach ($stats as $key => $value) {
+        $sizerange = get_size_range_from_logsize($value->datakey); // Turn logsize into a byte range.
+        $sitedata['logsize'][$key] = array($sizerange, $value->objectcount, $value->objectsum);
+    }
 }
 
 $sql = 'SELECT sum(size) as objectsum, filetype as datakey, count(*) as objectcount
@@ -102,8 +102,10 @@ $sql = 'SELECT sum(size) as objectsum, filetype as datakey, count(*) as objectco
 
 $stats = get_records_sql_array($sql);
 
-foreach ($stats as $key => $value) {
-    $sitedata['mimetypes'][$key] = array($value->datakey, $value->objectcount, $value->objectsum);
+if ($stats) {
+    foreach ($stats as $key => $value) {
+        $sitedata['mimetypes'][$key] = array($value->datakey, $value->objectcount, $value->objectsum);
+    }
 }
 
 $smarty = smarty(array('paginator','js/chartjs/Chart.min.js'));

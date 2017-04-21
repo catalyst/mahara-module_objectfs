@@ -12,29 +12,13 @@
           <th>Objectsum</th>
         </tr>
 
-        <tr>
-          <td>{str tag=object_status:location:local section=module.objectfs}</td>
-          <td>{$sitedata.local.objectcount}</td>
-          <td>{$sitedata.local.objectsum|display_size}</td>
-        </tr>
-
-        <tr>
-          <td>{str tag=object_status:location:external section=module.objectfs}</td>
-          <td>{$sitedata.remote.objectcount}</td>
-          <td>{$sitedata.remote.objectsum|display_size}</td>
-        </tr>
-
-        <tr>
-          <td>{str tag=object_status:location:duplicated section=module.objectfs}</td>
-          <td>{$sitedata.duplicated.objectcount}</td>
-          <td>{$sitedata.duplicated.objectsum|display_size}</td>
-        </tr>
-
-        <tr>
-          <td>{str tag=object_status:location:error section=module.objectfs}</td>
-          <td>{$sitedata.error.objectcount}</td>
-          <td>{$sitedata.error.objectsum|display_size}</td>
-        </tr>
+        {foreach from=$sitedata['location'] key=key item=item}
+          <tr>
+            <td>{$item.0}</td>
+            <td>{$item.1}</td>
+            <td>{$item.2|display_size}</td>
+          </tr>
+        {/foreach}
 
         <tr>
           <td>{str tag=object_status:location:total section=module.objectfs}</td>
@@ -61,9 +45,9 @@
 
         {foreach from=$sitedata['logsize'] key=key item=item}
           <tr>
-            <td>{$sitedata.logsize.$key.0}</td>
-            <td>{$sitedata.logsize.$key.1}</td>
-            <td>{$sitedata.logsize.$key.2}</td>
+            <td>{$item.0}</td>
+            <td>{$item.1}</td>
+            <td>{$item.2|display_size}</td>
           </tr>
         {/foreach}
 
@@ -83,9 +67,9 @@
 
         {foreach from=$sitedata['mimetypes'] key=key item=item}
           <tr>
-            <td>{$sitedata.mimetypes.$key.0}</td>
-            <td>{$sitedata.mimetypes.$key.1}</td>
-            <td>{$sitedata.mimetypes.$key.2}</td>
+            <td>{$item.0}</td>
+            <td>{$item.1}</td>
+            <td>{$item.2|display_size}</td>
           </tr>
         {/foreach}
 

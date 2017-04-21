@@ -244,43 +244,4 @@ class objectfs_file_system extends remote_file_system {
         return false;
     }
 
-    /**
-    *   We adjust this method from the parent to never delete remote objects
-    **/
-    public function delete($fileartefact) {
-
-        if (empty($fileartefact)) {
-            return;
-        }
-        $file = $fileartefact->get_path();
-
-        // We never delete remote objects.
-        if (($this->get_actual_object_location($fileartefact) == 1) || ($this->get_actual_object_location($fileartefact) == 2)) {
-            return;
-        }
-
-        if (is_file($file)) {
-            $size = filesize($file);
-            // Only delete the file on disk if no other artefacts point to it
-            if (count_records('artefact_file_files', 'fileid', $fileartefact->get('id')) == 1) {
-                unlink($file);
-            }
-            global $USER;
-            // Deleting other users' files won't lower their quotas yet...
-            if (!$fileartefact->get('institution') && $USER->id == $fileartefact->get('owner')) {
-                $USER->quota_remove($size);
-                $USER->commit();
-            }
-            if (!empty($fileartefact->get('group'))) {
-                require_once('group.php');
-                group_quota_remove($fileartefact->get('group'), $size);
-            }
-        }
-
-        delete_records('artefact_attachment', 'attachment', $fileartefact->get('id'));
-        delete_records('artefact_file_files', 'artefact', $fileartefact->get('id'));
-        delete_records('site_menu', 'file', $fileartefact->get('id'));
-        $fileartefact->delete_local();
-    }
-
 }
