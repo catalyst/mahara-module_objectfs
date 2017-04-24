@@ -104,7 +104,7 @@ class objectfs_file_system extends remote_file_system {
      * @param int $contentid The content id
      * @return string The full path to the content file
      */
-    protected function get_remote_path_from_id($contentid) {
+    public function get_remote_path_from_id($contentid) {
         return $this->client->get_remote_fullpath_from_id($contentid);
     }
 

@@ -344,6 +344,11 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                 'hour'         => '*',
                 'minute'       => '*/5',
             ),
+            (object)array(
+                'callfunction' => 'generate_status_report',
+                'hour'         => '*',
+                'minute'       => '*/5',
+            ),
         );
     }
 
@@ -414,6 +419,54 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         } else {
             log_debug(get_string('not_enabled', 'module_objectfs'));
         }
+    }
+
+    /**
+     * Generate reports task
+     */
+    public static function generate_status_report() {
+        global $CFG;
+        require_once($CFG->docroot . 'module/objectfs/classes/report/location_report_builder.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/report/log_size_report_builder.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/report/mime_type_report_builder.php');
+
+        $timestamp = date('Y-m-d H:i:s');
+        set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
+
+        $locationreport = new \module_objectfs\report\location_report_builder();
+        $tmp = $locationreport->build_report();
+
+        $test = array();
+        $test['reporttype'] = 0;
+        foreach ($tmp as $key => $value) {
+            $test['rows'][] = $value;
+        }
+
+        $locationreport->save_report_to_database($test);
+
+        $logsizereport = new \module_objectfs\report\log_size_report_builder();
+        $tmp = $logsizereport->build_report();
+
+        $test = array();
+        $test['reporttype'] = 1;
+        foreach ($tmp as $key => $value) {
+            $test['rows'][] = $value;
+        }
+
+        $logsizereport->save_report_to_database($test);
+
+        $mimetypesreport = new \module_objectfs\report\mime_type_report_builder();
+        $tmp = $mimetypesreport->build_report();
+
+        $test = array();
+        $test['reporttype'] = 2;
+        if (is_array($tmp)) {
+            foreach ($tmp as $key => $value) {
+                $test['rows'][] = $value;
+            }
+        }
+
+        $mimetypesreport->save_report_to_database($test);
     }
 
 }

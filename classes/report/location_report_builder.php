@@ -1,19 +1,4 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
  * Object location report builder.
  *
@@ -24,9 +9,6 @@
  */
 
 namespace module_objectfs\report;
-
-defined('INTERNAL') || die();
-
 require_once($CFG->docroot . '/module/objectfs/classes/report/objectfs_report_builder.php');
 
 class location_report_builder extends objectfs_report_builder {
@@ -36,13 +18,15 @@ class location_report_builder extends objectfs_report_builder {
 
     public function build_report() {
 
-        $locations = array(OBJECT_LOCATION_LOCAL,
-                           OBJECT_LOCATION_DUPLICATED,
-                           OBJECT_LOCATION_REMOTE,
-                           OBJECT_LOCATION_ERROR);
+        $locations = array('local'      => OBJECT_LOCATION_LOCAL,
+                           'duplicated' => OBJECT_LOCATION_DUPLICATED,
+                           'remote'     => OBJECT_LOCATION_REMOTE,
+                           'error'      => OBJECT_LOCATION_ERROR);
 
         $totalcount = 0;
         $totalsum = 0;
+
+        $report = array();
 
         foreach ($locations as $key => $value) {
 
@@ -62,20 +46,44 @@ class location_report_builder extends objectfs_report_builder {
 
             $result = get_record_sql($sql, array($value));
 
-            $sitedata['rows'][$key]['objectcount'] = $result->objectcount;
-            $sitedata['rows'][$key]['objectsum'] = $result->objectsum;
+            $tmp = new \stdClass();
+            $tmp->datakey = $key;
+            $tmp->reporttype = 0;
+            $tmp->objectcount = $result->objectcount;
+            $tmp->objectsum = $result->objectsum;
+
+            if (is_null($tmp->objectcount)) {
+                $tmp->objectcount =0;
+            }
+
+            if (is_null($tmp->objectsum)) {
+                $tmp->objectsum =0;
+            }
+
+            $report[] = $tmp;
 
             $totalcount += $result->objectcount;
             $totalsum += $result->objectsum;
 
         }
 
-        $sitedata['rows']['total']['objectcount'] = $totalcount;
-        $sitedata['rows']['total']['objectcount'] = $totalsum;
+        $tmp = new \stdClass();
+        $tmp->datakey = 'total';
+        $tmp->reporttype = 0;
+        $tmp->objectcount = $totalcount;
+        $tmp->objectsum = $totalsum;
 
-        $sitedata['reporttype'] = 'location';
+        if (is_null($tmp->objectcount)) {
+            $tmp->objectcount = 0;
+        }
 
-        return $sitedata;
+        if (is_null($tmp->objectsum)) {
+            $tmp->objectsum = 0;
+        }
+
+        $report['total'] = $tmp;
+
+        return $report;
     }
 
 }

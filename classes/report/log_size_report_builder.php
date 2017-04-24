@@ -1,52 +1,36 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
-//
-// Moodle is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// Moodle is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Log size report
+ * Object location report builder.
  *
- * @package   tool_objectfs
- * @author    Kenneth Hendricks <kennethhendricks@catalyst-au.net>
+ * @package   module_objectfs
+ * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
  * @copyright Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_objectfs\report;
-
-defined('MOODLE_INTERNAL') || die();
+namespace module_objectfs\report;
+require_once($CFG->docroot . '/module/objectfs/classes/report/objectfs_report_builder.php');
 
 class log_size_report_builder extends objectfs_report_builder {
 
     public function build_report() {
-        global $DB;
-
-        $report = new objectfs_report('log_size');
 
         $sql = 'SELECT log as datakey,
-                       sum(filesize) as objectsum,
+                       sum(size) as objectsum,
                        count(*) as objectcount
-                  FROM (SELECT DISTINCT contenthash, filesize, floor(log(2,filesize)) AS log
-                            FROM {files}
-                            WHERE filesize != 0) d
-              GROUP BY log ORDER BY log';
+                  FROM (SELECT DISTINCT artefact, size, floor(log(2,size)) AS log
+                            FROM {artefact_file_files}
+                            WHERE size != 0) d
+               GROUP BY log ORDER BY log';
 
-        $stats = $DB->get_records_sql($sql);
+        $report = get_records_sql_array($sql);
 
-        $this->compress_small_log_sizes($stats);
-
-        $report->add_rows($stats);
+        if ($report) {
+            $this->compress_small_log_sizes($report);
+            foreach ($report as $key => $value) {
+                $report[$key]->reporttype = 1;
+            }
+        }
 
         return $report;
     }
@@ -70,4 +54,5 @@ class log_size_report_builder extends objectfs_report_builder {
         // Add to the beginning of the array.
         array_unshift($stats, $smallstats);
     }
+
 }
