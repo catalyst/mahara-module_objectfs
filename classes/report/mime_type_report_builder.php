@@ -41,13 +41,15 @@ class mime_type_report_builder extends objectfs_report_builder {
         ORDER BY
         sum(size) / 1024, datakey;';
 
-        $report = get_records_sql_array($sql);
+        $report['rows'] = get_records_sql_array($sql);
 
-        if ($report) {
-            foreach ($report as $key => $value) {
-                $report[$key]->reporttype = 2;
+        if (is_array($report['rows'])) {
+            foreach ($report['rows'] as $key => $value) {
+                $value->reporttype = 2;
             }
         }
+
+        $report['reporttype'] = 2;
 
         return $report;
     }

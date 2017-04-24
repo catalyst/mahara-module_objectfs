@@ -23,14 +23,19 @@ class log_size_report_builder extends objectfs_report_builder {
                             WHERE size != 0) d
                GROUP BY log ORDER BY log';
 
-        $report = get_records_sql_array($sql);
+        $report['rows'] = get_records_sql_array($sql);
 
-        if ($report) {
-            $this->compress_small_log_sizes($report);
-            foreach ($report as $key => $value) {
-                $report[$key]->reporttype = 1;
+        if ($report['rows']) {
+            $this->compress_small_log_sizes($report['rows']);
+
+            if (is_array($report['rows'])) {
+                foreach ($report['rows'] as $key => $value) {
+                    $value->reporttype = 1;
+                }
             }
         }
+
+        $report['reporttype'] = 1;
 
         return $report;
     }

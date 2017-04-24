@@ -60,7 +60,7 @@ class location_report_builder extends objectfs_report_builder {
                 $tmp->objectsum =0;
             }
 
-            $report[] = $tmp;
+            $report['rows'][] = $tmp;
 
             $totalcount += $result->objectcount;
             $totalsum += $result->objectsum;
@@ -81,7 +81,9 @@ class location_report_builder extends objectfs_report_builder {
             $tmp->objectsum = 0;
         }
 
-        $report['total'] = $tmp;
+        $report['rows']['total'] = $tmp;
+
+        $report['reporttype'] = 0;
 
         return $report;
     }

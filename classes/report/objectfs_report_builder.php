@@ -16,6 +16,22 @@ abstract class objectfs_report_builder {
 
     abstract public function build_report();
 
+    public static function generate_status_report() {
+        global $CFG;
+        require_once($CFG->docroot . 'module/objectfs/classes/report/location_report_builder.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/report/log_size_report_builder.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/report/mime_type_report_builder.php');
+
+        $reporttypes = self::get_report_types();
+
+        foreach ($reporttypes as $reporttype) {
+            $reportbuilderclass = "module_objectfs\\report\\{$reporttype}_report_builder";
+            $reportbuilder = new $reportbuilderclass();
+            $report = $reportbuilder->build_report();
+            objectfs_report_builder::save_report_to_database($report);
+        }
+    }
+
     public static function save_report_to_database($sitedata) {
         $reporttype = $sitedata['reporttype'];
         if (isset($sitedata['rows'])) {
@@ -63,6 +79,13 @@ abstract class objectfs_report_builder {
         }
 
         return $report;
+    }
+
+    public static function get_report_types() {
+        $reporttypes = array('location',
+                             'log_size',
+                             'mime_type');
+        return $reporttypes;
     }
 
 }
