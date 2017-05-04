@@ -36,16 +36,25 @@ class deleter extends manipulator {
     private $deletelocal;
 
     /**
+     * Size threshold for pushing files to remote in bytes.
+     *
+     * @var int
+     */
+    private $sizethreshold;
+
+    /**
      * deleter constructor.
      *
      * @param sss_client $client S3 client
-     * @param PluginModuleObjectfs $filesystem S3 file system
+     * @param objectfs_file_system $filesystem S3 file system
      * @param object $config sssfs config.
      */
     public function __construct($filesystem, $config) {
         parent::__construct($filesystem, $config);
         $this->consistencydelay = $config->consistencydelay;
         $this->deletelocal = $config->deletelocal;
+        $this->sizethreshold = $config->sizethreshold;
+
     }
 
     /**
@@ -70,67 +79,38 @@ class deleter extends manipulator {
                        AND o.location = ?
               GROUP BY af.artefact,
                        af.size,
-                       o.location';
+                       o.location
+                 HAVING MAX(f.size) > ?';
 
         $consistancythrehold = time() - $this->consistencydelay;
 
-        $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED);
+        $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED, $this->sizethreshold);
 
         $starttime = time();
-        $files = get_records_sql_array($sql, $params);
+        $objects = get_records_sql_array($sql, $params);
         $duration = time() - $starttime;
-        $count = count($files);
+        $count = count($objects);
 
         $logstring = "File deleter query took $duration seconds to find $count files \n";
         log_debug($logstring);
 
-        if ($files == false ) {
-            $files = array();
+        if ($objects == false ) {
+            $objects = array();
         }
 
-        return $files;
+        return $objects;
     }
 
-    /**
-     * Cleans local file system of candidate id files.
-     *
-     * @param  array $candidateids content ids to delete
-     */
-    public function execute($files) {
-
-        $starttime = time();
-        $objectcount = 0;
-        $totalfilesize = 0;
-
+    protected function manipulate_object($objectrecord) {
+        $newlocation = $this->filesystem->get('remotefilesystem')->delete_object_from_local($this->filesystem);
+        return $newlocation;
+    }
+    protected function manipulator_can_execute() {
         if ($this->deletelocal == 0) {
-            log_debug("Delete local disabled, not deleting \n");
-            return;
+            log_debug("Delete local disabled \n");
+            return false;
         }
-
-        foreach ($files as $file) {
-            if (time() >= $this->finishtime) {
-                break;
-            }
-
-            $this->filesystem->set('fileid', $file->artefact);
-            $success = $this->filesystem->get('remotefilesystem')->delete_object_from_local($this->filesystem);
-
-            if ($success) {
-                $location = OBJECT_LOCATION_REMOTE;
-            } else {
-                $location = $this->filesystem->get('remotefilesystem')->get_actual_object_location($this->filesystem);
-            }
-
-            update_object_record($file->artefact, $location);
-
-            $objectcount++;
-            $totalfilesize += $file->filesize;
-        }
-
-        $duration = time() - $starttime;
-
-        $totalfilesize = display_size($totalfilesize);
-        $logstring = "File deleter processed $objectcount files, total size: $totalfilesize in $duration seconds \n";
-        log_debug($logstring);
+        return true;
     }
+
 }

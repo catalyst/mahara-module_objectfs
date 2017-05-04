@@ -31,6 +31,16 @@ class s3_client implements object_client {
 
     public function __construct($config) {
         $this->bucket = $config->bucket;
+        $this->set_client($config);
+    }
+
+    public function __wakeup() {
+        // We dont want to store credentials in the client itself as
+        // it will be serialised, so re-retrive them now.
+        $config = get_objectfs_config();
+        $this->set_client($config);
+    }
+    public function set_client($config) {
         $this->client = S3Client::factory(array(
             'credentials' => array('key' => $config->key, 'secret' => $config->secret),
             'region' => $config->region,
@@ -91,13 +101,19 @@ class s3_client implements object_client {
      * @return boolean true on success, false on failure.
      */
     public function test_connection() {
+        $connection = new \stdClass();
+        $connection->success = true;
+        $connection->message = '';
         try {
             $result = $this->client->headBucket(array(
                 'Bucket' => $this->bucket));
-            return true;
+            $connection->message = get_string('settings:connectionsuccess', 'module.objectfs');
         } catch (S3Exception $e) {
-            return false;
+            $connection->success = false;
+            $details = $this->get_exception_details($e);
+            $connection->message = get_string('settings:connectionfailure', 'module.objectfs') . $details;
         }
+        return $connection;
     }
 
     /**
@@ -109,29 +125,32 @@ class s3_client implements object_client {
      */
     public function permissions_check() {
 
-        $permissions = array();
+        $permissions = new \stdClass();
+        $permissions->success = true;
+        $permissions->messages = array();
 
         try {
             $result = $this->client->putObject(array(
                 'Bucket' => $this->bucket,
                 'Key' => 'permissions_check_file',
                 'Body' => 'test content'));
-            $permissions[AWS_CAN_WRITE_OBJECT] = true;
         } catch (S3Exception $e) {
-            $permissions[AWS_CAN_WRITE_OBJECT] = false;
+            $details = $this->get_exception_details($e);
+            $permissions->messages[] = get_string('settings:writefailure', 'module.objectfs') . $details;
+            $permissions->success = false;
         }
 
         try {
             $result = $this->client->getObject(array(
                 'Bucket' => $this->bucket,
                 'Key' => 'permissions_check_file'));
-            $permissions[AWS_CAN_READ_OBJECT] = true;
         } catch (S3Exception $e) {
-            if ($e->getAwsErrorCode() === 'NoSuchKey') {
-                // Write could have failed.
-                $permissions[AWS_CAN_READ_OBJECT] = true;
-            } else {
-                $permissions[AWS_CAN_READ_OBJECT] = false;
+            $errorcode = $e->getAwsErrorCode();
+            // Write could have failed.
+            if ($errorcode !== 'NoSuchKey') {
+                $details = $this->get_exception_details($e);
+                $permissions->messages[] = get_string('settings:readfailure', 'module.objectfs') . $details;
+                $permissions->success = false;
             }
         }
 
@@ -139,11 +158,38 @@ class s3_client implements object_client {
             $result = $this->client->deleteObject(array(
                 'Bucket' => $this->bucket,
                 'Key' => 'permissions_check_file'));
-            $permissions[AWS_CAN_DELETE_OBJECT] = true;
+            $permissions->messages[] = get_string('settings:deletesuccess', 'module.objectfs');
+            $permissions->success = false;
         } catch (S3Exception $e) {
-            $permissions[AWS_CAN_DELETE_OBJECT] = false;
+            $errorcode = $e->getAwsErrorCode();
+            // Something else went wrong.
+            if ($errorcode !== 'AccessDenied') {
+                $details = $this->get_exception_details($e);
+                $permissions->messages[] = get_string('settings:deleteerror', 'module.objectfs') . $details;
+            }
+        }
+
+        if ($permissions->success) {
+            $permissions->messages[] = get_string('settings:permissioncheckpassed', 'module.objectfs');
         }
 
         return $permissions;
+
+    }
+
+    protected function get_exception_details($exception) {
+        $message = $exception->getMessage();
+        if (get_class($exception) !== 'S3Exception') {
+            return "Not a S3 exception : $message";
+        }
+        $errorcode = $exception->getAwsErrorCode();
+        $details = ' ';
+        if ($message) {
+            $details .= "ERROR MSG: " . $message . "\n";
+        }
+        if ($errorcode) {
+            $details .= "ERROR CODE: " . $errorcode . "\n";
+        }
+        return $details;
     }
 }

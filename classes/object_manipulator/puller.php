@@ -30,7 +30,7 @@ class puller extends manipulator {
      * Puller constructor.
      *
      * @param object_client $client object client
-     * @param PluginModuleObjectfs $filesystem object file system
+     * @param objectfs_file_system $filesystem object file system
      * @param object $config objectfs config.
      */
     public function __construct($filesystem, $config) {
@@ -60,53 +60,23 @@ class puller extends manipulator {
         $params = array($this->sizethreshold, OBJECT_LOCATION_REMOTE);
 
         $starttime = time();
-        $files = get_records_sql_array($sql, $params);
+        $objects = get_records_sql_array($sql, $params);
         $duration = time() - $starttime;
-        $count = count($files);
+        $count = count($objects);
 
         $logstring = "File puller query took $duration seconds to find $count files \n";
         log_debug($logstring);
 
-        if ($files == false ) {
-            $files = array();
+        if ($objects == false) {
+            $objects = array();
         }
 
-        return $files;
+        return $objects;
     }
 
-    /**
-     * Pulles files from S3 file system to local.
-     *
-     * @param  array $candidateids content ids to pull
-     */
-    public function execute($files) {
-        $starttime = time();
-        $objectcount = 0;
-        $totalfilesize = 0;
-
-        foreach ($files as $file) {
-            if (time() >= $this->finishtime) {
-                break;
-            }
-
-            $this->filesystem->set('fileid', $file->artefact);
-            $success = $this->filesystem->get('remotefilesystem')->copy_object_from_remote_to_local($this->filesystem);
-
-            if ($success) {
-                $location = OBJECT_LOCATION_DUPLICATED;
-            } else {
-                $location = $this->filesystem->get('remotefilesystem')->get_actual_object_location($this->filesystem);
-            }
-
-            update_object_record($file->artefact, $location);
-
-            $objectcount++;
-            $totalfilesize += $file->filesize;
-        }
-
-        $duration = time() - $starttime;
-        $totalfilesize = display_size($totalfilesize);
-        $logstring = "File puller processed $objectcount files, total size: $totalfilesize in $duration seconds \n";
-        log_debug($logstring);
+    protected function manipulate_object($objectrecord) {
+        $newlocation = $this->filesystem->get('remotefilesystem')->copy_object_from_external_to_local($this->filesystem);
+        return $newlocation;
     }
+
 }

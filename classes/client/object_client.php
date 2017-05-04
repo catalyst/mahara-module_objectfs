@@ -19,5 +19,5 @@ interface object_client {
     public function get_remote_fullpath_from_id($contentid);
     public function verify_remote_object($contentid, $localpath);
     public function test_connection();
-    public function permissions_check();
+//    public function permissions_check();
 }

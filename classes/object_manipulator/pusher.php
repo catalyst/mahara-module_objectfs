@@ -40,10 +40,14 @@ class pusher extends manipulator {
      * @param PluginModuleObjectfs $filesystem objectfs file system
      * @param object $config objectfs config.
      */
-    public function __construct($filesystem, $config) {
+    public function __construct($filesystem, $config, $logger) {
         parent::__construct($filesystem, $config);
         $this->sizethreshold = $config->sizethreshold;
         $this->minimumage = $config->minimumage;
+
+        $this->logger = $logger;
+        // Inject our logger into the filesystem.
+        $this->filesystem->get('remotefilesystem')->set_logger($this->logger);
     }
 
     /**
@@ -80,58 +84,22 @@ class pusher extends manipulator {
 
         $params = array($maxcreatedtimestamp, $this->sizethreshold, OBJECT_LOCATION_LOCAL);
 
-        $starttime = time();
-        $files = get_records_sql_array($sql, $params);
-        $duration = time() - $starttime;
-        $count = count($files);
+        $this->logger->start_timing();
+        $objects = get_records_sql_array($sql, $params);
+        $this->logger->end_timing();
 
-        $logstring = "File pusher query took $duration seconds to find $count files \n";
-        log_debug($logstring);
-
-        if ($files == false ) {
-            $files = array();
+        $totalobjectsfound = count($objects);
+        $this->logger->log_object_query('get_push_candidates', $totalobjectsfound);
+        if ($objects == false) {
+            $objects = array();
         }
 
-        return $files;
+        return $objects;
     }
 
-    /**
-     * Pushes files from local file system to remote.
-     *
-     * @param  array $candidateids content ids to push
-     */
-    public function execute($files) {
-        $starttime = time();
-        $objectcount = 0;
-        $totalfilesize = 0;
-
-        foreach ($files as $file) {
-            if (time() >= $this->finishtime) {
-                break;
-            }
-
-            if (!isset($file->contenthash) || is_null($file->contenthash)) {
-                $contenthash = hash('sha256', $file->title); // Not sure??????????
-            }
-
-            $this->filesystem->set('fileid', $file->artefact);
-            $success = $this->filesystem->get('remotefilesystem')->copy_object_from_local_to_remote($this->filesystem);
-
-            if ($success) {
-                $location = OBJECT_LOCATION_DUPLICATED;
-            } else {
-                $location = $this->filesystem->get('remotefilesystem')->get_actual_object_location($this->filesystem);
-            }
-
-            update_object_record($file->artefact, $location, $contenthash);
-
-            $objectcount++;
-            $totalfilesize += $file->filesize;
-        }
-
-        $duration = time() - $starttime;
-        $totalfilesize = display_size($totalfilesize);
-        $logstring = "File pusher processed $objectcount files, total size: $totalfilesize in $duration seconds \n";
-        log_debug($logstring);
+    protected function manipulate_object($objectrecord) {
+        $newlocation = $this->filesystem->get('remotefilesystem')->copy_object_from_local_to_remote($this->filesystem);
+        return $newlocation;
     }
+
 }

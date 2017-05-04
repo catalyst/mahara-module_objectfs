@@ -13,7 +13,6 @@ $string['push_objects_to_storage_task'] = 'Object file system upload task';
 $string['delete_local_objects_task'] = 'Object file system delete local objects task';
 $string['pull_objects_from_storage_task'] = 'Object file system download objects task';
 
-
 $string['generate_status_report_task'] = 'Object status report generator task';
 $string['not_enabled'] = 'The object file system background tasks are not enabled. No objects will move location until you do.';
 
@@ -32,13 +31,14 @@ $string['object_status:location:remote'] = 'Only in remote storage';
 $string['object_status:location:unknown'] = 'Unknown object location';
 $string['object_status:location:total'] = 'Total';
 
-
 $string['object_status:last_run'] = 'This report was generated on {$a}';
 $string['object_status:never_run'] = 'The task to generate this report has not been run.';
 
 $string['settings'] = 'Settings';
 $string['settings:enabletasks'] = 'Enable transfer tasks';
 $string['settings:enabletasks_help'] = 'Enable or disable the object file system tasks which move files between the filedir and remote object storage.';
+$string['settings:enablelogging'] = 'Enable real time logging';
+$string['settings:enablelogging_help'] = 'Enable or disable file system logging. Will output diagnostic information to the php error log. ';
 
 $string['settings:generalheader'] = 'General Settings';
 

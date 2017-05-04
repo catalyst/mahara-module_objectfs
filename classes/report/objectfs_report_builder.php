@@ -41,7 +41,7 @@ abstract class objectfs_report_builder {
         // Remove old records.
         delete_records('module_objectfs_report_data', 'reporttype', $reporttype);
 
-        if (isset($reportrows)) {
+        if (is_array($reportrows)) {
             foreach ($reportrows as $row) {
                 insert_record('module_objectfs_report_data', $row);
             }

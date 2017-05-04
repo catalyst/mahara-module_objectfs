@@ -111,23 +111,15 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             $permissions = $client->permissions_check();
 
             $errormsg = '';
-            if (!$permissions[AWS_CAN_WRITE_OBJECT]) {
-                $errormsg .= get_string('settings:writefailure', 'module.objectfs');
-            }
-
-            if (!$permissions[AWS_CAN_READ_OBJECT]) {
-                $errormsg .= get_string('settings:readfailure', 'module.objectfs');
-            }
-
-            if ($permissions[AWS_CAN_DELETE_OBJECT]) {
-                $errormsg .= get_string('settings:deletesuccess', 'module.objectfs');
-            }
-
-            if (strlen($errormsg) > 0) {
-                $permissionsmsg = $errormsg;
-            } else {
+            if ($permissions->success) {
                 $permissionsmsg = get_string('settings:permissioncheckpassed', 'module.objectfs');
+            } else {
+                foreach ($permissions->messages as $message) {
+                    $errormsg .=$message;
+                }
+                $permissionsmsg = $errormsg;
             }
+
             $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
                                        'type'  => 'html',
                                        'value' => $permissionsmsg,
@@ -357,8 +349,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     */
     public static function push_objects_to_storage() {
         global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/pusher.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
 
         $config = get_objectfs_config();
 
@@ -366,12 +357,9 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
         if (isset($config->enabletasks) && $config->enabletasks) {
-            $filesystem = new ArtefactTypeFile_s3_file_system();
-            $pusher = new pusher($filesystem, $config);
-            $candidateids = $pusher->get_candidate_objects();
-            $pusher->execute($candidateids);
+            \module_objectfs\object_manipulator\manipulator::setup_and_run_object_manipulator('pusher');
         } else {
-            log_debug(get_string('not_enabled', 'module_objectfs'));
+            log_debug(get_string('not_enabled', 'module.objectfs'));
         }
     }
 
@@ -380,8 +368,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      */
     public static function pull_objects_from_storage() {
         global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/puller.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
 
         $config = get_objectfs_config();
 
@@ -389,12 +376,9 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
         if (isset($config->enabletasks) && $config->enabletasks) {
-            $filesystem = new ArtefactTypeFile_s3_file_system();
-            $puller = new puller($filesystem, $config);
-            $candidateids = $puller->get_candidate_objects();
-            $puller->execute($candidateids);
+            \module_objectfs\object_manipulator\manipulator::setup_and_run_object_manipulator('puller');
         } else {
-            log_debug(get_string('not_enabled', 'module_objectfs'));
+            log_debug(get_string('not_enabled', 'module.objectfs'));
         }
     }
 
@@ -403,8 +387,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      */
     public static function delete_local_objects() {
         global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/s3_file_system.php');
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/deleter.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
 
         $config = get_objectfs_config();
 
@@ -412,12 +395,9 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
         if (isset($config->enabletasks) && $config->enabletasks) {
-            $filesystem = new ArtefactTypeFile_s3_file_system();
-            $deleter = new deleter($filesystem, $config);
-            $candidateids = $deleter->get_candidate_objects();
-            $deleter->execute($candidateids);
+            \module_objectfs\object_manipulator\manipulator::setup_and_run_object_manipulator('deleter');
         } else {
-            log_debug(get_string('not_enabled', 'module_objectfs'));
+            log_debug(get_string('not_enabled', 'module.objectfs'));
         }
     }
 

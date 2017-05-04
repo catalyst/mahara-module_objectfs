@@ -19,24 +19,34 @@ define('OBJECTFS_REPORT_OBJECT_LOCATION', 0);
 define('OBJECTFS_REPORT_LOG_SIZE', 1);
 define('OBJECTFS_REPORT_MIME_TYPE', 2);
 
-function update_object_record($contentid, $location, $contenthash = null) {
+function update_object_record($contentid, $location) {
 
-    $logrecord = new \stdClass();
-    $logrecord->contentid = $contentid;
-    $logrecord->timeduplicated = time();
-    $logrecord->location = $location;
-    if ($contenthash) {
-        $logrecord->contenthash = $contenthash;
-    }
+    $newobject = new \stdClass();
+    $newobject->contentid = $contentid;
+    $newobject->timeduplicated = time();
+    $newobject->location = $location;
 
-    $existing = get_record('module_objectfs_objects', 'contentid', $contentid); // should it be hash????????
+    $oldobject = get_record('module_objectfs_objects', 'contentid', $contentid);
 
-    if ($existing) {
-        $logrecord->id = $existing->id;
-        update_record('module_objectfs_objects', $logrecord);
+    if ($oldobject) {
+
+        // If location hasn't changed we do not need to update.
+        if ($oldobject->location === $newobject->location) {
+            return $oldobject;
+        }
+        // If location change is not to duplicated we do not update timeduplicated.
+        if ($newobject->location !== OBJECT_LOCATION_DUPLICATED) {
+            $newobject->timeduplicated = $oldobject->timeduplicated;
+        }
+
+        $newobject->id = $oldobject->id;
+
+        update_record('module_objectfs_objects', $newobject);
     } else {
-        insert_record('module_objectfs_objects', $logrecord);
+        insert_record('module_objectfs_objects', $newobject);
     }
+
+    return $newobject;
 }
 
 function set_objectfs_config($config) {
@@ -48,6 +58,7 @@ function set_objectfs_config($config) {
 function get_objectfs_config() {
     $config = new stdClass;
     $config->enabletasks = 0;
+    $config->enablelogging = 0;
     $config->key = '';
     $config->secret = '';
     $config->bucket = '';
@@ -60,6 +71,12 @@ function get_objectfs_config() {
     $config->logging = 0;
     $config->preferremote = 0;
 
+/*
+    $config->key = 'AKIAIRPBEPF7TC7CLZXQ';
+    $config->secret = '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';
+    $config->bucket = 'testmahara';
+    $config->region = 'ap-southeast-2';
+*/
     $keys = array('enabletasks', 'key', 'secret', 'bucket', 'region', 'sizethreshold', 'minimumage',
         'deletelocal', 'consistencydelay', 'maxtaskruntime', 'logging', 'preferredmode');
 
@@ -75,4 +92,12 @@ function get_objectfs_config() {
         }
     }
     return $config;
+}
+
+function module_objectfs_should_tasks_run() {
+    $config = get_objectfs_config();
+    if (isset($config->enabletasks) && $config->enabletasks) {
+        return true;
+    }
+    return false;
 }

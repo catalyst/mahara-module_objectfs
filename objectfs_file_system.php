@@ -1,20 +1,38 @@
 <?php
 
-//require_once(dirname(dirname(dirname(__FILE__))).'/init.php');
 global $CFG;
 require_once($CFG->docroot . '/artefact/file/remote_file_system.php');
 require_once($CFG->docroot . '/module/objectfs/classes/client/s3_client.php');
+require_once($CFG->docroot . '/module/objectfs/classes/log/null_logger.php');
 
 class objectfs_file_system extends remote_file_system {
+
+    private $logger;
 
     function __construct() {
         $config = get_objectfs_config();
         $this->client = new \module_objectfs\client\s3_client($config);
         $this->client->register_stream_wrapper();
+
+
+        if ($config->enablelogging) {
+            $this->logger = new \module_objectfs\log\real_time_logger();
+        } else {
+            $this->logger = new \module_objectfs\log\null_logger();
+        }
+
+    }
+
+    public function set_logger(\module_objectfs\log\objectfs_logger $logger) {
+        $this->logger = $logger;
     }
 
     public function get_path($fileartefact, $data = array()) {
         $localpath = $fileartefact->get_local_path($data);
+
+        if (strpos($fileartefact->get('filetype'), 'image') !== false) {
+            $this->ensure_local($fileartefact); // Always pull images from S3
+        }
 
         if (is_readable($localpath)) {
             return $localpath;
