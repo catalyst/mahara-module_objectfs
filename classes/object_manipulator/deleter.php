@@ -49,12 +49,14 @@ class deleter extends manipulator {
      * @param objectfs_file_system $filesystem S3 file system
      * @param object $config sssfs config.
      */
-    public function __construct($filesystem, $config) {
+    public function __construct($filesystem, $config, $logger) {
         parent::__construct($filesystem, $config);
         $this->consistencydelay = $config->consistencydelay;
         $this->deletelocal = $config->deletelocal;
         $this->sizethreshold = $config->sizethreshold;
-
+        $this->logger = $logger;
+        // Inject our logger into the filesystem.
+        $this->filesystem->get('remotefilesystem')->set_logger($this->logger);
     }
 
     /**
@@ -80,19 +82,19 @@ class deleter extends manipulator {
               GROUP BY af.artefact,
                        af.size,
                        o.location
-                 HAVING MAX(f.size) > ?';
+                 HAVING MAX(af.size) > ?';
 
         $consistancythrehold = time() - $this->consistencydelay;
 
         $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED, $this->sizethreshold);
 
-        $starttime = time();
+        $this->logger->start_timing();
         $objects = get_records_sql_array($sql, $params);
-        $duration = time() - $starttime;
-        $count = count($objects);
+        $this->logger->end_timing();
 
-        $logstring = "File deleter query took $duration seconds to find $count files \n";
-        log_debug($logstring);
+        $totalobjectsfound = count($objects);
+
+        $this->logger->log_object_query('get_delete_candidates', $totalobjectsfound);
 
         if ($objects == false ) {
             $objects = array();

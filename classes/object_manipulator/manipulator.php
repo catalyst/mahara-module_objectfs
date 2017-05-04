@@ -71,15 +71,15 @@ abstract class manipulator {
             if (time() >= $this->finishtime) {
                 break;
             }
-//            $objectlock = $this->filesystem->acquire_object_lock($objectrecord->contentid); // FIX this
+            $objectlock = $this->filesystem->get('remotefilesystem')->acquire_object_lock($objectrecord->artefact);
             // Object is currently being manipulated elsewhere.
-//            if (!$objectlock) {
-//                continue;
-//            }
+            if (!$objectlock) {
+                continue;
+            }
             $this->filesystem->set('fileid', $objectrecord->artefact);
             $newlocation = $this->manipulate_object($objectrecord);
             update_object_record($objectrecord->artefact, $newlocation);
-//            $objectlock->release();
+            $this->filesystem->get('remotefilesystem')->release_object_lock($objectrecord->artefact);
         }
         $this->logger->end_timing();
         $this->logger->output_move_statistics();

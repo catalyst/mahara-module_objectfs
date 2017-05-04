@@ -145,7 +145,7 @@ class objectfs_file_system extends remote_file_system {
         }
     }
 
-    protected function acquire_object_lock($contentid) {
+    public function acquire_object_lock($contentid) {
         $timeout = 600; // 10 minutes before giving up.
 
         $giveuptime = time() + $timeout;
@@ -165,101 +165,81 @@ class objectfs_file_system extends remote_file_system {
         return $lock;
     }
 
-    protected function release_object_lock($contentid) {
+    public function release_object_lock($contentid) {
 
         delete_records('config', 'field', '_cron_lock_module_objectfs_cron_'.$contentid);
 
     }
 
     public function copy_object_from_remote_to_local($content) {
-        $location = $this->get_actual_object_location($content);
+        $initiallocation = $this->get_actual_object_location($content);
+        $finallocation = $initiallocation;
 
-        // Already duplicated.
-        if ($location === OBJECT_LOCATION_DUPLICATED) {
-            return true;
-        }
-
-        if ($location === OBJECT_LOCATION_REMOTE) {
-
+        if ($initiallocation === OBJECT_LOCATION_REMOTE) {
             $localpath = $this->get_local_path_from_id($content);
-            $remotepath = $this->get_remote_path_from_id($content->get('fileid'));
-
-            $objectlock = $this->acquire_object_lock($content->get('fileid'));
-
-            // Lock is still held by something.
-            if (!$objectlock) {
-                return false;
+            $externalpath = $this->get_remote_path_from_id($content->get('fileid'));
+//            $localdirpath = $this->get_fulldir_from_hash($contenthash);
+            // Folder may not exist yet if pulling a file that came from another environment.
+//            if (!is_dir($localdirpath)) {
+//                if (!mkdir($localdirpath, $this->dirpermissions, true)) {
+                    // Permission trouble.
+//                    throw new file_exception('storedfilecannotcreatefiledirs');
+//                }
+//            }
+            $success = copy($externalpath, $localpath);
+            if ($success) {
+                chmod($localpath, $this->filepermissions);
+                $finallocation = OBJECT_LOCATION_DUPLICATED;
             }
-
-            // While waiting for lock, file was moved.
-            if (($localpath !== $remotepath) && is_readable($localpath)) {
-                $this->release_object_lock($content->get('fileid'));
-                return true;
-            }
-
-            $result = copy($remotepath, $localpath);
-
-            $this->release_object_lock($content->get('fileid'));
-
-            return $result;
         }
-        return false;
+
+        $this->logger->log_object_move('copy_object_from_remote_to_local',
+                                        $initiallocation,
+                                        $finallocation,
+                                        $content->get('fileid'),
+                                        $content->get('size'));
+        return $finallocation;
     }
 
     public function copy_object_from_local_to_remote($content) {
-        $location = $this->get_actual_object_location($content);
+        $initiallocation = $this->get_actual_object_location($content);
+        $finallocation = $initiallocation;
 
-        // Already duplicated.
-        if ($location === OBJECT_LOCATION_DUPLICATED) {
-            return true;
-        }
-
-        if ($location === OBJECT_LOCATION_LOCAL) {
-
+        if ($initiallocation === OBJECT_LOCATION_LOCAL) {
             $localpath = $this->get_local_path_from_id($content);
-            $remotepath = $this->get_remote_path_from_id($content->get('fileid'));
-
-            $objectlock = $this->acquire_object_lock($content->get('fileid'));
-
-            // Lock is still held by something.
-            if (!$objectlock) {
-                return false;
+            $externalpath = $this->get_remote_path_from_id($content->get('fileid'));
+            $success = copy($localpath, $externalpath);
+            if ($success) {
+                $finallocation = OBJECT_LOCATION_DUPLICATED;
             }
-
-            // While waiting for lock, file was moved.
-            if (is_readable($remotepath)) {
-                $this->release_object_lock($content->get('fileid'));
-                return true;
-            }
-
-            $result = copy($localpath, $remotepath);
-
-            $this->release_object_lock($content->get('fileid'));
-
-            return $result;
         }
-        return false;
+        $this->logger->log_object_move('copy_object_from_local_to_remote',
+                                        $initiallocation,
+                                        $finallocation,
+                                        $content->get('fileid'),
+                                        $content->get('size'));
+        return $finallocation;
     }
 
     public function delete_object_from_local($content) {
-        $location = $this->get_actual_object_location($content);
+        $initiallocation = $this->get_actual_object_location($content);
+        $finallocation = $initiallocation;
 
-        // Already deleted.
-        if ($location === OBJECT_LOCATION_REMOTE) {
-            return true;
-        }
-
-        // We want to be very sure it is remote if we're deleting objects.
-        // There is no going back.
-        if ($location === OBJECT_LOCATION_DUPLICATED) {
+        if ($initiallocation === OBJECT_LOCATION_DUPLICATED) {
             $localpath = $this->get_local_path_from_id($content);
-            $objectvalid = $this->client->verify_remote_object($content->get('fileid'), $localpath);
-            if ($objectvalid) {
-                return unlink($localpath);
+            if ($this->client->verify_remote_object($content->get('fileid'), $localpath)) {
+                $success = unlink($localpath);
+                if ($success) {
+                    $finallocation = OBJECT_LOCATION_REMOTE;
+                }
             }
         }
-
-        return false;
+        $this->logger->log_object_move('delete_object_from_local',
+                                        $initiallocation,
+                                        $finallocation,
+                                        $content->get('fileid'),
+                                        $content->get('size'));
+        return $finallocation;
     }
 
 }

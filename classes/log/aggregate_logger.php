@@ -95,7 +95,7 @@ class aggregate_logger extends objectfs_logger {
         $objectsum = display_size($objectsum);
         $initiallocation = $this->location_to_string($initiallocation);
         $finallocation = $this->location_to_string($finallocation);
-        mtrace("$initiallocation -> $finallocation. Objects moved: $objectcount. Total size: $objectsum. ");
+        log_debug("$initiallocation -> $finallocation. Objects moved: $objectcount. Total size: $objectsum. ");
     }
 
     public function location_to_string($location) {

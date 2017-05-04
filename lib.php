@@ -350,6 +350,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     public static function push_objects_to_storage() {
         global $CFG;
         require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/pusher.php');
 
         $config = get_objectfs_config();
 
@@ -369,6 +370,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     public static function pull_objects_from_storage() {
         global $CFG;
         require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/puller.php');
 
         $config = get_objectfs_config();
 
@@ -388,6 +390,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     public static function delete_local_objects() {
         global $CFG;
         require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/deleter.php');
 
         $config = get_objectfs_config();
 

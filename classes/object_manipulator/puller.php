@@ -33,9 +33,13 @@ class puller extends manipulator {
      * @param objectfs_file_system $filesystem object file system
      * @param object $config objectfs config.
      */
-    public function __construct($filesystem, $config) {
+    public function __construct($filesystem, $config, $logger) {
         parent::__construct($filesystem, $config);
         $this->sizethreshold = $config->sizethreshold;
+
+        $this->logger = $logger;
+        // Inject our logger into the filesystem.
+        $this->filesystem->get('remotefilesystem')->set_logger($this->logger);
     }
 
     /**
@@ -59,13 +63,13 @@ class puller extends manipulator {
 
         $params = array($this->sizethreshold, OBJECT_LOCATION_REMOTE);
 
-        $starttime = time();
+        $this->logger->start_timing();
         $objects = get_records_sql_array($sql, $params);
-        $duration = time() - $starttime;
-        $count = count($objects);
+        $this->logger->end_timing();
 
-        $logstring = "File puller query took $duration seconds to find $count files \n";
-        log_debug($logstring);
+        $totalobjectsfound = count($objects);
+
+        $this->logger->log_object_query('get_pull_candidates', $totalobjectsfound);
 
         if ($objects == false) {
             $objects = array();
@@ -75,7 +79,7 @@ class puller extends manipulator {
     }
 
     protected function manipulate_object($objectrecord) {
-        $newlocation = $this->filesystem->get('remotefilesystem')->copy_object_from_external_to_local($this->filesystem);
+        $newlocation = $this->filesystem->get('remotefilesystem')->copy_object_from_remote_to_local($this->filesystem);
         return $newlocation;
     }
 
