@@ -8,8 +8,6 @@ require_once($CFG->docroot . '/module/objectfs/classes/log/null_logger.php');
 class objectfs_file_system extends remote_file_system {
 
     private $logger;
-    private $filepermissions;
-    private $dirpermissions;
 
     function __construct() {
         global $CFG;
