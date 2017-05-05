@@ -37,7 +37,7 @@ class pusher extends manipulator {
      * Pusher constructor.
      *
      * @param object_client $client remote object client
-     * @param PluginModuleObjectfs $filesystem objectfs file system
+     * @param objectfs_file_system $filesystem object file system
      * @param object $config objectfs config.
      */
     public function __construct($filesystem, $config, $logger) {

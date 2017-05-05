@@ -8,12 +8,17 @@ require_once($CFG->docroot . '/module/objectfs/classes/log/null_logger.php');
 class objectfs_file_system extends remote_file_system {
 
     private $logger;
+    private $filepermissions;
+    private $dirpermissions;
 
     function __construct() {
+        global $CFG;
         $config = get_objectfs_config();
         $this->client = new \module_objectfs\client\s3_client($config);
         $this->client->register_stream_wrapper();
 
+        $this->filepermissions = $CFG->filepermissions;
+        $this->dirpermissions = $CFG->directorypermissions;
 
         if ($config->enablelogging) {
             $this->logger = new \module_objectfs\log\real_time_logger();

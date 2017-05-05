@@ -70,13 +70,7 @@ function get_objectfs_config() {
     $config->maxtaskruntime = 60;
     $config->logging = 0;
     $config->preferremote = 0;
-
-/*
-    $config->key = 'AKIAIRPBEPF7TC7CLZXQ';
-    $config->secret = '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';
-    $config->bucket = 'testmahara';
-    $config->region = 'ap-southeast-2';
-*/
+    
     $keys = array('enabletasks', 'key', 'secret', 'bucket', 'region', 'sizethreshold', 'minimumage',
         'deletelocal', 'consistencydelay', 'maxtaskruntime', 'logging', 'preferredmode');
 

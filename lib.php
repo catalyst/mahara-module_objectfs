@@ -405,6 +405,25 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     }
 
     /**
+     * Recover error objects
+     */
+    public static function recover_error_objects() {
+        global $CFG;
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
+
+        $config = get_objectfs_config();
+
+        $timestamp = date('Y-m-d H:i:s');
+        set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
+
+        if (isset($config->enabletasks) && $config->enabletasks) {
+            \module_objectfs\object_manipulator\manipulator::setup_and_run_object_manipulator('recoverer');
+        } else {
+            log_debug(get_string('not_enabled', 'module.objectfs'));
+        }
+    }
+
+    /**
      * Generate reports task
      */
     public static function generate_status_report_task() {
