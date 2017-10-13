@@ -2,18 +2,17 @@
 /**
  * Deletes files that are old enough and are in S3.
  *
- * @package   module_objectfs
- * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahra
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace module_objectfs\object_manipulator;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . '/module/objectfs/lib.php');
-require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
+require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
 
 use Aws\S3\Exception\S3Exception;
 
@@ -46,7 +45,7 @@ class deleter extends manipulator {
      * deleter constructor.
      *
      * @param sss_client $client S3 client
-     * @param objectfs_file_system $filesystem S3 file system
+     * @param object_file_system $filesystem S3 file system
      * @param object $config sssfs config.
      */
     public function __construct($filesystem, $config, $logger) {
@@ -56,20 +55,20 @@ class deleter extends manipulator {
         $this->sizethreshold = $config->sizethreshold;
         $this->logger = $logger;
         // Inject our logger into the filesystem.
-        $this->filesystem->get('remotefilesystem')->set_logger($this->logger);
+        $this->filesystem->set_logger($this->logger);
     }
 
     /**
-     * Get candidate content ids for cleaning.
-     * Files that are past the consistency delay
+     * Get candidate content hashes for cleaning.
+     * Files that are past the consistancy delay
      * and are in location duplicated.
      *
-     * @return array candidate contentids
+     * @return array candidate contenthashes
      */
     public function get_candidate_objects() {
 
         if ($this->deletelocal == 0) {
-            log_debug("Delete local disabled, not running query \n");
+            mtrace("Delete local disabled, not running query \n");
             return array();
         }
 
@@ -85,7 +84,6 @@ class deleter extends manipulator {
                  HAVING MAX(af.size) > ?';
 
         $consistancythrehold = time() - $this->consistencydelay;
-
         $params = array($consistancythrehold, OBJECT_LOCATION_DUPLICATED, $this->sizethreshold);
 
         $this->logger->start_timing();
@@ -96,22 +94,21 @@ class deleter extends manipulator {
 
         $this->logger->log_object_query('get_delete_candidates', $totalobjectsfound);
 
-        if ($objects == false ) {
-            $objects = array();
-        }
-
         return $objects;
     }
 
+
     protected function manipulate_object($objectrecord) {
-        $newlocation = $this->filesystem->get('remotefilesystem')->delete_object_from_local($this->filesystem);
+        $newlocation = $this->filesystem->delete_object_from_local_by_hash($objectrecord->contenthash, $objectrecord->filesize);
         return $newlocation;
     }
+
     protected function manipulator_can_execute() {
         if ($this->deletelocal == 0) {
-            log_debug("Delete local disabled \n");
+            mtrace("Delete local disabled \n");
             return false;
         }
+
         return true;
     }
 

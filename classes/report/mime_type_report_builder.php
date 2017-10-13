@@ -2,54 +2,52 @@
 /**
  * Mime type report
  *
- * @package   module_objectfs
- * @author    Ilya Tregubov <kennethhendricks@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahara
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace module_objectfs\report;
-require_once($CFG->docroot . '/module/objectfs/classes/report/objectfs_report_builder.php');
+
+defined('INTERNAL') || die();
 
 class mime_type_report_builder extends objectfs_report_builder {
 
     public function build_report() {
 
-        $sql = 'SELECT sum(size) as objectsum, filetype as datakey, count(*) as objectcount
-        FROM (SELECT size,
-                CASE
-                    WHEN filetype = \'application/pdf\'                                   THEN \'pdf\'
-                    WHEN filetype = \'application/epub+zip\'                              THEN \'epub\'
-                    WHEN filetype =    \'application/msword\'                             THEN \'document\'
-                    WHEN filetype =    \'application/x-mspublisher\'                      THEN \'document\'
-                    WHEN filetype like \'application/vnd.ms-word%\'                       THEN \'document\'
-                    WHEN filetype like \'application/vnd.oasis.opendocument.text%\'       THEN \'document\'
-                    WHEN filetype like \'application/vnd.openxmlformats-officedocument%\' THEN \'document\'
-                    WHEN filetype like \'application/vnd.ms-powerpoint%\'                 THEN \'document\'
-                    WHEN filetype = \'application/vnd.oasis.opendocument.presentation\'   THEN \'document\'
-                    WHEN filetype =    \'application/vnd.oasis.opendocument.spreadsheet\' THEN \'spreadsheet\'
-                    WHEN filetype like \'application/vnd.ms-excel%\'                      THEN \'spreadsheet\'
-                    WHEN filetype =    \'application/g-zip\'                              THEN \'archive\'
-                    WHEN filetype =    \'application/x-7z-compressed\'                    THEN \'archive\'
-                    WHEN filetype =    \'application/x-rar-compressed\'                   THEN \'archive\'
-                    WHEN filetype like \'application/%\'                                  THEN \'other\'
-                    ELSE         substr(filetype,0,position(\'/\' IN filetype))
-                END AS filetype
-                FROM {artefact_file_files}
-                WHERE filetype IS NOT NULL AND size > 0) stats
-        GROUP BY datakey
-        ORDER BY
-        sum(size) / 1024, datakey;';
+        $report = new objectfs_report('mime_type');
 
-        $report['rows'] = get_records_sql_array($sql);
+        $sql = "SELECT sum(filesize) as objectsum, filetype as datakey, count(*) as objectcount
+                FROM (SELECT distinct filesize,
+                        CASE
+                            WHEN mimetype = 'application/pdf'                                   THEN 'pdf'
+                            WHEN mimetype = 'application/epub+zip'                              THEN 'epub'
+                            WHEN mimetype = 'application/vnd.moodle.backup'                     THEN 'moodlebackup'
+                            WHEN mimetype =    'application/msword'                             THEN 'document'
+                            WHEN mimetype =    'application/x-mspublisher'                      THEN 'document'
+                            WHEN mimetype like 'application/vnd.ms-word%'                       THEN 'document'
+                            WHEN mimetype like 'application/vnd.oasis.opendocument.text%'       THEN 'document'
+                            WHEN mimetype like 'application/vnd.openxmlformats-officedocument%' THEN 'document'
+                            WHEN mimetype like 'application/vnd.ms-powerpoint%'                 THEN 'document'
+                            WHEN mimetype = 'application/vnd.oasis.opendocument.presentation'   THEN 'document'
+                            WHEN mimetype =    'application/vnd.oasis.opendocument.spreadsheet' THEN 'spreadsheet'
+                            WHEN mimetype like 'application/vnd.ms-excel%'                      THEN 'spreadsheet'
+                            WHEN mimetype =    'application/g-zip'                              THEN 'archive'
+                            WHEN mimetype =    'application/x-7z-compressed'                    THEN 'archive'
+                            WHEN mimetype =    'application/x-rar-compressed'                   THEN 'archive'
+                            WHEN mimetype like 'application/%'                                  THEN 'other'
+                            ELSE         substr(mimetype,0,position('/' IN mimetype))
+                        END AS filetype
+                        FROM {files}
+                        WHERE mimetype IS NOT NULL) stats
+                GROUP BY datakey
+                ORDER BY
+                sum(filesize) / 1024, datakey";
 
-        if (is_array($report['rows'])) {
-            foreach ($report['rows'] as $key => $value) {
-                $value->reporttype = 2;
-            }
-        }
+        $result = get_records_sql_array($sql);
 
-        $report['reporttype'] = 2;
+        $report->add_rows($result);
 
         return $report;
     }

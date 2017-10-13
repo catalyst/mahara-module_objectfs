@@ -1,21 +1,17 @@
 <?php
 /**
- * object_file_system abstract class.
  *
- * Remote object storage providers extent this class.
- * At minimum you need to implement get_remote_client.
- *
- * @package   module_objectfs
- * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahara
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('INTERNAL') || die();
 
 global $CFG;
 
-require_once($CFG->docroot . 'module/objectfs/s3_lib.php');
+require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
 require_once($CFG->docroot . 'artefact/lib.php');
 require_once($CFG->docroot . 'artefact/file/lib.php');
 

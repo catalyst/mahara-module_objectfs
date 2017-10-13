@@ -1,41 +1,36 @@
 <?php
 /**
- * Object location report builder.
+ * Log size report
  *
- * @package   module_objectfs
- * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahara
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace module_objectfs\report;
-require_once($CFG->docroot . '/module/objectfs/classes/report/objectfs_report_builder.php');
+
+defined('INTERNAL') || die();
 
 class log_size_report_builder extends objectfs_report_builder {
 
     public function build_report() {
 
+        $report = new objectfs_report('log_size');
+
         $sql = 'SELECT log as datakey,
-                       sum(size) as objectsum,
+                       sum(filesize) as objectsum,
                        count(*) as objectcount
-                  FROM (SELECT DISTINCT artefact, size, floor(log(2,size)) AS log
-                            FROM {artefact_file_files}
-                            WHERE size != 0) d
-               GROUP BY log ORDER BY log';
+                  FROM (SELECT DISTINCT contenthash, filesize, floor(log(2,filesize)) AS log
+                            FROM {files}
+                            WHERE filesize != 0) d
+              GROUP BY log ORDER BY log';
 
-        $report['rows'] = get_records_sql_array($sql);
+        $stats = get_records_sql_array($sql);
 
-        if ($report['rows']) {
-            $this->compress_small_log_sizes($report['rows']);
+        $this->compress_small_log_sizes($stats);
 
-            if (is_array($report['rows'])) {
-                foreach ($report['rows'] as $key => $value) {
-                    $value->reporttype = 1;
-                }
-            }
-        }
-
-        $report['reporttype'] = 1;
+        $report->add_rows($stats);
 
         return $report;
     }
@@ -59,5 +54,4 @@ class log_size_report_builder extends objectfs_report_builder {
         // Add to the beginning of the array.
         array_unshift($stats, $smallstats);
     }
-
 }

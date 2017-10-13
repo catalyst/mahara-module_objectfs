@@ -2,18 +2,17 @@
 /**
  * objectfs null logger class.
  *
- * @package   module_objectfs
- * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahara
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace module_objectfs\log;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . '/module/objectfs/s3_lib.php');
-require_once($CFG->docroot . '/module/objectfs/classes/log/objectfs_logger.php');
+require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
 
 class null_logger extends objectfs_logger {
 
@@ -21,7 +20,7 @@ class null_logger extends objectfs_logger {
         return;
     }
 
-    public function log_object_move($movename, $initallocation, $finallocation, $objectid, $objectsize = 0) {
+    public function log_object_move($movename, $initallocation, $finallocation, $objecthash, $objectsize = 0) {
         return;
     }
 

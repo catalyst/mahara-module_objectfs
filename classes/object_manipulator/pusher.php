@@ -1,19 +1,18 @@
 <?php
 /**
- * Pushes files to remote storage if they meet the configured criteria.
+ * Pushes files to remote storage if they meet the configured criterea.
  *
- * @package   module_objectfs
- * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahara
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace module_objectfs\object_manipulator;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . '/module/objectfs/lib.php');
-require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
+require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
 
 use Aws\S3\Exception\S3Exception;
 
@@ -37,7 +36,7 @@ class pusher extends manipulator {
      * Pusher constructor.
      *
      * @param object_client $client remote object client
-     * @param objectfs_file_system $filesystem object file system
+     * @param object_file_system $filesystem objectfs file system
      * @param object $config objectfs config.
      */
     public function __construct($filesystem, $config, $logger) {
@@ -47,19 +46,20 @@ class pusher extends manipulator {
 
         $this->logger = $logger;
         // Inject our logger into the filesystem.
-        $this->filesystem->get('remotefilesystem')->set_logger($this->logger);
+        $this->filesystem->set_logger($this->logger);
     }
 
     /**
-     * Get candidate content ids for pushing.
+     * Get candidate content hashes for pushing.
      * Files that are bigger than the sizethreshold,
      * less than 5GB (S3 upload max),
      * older than the minimum age
      * and have no location / are in local.
      *
-     * @return array candidate contentids
+     * @return array candidate contenthashes
      */
     public function get_candidate_objects() {
+
         $sql = 'SELECT af.artefact,
                        MAX(af.size) AS filesize,
                        a.title,
@@ -79,9 +79,6 @@ class pusher extends manipulator {
 
         $maxcreatedtimestamp = time() - $this->minimumage;
 
-        // Time created should be converted in D/M/Y format for mahara.
-        $maxcreatedtimestamp = db_format_timestamp($maxcreatedtimestamp);
-
         $params = array($maxcreatedtimestamp, $this->sizethreshold, OBJECT_LOCATION_LOCAL);
 
         $this->logger->start_timing();
@@ -89,17 +86,17 @@ class pusher extends manipulator {
         $this->logger->end_timing();
 
         $totalobjectsfound = count($objects);
+
         $this->logger->log_object_query('get_push_candidates', $totalobjectsfound);
-        if ($objects == false) {
-            $objects = array();
-        }
 
         return $objects;
     }
 
     protected function manipulate_object($objectrecord) {
-        $newlocation = $this->filesystem->get('remotefilesystem')->copy_object_from_local_to_remote($this->filesystem);
+        $newlocation = $this->filesystem->copy_object_from_local_to_external_by_hash($objectrecord->contenthash, $objectrecord->filesize);
         return $newlocation;
     }
 
 }
+
+

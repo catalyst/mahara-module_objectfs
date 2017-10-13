@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * File status page - stats on where files are b/w local file system and s3
+ * Task that pushes files to S3.
  *
  * @package   tool_objectfs
  * @author    Kenneth Hendricks <kennethhendricks@catalyst-au.net>
@@ -23,33 +23,27 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/../../../config.php');
-require_once( __DIR__ . '/lib.php');
-require_once($CFG->libdir.'/adminlib.php');
+namespace tool_objectfs\task;
 
 use tool_objectfs\report\objectfs_report;
-use tool_objectfs\report\objectfs_report_builder;
 
+require_once( __DIR__ . '/../../lib.php');
 
-admin_externalpage_setup('tool_objectfs');
+defined('MOODLE_INTERNAL') || die();
 
-$output = $PAGE->get_renderer('tool_objectfs');
+class generate_status_report extends \core\task\scheduled_task {
 
-echo $output->header();
+    /**
+     * Get task name
+     */
+    public function get_name() {
+        return get_string('generate_status_report_task', 'tool_objectfs');
+    }
 
-echo $output->heading(get_string('object_status:page', 'tool_objectfs'));
-
-echo $output->object_status_page_intro();
-
-$reporttypes = objectfs_report::get_report_types();
-
-foreach ($reporttypes as $reporttype) {
-    $report = objectfs_report_builder::load_report_from_database($reporttype);
-    // We call this render method directly cause 26 cant handle namespace classes.
-    echo $output->render_objectfs_report($report);
+    /**
+     * Execute task
+     */
+    public function execute() {
+        objectfs_report::generate_status_report();
+    }
 }
-
-echo $output->footer();
-
-
-

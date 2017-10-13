@@ -23,32 +23,31 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use tool_objectfs\form\settings_form;
+
 require_once(__DIR__ . '/../../../config.php');
 require_once( __DIR__ . '/lib.php');
 require_once($CFG->libdir.'/adminlib.php');
 
-use tool_objectfs\report\objectfs_report;
-use tool_objectfs\report\objectfs_report_builder;
-
-
-admin_externalpage_setup('tool_objectfs');
+admin_externalpage_setup('tool_objectfs_settings');
 
 $output = $PAGE->get_renderer('tool_objectfs');
 
-echo $output->header();
+$config = get_objectfs_config();
 
-echo $output->heading(get_string('object_status:page', 'tool_objectfs'));
+$config->sizethreshold /= 1024; // Convert to KB.
 
-echo $output->object_status_page_intro();
+$form = new settings_form(null, array('config' => $config));
 
-$reporttypes = objectfs_report::get_report_types();
-
-foreach ($reporttypes as $reporttype) {
-    $report = objectfs_report_builder::load_report_from_database($reporttype);
-    // We call this render method directly cause 26 cant handle namespace classes.
-    echo $output->render_objectfs_report($report);
+if ($data = $form->get_data()) {
+    $data->sizethreshold *= 1024; // Convert back to Bytes.
+    set_objectfs_config($data);
+    redirect(new moodle_url('/admin/tool/objectfs/index.php'));
 }
 
+echo $output->header();
+echo $output->heading(get_string('pluginname', 'tool_objectfs'));
+$form->display();
 echo $output->footer();
 
 

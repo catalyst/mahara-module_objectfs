@@ -15,7 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * File status page - stats on where files are b/w local file system and s3
+ * object_file_system abstract class.
+ *
+ * Remote object storage providers extent this class.
+ * At minimum you need to impletment get_remote_client.
  *
  * @package   tool_objectfs
  * @author    Kenneth Hendricks <kennethhendricks@catalyst-au.net>
@@ -23,33 +26,19 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(__DIR__ . '/../../../config.php');
-require_once( __DIR__ . '/lib.php');
-require_once($CFG->libdir.'/adminlib.php');
+namespace tool_objectfs;
 
-use tool_objectfs\report\objectfs_report;
-use tool_objectfs\report\objectfs_report_builder;
+defined('MOODLE_INTERNAL') || die();
 
+use tool_objectfs\object_file_system;
+use tool_objectfs\client\s3_client;
 
-admin_externalpage_setup('tool_objectfs');
+require_once($CFG->dirroot . '/admin/tool/objectfs/lib.php');
 
-$output = $PAGE->get_renderer('tool_objectfs');
+class s3_file_system extends object_file_system {
 
-echo $output->header();
-
-echo $output->heading(get_string('object_status:page', 'tool_objectfs'));
-
-echo $output->object_status_page_intro();
-
-$reporttypes = objectfs_report::get_report_types();
-
-foreach ($reporttypes as $reporttype) {
-    $report = objectfs_report_builder::load_report_from_database($reporttype);
-    // We call this render method directly cause 26 cant handle namespace classes.
-    echo $output->render_objectfs_report($report);
+    protected function get_external_client($config) {
+        $s3client = new s3_client($config);
+        return $s3client;
+    }
 }
-
-echo $output->footer();
-
-
-

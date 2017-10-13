@@ -2,17 +2,17 @@
 /**
  * objectfs logger abstract class.
  *
- * @package   module_objectfs
- * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahara
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace module_objectfs\log;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . '/module/objectfs/s3_lib.php');
+require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
 
 abstract class objectfs_logger {
     protected $timestart;

@@ -2,17 +2,17 @@
 /**
  * Recovers objects that are in the error state if it can.
  *
- * @package   module_objectfs
- * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahara
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace module_objectfs\object_manipulator;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . '/module/objectfs/lib.php');
+require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
 
 use Aws\S3\Exception\S3Exception;
 
@@ -21,24 +21,24 @@ class recoverer extends manipulator {
     /**
      * recoverer constructor.
      *
-     * @param objectfs_client $client remote object client
-     * @param objectfs_file_system $filesystem object file system
-     * @param object $config objectfs config.
+     * @param sss_client $client S3 client
+     * @param object_file_system $filesystem S3 file system
+     * @param object $config sssfs config.
      */
     public function __construct($filesystem, $config, $logger) {
         parent::__construct($filesystem, $config);
 
         $this->logger = $logger;
         // Inject our logger into the filesystem.
-        $this->filesystem->get('remotefilesystem')->set_logger($this->logger);
+        $this->filesystem->set_logger($this->logger);
     }
 
     /**
-     * Get candidate content ids for cleaning.
-     * Files that are past the consistency delay
+     * Get candidate content hashes for cleaning.
+     * Files that are past the consistancy delay
      * and are in location duplicated.
      *
-     * @return array candidate contentids
+     * @return array candidate contenthashes
      */
     public function get_candidate_objects() {
 
@@ -60,16 +60,11 @@ class recoverer extends manipulator {
         $totalobjectsfound = count($objects);
 
         $this->logger->log_object_query('get_recover_candidates', $totalobjectsfound);
-
-        if ($objects == false) {
-            $objects = array();
-        }
-
         return $objects;
     }
 
     protected function manipulate_object($objectrecord) {
-        $newlocation = $this->filesystem->get('remotefilesystem')->get_actual_object_location($this->filesystem);
+        $newlocation = $this->filesystem->get_object_location_from_hash($objectrecord->contenthash, $objectrecord->filesize);
         return $newlocation;
     }
 

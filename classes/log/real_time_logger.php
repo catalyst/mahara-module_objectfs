@@ -2,17 +2,17 @@
 /**
  * objectfs null logger class.
  *
- * @package   module_objectfs
- * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
- * @copyright Catalyst IT
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    mahara
+ * @subpackage module.objectfs
+ * @author     Catalyst IT
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace module_objectfs\log;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . '/module/objectfs/lib.php');
+require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
 
 class real_time_logger extends objectfs_logger {
 
@@ -20,7 +20,7 @@ class real_time_logger extends objectfs_logger {
 
     }
 
-    public function log_object_move_action($actionname, $objectid, $initallocation, $finallocation) {
+    public function log_object_move_action($actionname, $objecthash, $initallocation, $finallocation) {
 
     }
 
@@ -58,8 +58,8 @@ class real_time_logger extends objectfs_logger {
         // @codingStandardsIgnoreEnd
     }
 
-    public function log_object_move($movename, $initallocation, $finallocation, $objectid, $objectsize = 0) {
-        $logstring = "The move action '$movename' was performed on object with hash $objectid. ";
+    public function log_object_move($movename, $initallocation, $finallocation, $objecthash, $objectsize = 0) {
+        $logstring = "The move action '$movename' was performed on object with hash $objecthash. ";
         $this->append_location_change_string($logstring, $initallocation, $finallocation);
         $this->append_timing_string($logstring);
         $this->append_size_string($logstring, $objectsize);

@@ -80,7 +80,7 @@ class objectfs_file_system extends remote_file_system {
 
 
     protected function get_object_path_from_storedfile($file) {
-/*        if ($this->preferremote) {
+/*        if ($this->preferexternal) {
             $location = $this->get_actual_object_location_by_hash($file->get_contenthash());
             if ($location == OBJECT_LOCATION_DUPLICATED) {
                 return $this->get_remote_path_from_storedfile($file);
