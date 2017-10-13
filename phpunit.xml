@@ -29,7 +29,7 @@
 <!--All core suites need to be manually added here-->
 
     <testsuites>
-        <testsuite name="tool_objectfs_testsuite">
+        <testsuite name="module_objectfs_testsuite">
             <directory suffix="_test.php">tests</directory>
         </testsuite>
         <testsuite name="core_files_testsuite">

@@ -116,7 +116,7 @@ abstract class manipulator {
     public static function setup_and_run_object_manipulator($manipulatorclassname) {
         $config = get_objectfs_config();
 
-        $shouldtaskrun = tool_objectfs_should_tasks_run();
+        $shouldtaskrun = module_objectfs_should_tasks_run();
 
         if ($shouldtaskrun) {
             $logger = new \module_objectfs\log\aggregate_logger();

@@ -20,18 +20,18 @@
  * Remote object storage providers extent this class.
  * At minimum you need to impletment get_remote_client.
  *
- * @package   tool_objectfs
+ * @package   module_objectfs
  * @author    Kenneth Hendricks <kennethhendricks@catalyst-au.net>
  * @copyright Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_objectfs;
+namespace module_objectfs;
 
 defined('MOODLE_INTERNAL') || die();
 
-use tool_objectfs\object_file_system;
-use tool_objectfs\client\s3_client;
+use module_objectfs\object_file_system;
+use module_objectfs\client\s3_client;
 
 require_once($CFG->dirroot . '/admin/tool/objectfs/lib.php');
 

@@ -17,15 +17,15 @@
 /**
  * Task that pushes files to S3.
  *
- * @package   tool_objectfs
+ * @package   module_objectfs
  * @author    Kenneth Hendricks <kennethhendricks@catalyst-au.net>
  * @copyright Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_objectfs\task;
+namespace module_objectfs\task;
 
-use tool_objectfs\report\objectfs_report;
+use module_objectfs\report\objectfs_report;
 
 require_once( __DIR__ . '/../../lib.php');
 
@@ -37,7 +37,7 @@ class generate_status_report extends \core\task\scheduled_task {
      * Get task name
      */
     public function get_name() {
-        return get_string('generate_status_report_task', 'tool_objectfs');
+        return get_string('generate_status_report_task', 'module_objectfs');
     }
 
     /**

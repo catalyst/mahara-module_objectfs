@@ -14,24 +14,24 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace tool_objectfs\tests;
+namespace module_objectfs\tests;
 
 defined('MOODLE_INTERNAL') || die();
 
-use tool_objectfs\object_file_system;
-use tool_objectfs\object_manipulator\puller;
+use module_objectfs\object_file_system;
+use module_objectfs\object_manipulator\puller;
 
 require_once(__DIR__ . '/classes/test_client.php');
-require_once(__DIR__ . '/tool_objectfs_testcase.php');
+require_once(__DIR__ . '/module_objectfs_testcase.php');
 
-class puller_testcase extends tool_objectfs_testcase {
+class puller_testcase extends module_objectfs_testcase {
 
     protected function setUp() {
         parent::setUp();
         $config = get_objectfs_config();
         $config->sizethreshold = 100;
         set_objectfs_config($config);
-        $this->logger = new \tool_objectfs\log\aggregate_logger();
+        $this->logger = new \module_objectfs\log\aggregate_logger();
         $this->puller = new puller($this->filesystem, $config, $this->logger);
         ob_start();
     }
@@ -81,7 +81,7 @@ class puller_testcase extends tool_objectfs_testcase {
 
         $this->puller->execute(array($object));
 
-        $location = $DB->get_field('tool_objectfs_objects', 'location', array('contenthash' => $object->contenthash));
+        $location = $DB->get_field('module_objectfs_objects', 'location', array('contenthash' => $object->contenthash));
         $this->assertEquals(OBJECT_LOCATION_DUPLICATED, $location);
         $this->assertTrue($this->is_locally_readable_by_hash($object->contenthash));
         $this->assertTrue($this->is_externally_readable_by_hash($object->contenthash));
@@ -93,7 +93,7 @@ class puller_testcase extends tool_objectfs_testcase {
 
         $this->puller->execute(array($object));
 
-        $location = $DB->get_field('tool_objectfs_objects', 'location', array('contenthash' => $object->contenthash));
+        $location = $DB->get_field('module_objectfs_objects', 'location', array('contenthash' => $object->contenthash));
         $this->assertEquals(OBJECT_LOCATION_DUPLICATED, $location);
         $this->assertTrue($this->is_locally_readable_by_hash($object->contenthash));
         $this->assertTrue($this->is_externally_readable_by_hash($object->contenthash));
@@ -105,7 +105,7 @@ class puller_testcase extends tool_objectfs_testcase {
 
         $this->puller->execute(array($object));
 
-        $location = $DB->get_field('tool_objectfs_objects', 'location', array('contenthash' => $object->contenthash));
+        $location = $DB->get_field('module_objectfs_objects', 'location', array('contenthash' => $object->contenthash));
         $this->assertEquals(OBJECT_LOCATION_LOCAL, $location);
         $this->assertTrue($this->is_locally_readable_by_hash($object->contenthash));
         $this->assertFalse($this->is_externally_readable_by_hash($object->contenthash));

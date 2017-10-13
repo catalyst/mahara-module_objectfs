@@ -17,7 +17,7 @@
 /**
  * File status page - stats on where files are b/w local file system and s3
  *
- * @package   tool_objectfs
+ * @package   module_objectfs
  * @author    Kenneth Hendricks <kennethhendricks@catalyst-au.net>
  * @copyright Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,17 +27,17 @@ require_once(__DIR__ . '/../../../config.php');
 require_once( __DIR__ . '/lib.php');
 require_once($CFG->libdir.'/adminlib.php');
 
-use tool_objectfs\report\objectfs_report;
-use tool_objectfs\report\objectfs_report_builder;
+use module_objectfs\report\objectfs_report;
+use module_objectfs\report\objectfs_report_builder;
 
 
-admin_externalpage_setup('tool_objectfs');
+admin_externalpage_setup('module_objectfs');
 
-$output = $PAGE->get_renderer('tool_objectfs');
+$output = $PAGE->get_renderer('module_objectfs');
 
 echo $output->header();
 
-echo $output->heading(get_string('object_status:page', 'tool_objectfs'));
+echo $output->heading(get_string('object_status:page', 'module_objectfs'));
 
 echo $output->object_status_page_intro();
 

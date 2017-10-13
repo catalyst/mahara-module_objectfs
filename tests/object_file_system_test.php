@@ -14,16 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace tool_objectfs\tests;
+namespace module_objectfs\tests;
 
 defined('MOODLE_INTERNAL') || die();
 
-use tool_objectfs\object_file_system;
+use module_objectfs\object_file_system;
 
 require_once(__DIR__ . '/classes/test_client.php');
-require_once(__DIR__ . '/tool_objectfs_testcase.php');
+require_once(__DIR__ . '/module_objectfs_testcase.php');
 
-class object_file_system_testcase extends tool_objectfs_testcase {
+class object_file_system_testcase extends module_objectfs_testcase {
 
     public function test_get_remote_path_from_storedfile_returns_local_path_if_local() {
         $file = $this->create_local_file();
@@ -48,7 +48,7 @@ class object_file_system_testcase extends tool_objectfs_testcase {
     }
 
     public function test_get_remote_path_from_storedfile_returns_external_path_if_duplicated_and_preferexternal() {
-        set_config('preferexternal', true, 'tool_objectfs');
+        set_config('preferexternal', true, 'module_objectfs');
         $this->reset_file_system(); // Needed to load new config.
         $file = $this->create_duplicated_file();
         $expectedpath = $this->get_external_path_from_storedfile($file);
@@ -233,7 +233,7 @@ class object_file_system_testcase extends tool_objectfs_testcase {
         $this->filesystem->readfile($fakefile);
         restore_error_handler();
 
-        $location = $DB->get_field('tool_objectfs_objects', 'location', array('contenthash' => $fakefile->get_contenthash()));
+        $location = $DB->get_field('module_objectfs_objects', 'location', array('contenthash' => $fakefile->get_contenthash()));
         $this->assertEquals(OBJECT_LOCATION_ERROR, $location);
     }
 
@@ -265,7 +265,7 @@ class object_file_system_testcase extends tool_objectfs_testcase {
         $this->filesystem->get_content($fakefile);
         restore_error_handler();
 
-        $location = $DB->get_field('tool_objectfs_objects', 'location', array('contenthash' => $fakefile->get_contenthash()));
+        $location = $DB->get_field('module_objectfs_objects', 'location', array('contenthash' => $fakefile->get_contenthash()));
         $this->assertEquals(OBJECT_LOCATION_ERROR, $location);
     }
 
@@ -284,7 +284,7 @@ class object_file_system_testcase extends tool_objectfs_testcase {
         $this->filesystem->xsendfile($fakefile->get_contenthash());
         restore_error_handler();
 
-        $location = $DB->get_field('tool_objectfs_objects', 'location', array('contenthash' => $fakefile->get_contenthash()));
+        $location = $DB->get_field('module_objectfs_objects', 'location', array('contenthash' => $fakefile->get_contenthash()));
         $this->assertEquals(OBJECT_LOCATION_ERROR, $location);
     }
 
@@ -324,7 +324,7 @@ class object_file_system_testcase extends tool_objectfs_testcase {
         $filehandle = $this->filesystem->get_content_file_handle($fakefile);
         restore_error_handler();
 
-        $location = $DB->get_field('tool_objectfs_objects', 'location', array('contenthash' => $fakefile->get_contenthash()));
+        $location = $DB->get_field('module_objectfs_objects', 'location', array('contenthash' => $fakefile->get_contenthash()));
         $this->assertEquals(OBJECT_LOCATION_ERROR, $location);
     }
 

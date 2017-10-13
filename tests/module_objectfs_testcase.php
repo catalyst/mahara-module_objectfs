@@ -14,21 +14,21 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace tool_objectfs\tests;
+namespace module_objectfs\tests;
 
 defined('MOODLE_INTERNAL') || die();
 
-use tool_objectfs\object_file_system;
+use module_objectfs\object_file_system;
 
 require_once(__DIR__ . '/classes/test_client.php');
 require_once(__DIR__ . '/classes/test_file_system.php');
 
-abstract class tool_objectfs_testcase extends \advanced_testcase {
+abstract class module_objectfs_testcase extends \advanced_testcase {
 
     protected function setUp() {
         global $CFG;
         $this->filesystem = new test_file_system();
-        $this->logger = new \tool_objectfs\log\null_logger();
+        $this->logger = new \module_objectfs\log\null_logger();
         $this->resetAfterTest(true);
     }
 

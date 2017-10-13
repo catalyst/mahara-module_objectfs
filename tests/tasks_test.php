@@ -14,14 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-namespace tool_objectfs\tests;
+namespace module_objectfs\tests;
 
 defined('MOODLE_INTERNAL') || die();
 
 /**
  * End to end tests for tasks. Make sure all the plumbing is ok.
  */
-class tasks_testcase extends tool_objectfs_testcase {
+class tasks_testcase extends module_objectfs_testcase {
 
     protected function setUp() {
         parent::setUp();
@@ -36,7 +36,7 @@ class tasks_testcase extends tool_objectfs_testcase {
         $config = get_objectfs_config();
         $config->enabletasks = true;
         set_objectfs_config($config);
-        tool_objectfs_cron();
+        module_objectfs_cron();
     }
 
     public function test_run_scheduled_tasks() {
@@ -57,7 +57,7 @@ class tasks_testcase extends tool_objectfs_testcase {
                                     'recover_error_objects');
 
         foreach ($scheduledtasknames as $taskname) {
-            $task = \core\task\manager::get_scheduled_task('\\tool_objectfs\\task\\' . $taskname);
+            $task = \core\task\manager::get_scheduled_task('\\module_objectfs\\task\\' . $taskname);
             $task->execute();
         }
     }

@@ -45,7 +45,7 @@ abstract class object_file_system extends \remote_file_system {
         }
     }
 
-    public function set_logger(\tool_objectfs\log\objectfs_logger $logger) {
+    public function set_logger(\module_objectfs\log\objectfs_logger $logger) {
         $this->logger = $logger;
     }
 
@@ -165,7 +165,7 @@ abstract class object_file_system extends \remote_file_system {
     public function acquire_object_lock($contenthash) {
         $timeout = 600; // 10 minutes before giving up.
         $resource = "object: $contenthash";
-        $lockfactory = \core\lock\lock_config::get_lock_factory('tool_objectfs_object');
+        $lockfactory = \core\lock\lock_config::get_lock_factory('module_objectfs_object');
         $lock = $lockfactory->get_lock($resource, $timeout);
         return $lock;
     }

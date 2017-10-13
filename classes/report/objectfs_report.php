@@ -47,7 +47,7 @@ class objectfs_report implements \renderable {
         $reporttypes = self::get_report_types();
 
         foreach ($reporttypes as $reporttype) {
-            $reportbuilderclass = "tool_objectfs\\report\\{$reporttype}_report_builder";
+            $reportbuilderclass = "module_objectfs\\report\\{$reporttype}_report_builder";
             $reportbuilder = new $reportbuilderclass();
             $report = $reportbuilder->build_report();
             objectfs_report_builder::save_report_to_database($report);

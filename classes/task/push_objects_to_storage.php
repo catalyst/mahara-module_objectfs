@@ -17,17 +17,17 @@
 /**
  * Task that pushes files to S3.
  *
- * @package   tool_objectfs
+ * @package   module_objectfs
  * @author    Kenneth Hendricks <kennethhendricks@catalyst-au.net>
  * @copyright Catalyst IT
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace tool_objectfs\task;
+namespace module_objectfs\task;
 
-use tool_objectfs\object_manipulator\manipulator;
-use tool_objectfs\object_file_system;
-use tool_objectfs\s3_file_system;
+use module_objectfs\object_manipulator\manipulator;
+use module_objectfs\object_file_system;
+use module_objectfs\s3_file_system;
 
 
 defined('MOODLE_INTERNAL') || die();
@@ -42,14 +42,14 @@ class push_objects_to_storage extends \core\task\scheduled_task {
      * Get task name
      */
     public function get_name() {
-        return get_string('push_objects_to_storage_task', 'tool_objectfs');
+        return get_string('push_objects_to_storage_task', 'module_objectfs');
     }
 
     /**
      * Execute task
      */
     public function execute() {
-        manipulator::setup_and_run_object_manipulator('\\tool_objectfs\\object_manipulator\\pusher');
+        manipulator::setup_and_run_object_manipulator('\\module_objectfs\\object_manipulator\\pusher');
     }
 }
 

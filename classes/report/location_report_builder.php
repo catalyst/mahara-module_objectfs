@@ -38,7 +38,7 @@ class location_report_builder extends objectfs_report_builder {
                            COALESCE(SUM(sub.filesize) ,0) AS objectsum
                       FROM (SELECT f.contenthash, MAX(f.filesize) AS filesize
                               FROM {files} f
-                              LEFT JOIN {tool_objectfs_objects} o on f.contenthash = o.contenthash
+                              LEFT JOIN {module_objectfs_objects} o on f.contenthash = o.contenthash
                               GROUP BY f.contenthash, f.filesize, o.location
                               HAVING o.location = ?' . $localsql .') AS sub
                      WHERE sub.filesize != 0';

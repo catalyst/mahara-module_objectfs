@@ -22,13 +22,13 @@ abstract class objectfs_report_builder {
         $reportrows = $report->get_rows();
 
         // Remove old records.
-        delete_records('tool_objectfs_reports', array('reporttype' => $reporttype));
+        delete_records('module_objectfs_reports', array('reporttype' => $reporttype));
 
         // Add report type to each row.
         foreach ($reportrows as $row) {
             $row->reporttype = $reporttype;
             // We dont use insert_records because of 26 compatibility.
-            insert_record('tool_objectfs_reports', $row);
+            insert_record('module_objectfs_reports', $row);
         }
     }
 
