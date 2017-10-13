@@ -12,6 +12,7 @@ defined('INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
+require_once($CFG->docroot . 'module/objectfs/classes/client/s3_client.php');
 require_once($CFG->docroot . 'artefact/lib.php');
 require_once($CFG->docroot . 'artefact/file/lib.php');
 
@@ -84,8 +85,6 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     }
 
     public static function get_config_options() {
-        global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/classes/client/s3_client.php');
 
         $configtemp = get_objectfs_config();
 
@@ -104,7 +103,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         if ($connection) {
             $connection = get_string('settings:connectionsuccess', 'module.objectfs');
-            $permissions = $client->permissions_check();
+            $permissions = $client->test_permissions();
 
             $errormsg = '';
             if ($permissions->success) {
@@ -204,9 +203,9 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
             ),
         );
 
-        $config['sssfssettings'] = array(
+        $config['objectfssettings'] = array(
             'type' => 'fieldset',
-            'legend' => get_string('settings:filetransferheader', 'module.objectfs'),
+            'legend' => get_string('settings:awsheader', 'module.objectfs'),
             'collapsible' => true,
             'collapsed' => true,
             'elements' => array(
