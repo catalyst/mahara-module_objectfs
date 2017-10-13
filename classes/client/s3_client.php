@@ -131,11 +131,11 @@ class s3_client implements object_client {
             $result = $this->client->headBucket(array(
                             'Bucket' => $this->bucket));
 
-            $connection->message = get_string('settings:connectionsuccess', 'tool_objectfs');
+            $connection->message = get_string('settings:connectionsuccess', 'module.objectfs');
         } catch (S3Exception $e) {
             $connection->success = false;
             $details = $this->get_exception_details($e);
-            $connection->message = get_string('settings:connectionfailure', 'tool_objectfs') . $details;
+            $connection->message = get_string('settings:connectionfailure', 'module.objectfs') . $details;
         }
         return $connection;
     }
@@ -159,7 +159,7 @@ class s3_client implements object_client {
                             'Body' => 'test content'));
         } catch (S3Exception $e) {
             $details = $this->get_exception_details($e);
-            $permissions->messages[] = get_string('settings:writefailure', 'tool_objectfs') . $details;
+            $permissions->messages[] = get_string('settings:writefailure', 'module.objectfs') . $details;
             $permissions->success = false;
         }
 
@@ -172,7 +172,7 @@ class s3_client implements object_client {
             // Write could have failed.
             if ($errorcode !== 'NoSuchKey') {
                 $details = $this->get_exception_details($e);
-                $permissions->messages[] = get_string('settings:readfailure', 'tool_objectfs') . $details;
+                $permissions->messages[] = get_string('settings:readfailure', 'module.objectfs') . $details;
                 $permissions->success = false;
             }
         }
@@ -181,19 +181,19 @@ class s3_client implements object_client {
             $result = $this->client->deleteObject(array(
                             'Bucket' => $this->bucket,
                             'Key' => 'permissions_check_file'));
-            $permissions->messages[] = get_string('settings:deletesuccess', 'tool_objectfs');
+            $permissions->messages[] = get_string('settings:deletesuccess', 'module.objectfs');
             $permissions->success = false;
         } catch (S3Exception $e) {
             $errorcode = $e->getAwsErrorCode();
             // Something else went wrong.
             if ($errorcode !== 'AccessDenied') {
                 $details = $this->get_exception_details($e);
-                $permissions->messages[] = get_string('settings:deleteerror', 'tool_objectfs') . $details;
+                $permissions->messages[] = get_string('settings:deleteerror', 'module.objectfs') . $details;
             }
         }
 
         if ($permissions->success) {
-            $permissions->messages[] = get_string('settings:permissioncheckpassed', 'tool_objectfs');
+            $permissions->messages[] = get_string('settings:permissioncheckpassed', 'module.objectfs');
         }
 
         return $permissions;

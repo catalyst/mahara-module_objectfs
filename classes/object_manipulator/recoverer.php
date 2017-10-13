@@ -21,9 +21,9 @@ class recoverer extends manipulator {
     /**
      * recoverer constructor.
      *
-     * @param sss_client $client S3 client
+     * @param s3_client $client S3 client
      * @param object_file_system $filesystem S3 file system
-     * @param object $config sssfs config.
+     * @param object $config objectfs config.
      */
     public function __construct($filesystem, $config, $logger) {
         parent::__construct($filesystem, $config);
