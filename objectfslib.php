@@ -52,7 +52,7 @@ function update_object_record($contenthash, $location) {
 
 function set_objectfs_config($config) {
     foreach ($config as $key => $value) {
-        set_config($key, $value, 'tool_objectfs');
+        set_config($key, $value, 'module_objectfs');
     }
 }
 
@@ -72,16 +72,20 @@ function get_objectfs_config() {
     $config->logging = 0;
     $config->preferexternal = 0;
 
-    $storedconfig = get_config('tool_objectfs');
+    $storedconfig = get_config('module_objectfs');
 
     // Override defaults if set.
-    foreach ($storedconfig as $key => $value) {
-        $config->$key = $value;
+    if (isset($storedconfig) && !empty($storedconfig)) {
+
+        foreach ($storedconfig as $key => $value) {
+            $config->$key = $value;
+        }
     }
+
     return $config;
 }
 
-function tool_objectfs_should_tasks_run() {
+function module_objectfs_should_tasks_run() {
     $config = get_objectfs_config();
     if (isset($config->enabletasks) && $config->enabletasks) {
         return true;
