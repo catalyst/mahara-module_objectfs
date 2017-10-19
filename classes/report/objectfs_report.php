@@ -12,7 +12,7 @@ namespace module_objectfs\report;
 
 defined('INTERNAL') || die();
 
-class objectfs_report implements \renderable {
+class objectfs_report {
     protected $reporttype;
     protected $rows;
 
