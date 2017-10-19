@@ -70,7 +70,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         }
         $items['adminhome/objectfs'] = array(
             'path'   => 'adminhome/objectfs',
-            'url'    => 'module/objectfs/objectfs.php',
+            'url'    => 'module/objectfs/object_staus.php',
             'title'  => get_string('object_status:page', 'module.objectfs'),
             'weight' => 40,
         );
