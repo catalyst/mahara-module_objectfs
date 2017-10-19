@@ -18,9 +18,9 @@ defined('INTERNAL') || die();
 require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
 require_once($CFG->docroot . 'module/objectfs/classes/log/null_logger.php');
 require_once($CFG->docroot . 'module/objectfs/classes/log/real_time_logger.php');
-require_once($CFG->docroot . 'artefact/file/remote_file_system.php');
+require_once($CFG->docroot . 'artefact/file/remotefilesystem.php');
 
-abstract class object_file_system extends \remote_file_system {
+abstract class object_file_system implements \remote_file_system {
 
     private $externalclient;
     private $preferexternal;
