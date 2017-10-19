@@ -8,9 +8,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('MENUITEM', 'adminhome/objectfs');
+define('INTERNAL', 1);
 
-require_once(__DIR__ . '/../../../init.php');
+require(dirname(dirname(dirname(__FILE__))).'/init.php');
 global $CFG;
 require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report.php');
 require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report_builder.php');
@@ -18,6 +18,7 @@ require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report_bui
 use module_objectfs\report\objectfs_report;
 use module_objectfs\report\objectfs_report_builder;
 
+define('MENUITEM', 'adminhome/objectfs');
 define('TITLE', get_string('object_status:page', 'module.objectfs'));
 
 $reporttypes = objectfs_report::get_report_types();
@@ -28,7 +29,7 @@ foreach ($reporttypes as $reporttype) {
     $sitedata[$reporttype] = objectfs_report_builder::load_report_from_database($reporttype);
 }
 
-$smarty = smarty(array('paginator', 'js/chartjs/Chart.min.js'));
+$smarty = smarty(array('paginator','js/chartjs/Chart.min.js'));
 setpageicon($smarty, 'icon-area-chart');
 
 $smarty->assign('sitedata', $sitedata);
