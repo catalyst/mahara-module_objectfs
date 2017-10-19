@@ -2,10 +2,10 @@
   /**
    * Strings for component 'module_objectfs', language 'en'.
    *
-   * @package   module_objectfs
-   * @author    Ilya Tregubov <ilya.tregubov@catalyst-au.net>
-   * @copyright Catalyst IT
-   * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+   * @package    mahara
+   * @subpackage module_objectfs
+   * @author     Catalyst IT
+   * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
    */
 
 $string['pluginname'] = 'Object storage file system';
