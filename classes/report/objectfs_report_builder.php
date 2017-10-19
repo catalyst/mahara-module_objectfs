@@ -36,7 +36,11 @@ abstract class objectfs_report_builder {
 
         $rows = get_records_array('module_objectfs_reports', 'reporttype', $reporttype);
         $report = new objectfs_report($reporttype);
-        $report->add_rows($rows);
+
+        if (!empty($rows)) {
+            $report->add_rows($rows);
+        }
+
         return $report;
     }
 }
