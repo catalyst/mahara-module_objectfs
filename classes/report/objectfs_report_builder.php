@@ -34,7 +34,7 @@ abstract class objectfs_report_builder {
 
     public static function load_report_from_database($reporttype) {
 
-        $rows = get_records_array('module_objectfs_reports_data', 'reporttype', $reporttype);
+        $rows = get_records_array('module_objectfs_report_data', 'reporttype', $reporttype);
         $report = new objectfs_report($reporttype);
         $report->add_rows($rows);
         return $report;
