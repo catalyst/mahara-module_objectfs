@@ -28,7 +28,7 @@ foreach ($reporttypes as $reporttype) {
     $sitedata[$reporttype] = objectfs_report_builder::load_report_from_database($reporttype);
 }
 
-$smarty = smarty(array('paginator', 'js/chartjs/Char.min.js'));
+$smarty = smarty(array('paginator', 'js/chartjs/Chart.min.js'));
 setpageicon($smarty, 'icon-area-chart');
 
 $smarty->assign('sitedata', $sitedata);
