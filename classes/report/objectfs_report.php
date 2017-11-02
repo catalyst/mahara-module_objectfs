@@ -10,6 +10,9 @@
 
 namespace module_objectfs\report;
 
+require_once($CFG->docroot . 'module/objectfs/classes/report/location_report_builder.php');
+require_once($CFG->docroot . 'module/objectfs/classes/report/log_size_report_builder.php');
+require_once($CFG->docroot . 'module/objectfs/classes/report/mime_type_report_builder.php');
 require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report_builder.php');
 
 defined('INTERNAL') || die();
