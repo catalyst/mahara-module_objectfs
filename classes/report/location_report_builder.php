@@ -36,13 +36,12 @@ class location_report_builder extends objectfs_report_builder {
                 $localsql = '';
             }
 
-            $sql = 'SELECT COALESCE(count(sub.contenthash) ,0) AS objectcount,
-                           COALESCE(SUM(sub.filesize) ,0) AS objectsum
-                      FROM (SELECT f.contenthash, MAX(f.filesize) AS filesize
-                              FROM {files} f
-                              LEFT JOIN {module_objectfs_objects} o on f.contenthash = o.contenthash
-                              GROUP BY f.contenthash, f.filesize, o.location
-                              HAVING o.location = ?' . $localsql .') AS sub
+            $sql = 'SELECT count(sub.artefact) as objectcount, SUM(sub.filesize) as objectsum
+                      FROM (SELECT af.artefact, MAX(af.size) AS filesize
+                              FROM artefact_file_files af
+                         LEFT JOIN module_objectfs_objects o on af.artefact = o.contentid
+                          GROUP BY af.artefact, af.size, o.location
+                            HAVING o.location = ?' . $localsql .' ) AS sub 
                      WHERE sub.filesize != 0';
 
             $result = get_record_sql($sql, array($location));
