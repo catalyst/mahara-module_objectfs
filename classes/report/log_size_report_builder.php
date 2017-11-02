@@ -24,7 +24,7 @@ class log_size_report_builder extends objectfs_report_builder {
                        sum(size) as objectsum,
                        count(*) as objectcount
                   FROM (SELECT DISTINCT artefact, size, floor(log(2,size)) AS log
-                            FROM {artefact_file_files}
+                            FROM artefact_file_files
                             WHERE size != 0) d
                GROUP BY log ORDER BY log';
 
