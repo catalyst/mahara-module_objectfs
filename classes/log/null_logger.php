@@ -12,7 +12,7 @@ namespace module_objectfs\log;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
+require_once($CFG->docroot . 'module/objectfs/classes/log/objectfs_logger.php');
 
 class null_logger extends objectfs_logger {
 
