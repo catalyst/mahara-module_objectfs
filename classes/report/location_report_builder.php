@@ -10,6 +10,8 @@
 
 namespace module_objectfs\report;
 
+require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report_builder.php');
+
 defined('INTERNAL') || die();
 
 class location_report_builder extends objectfs_report_builder {
