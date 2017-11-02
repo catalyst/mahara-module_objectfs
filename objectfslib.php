@@ -57,7 +57,7 @@ function set_objectfs_config($config) {
 }
 
 function get_objectfs_config() {
-    $config = new stdClass;
+    $config = new \stdClass;
     $config->enabletasks = 0;
     $config->enablelogging = 0;
     $config->key = '';
@@ -72,12 +72,16 @@ function get_objectfs_config() {
     $config->logging = 0;
     $config->preferexternal = 0;
 
-    $storedconfig = get_config('module_objectfs');
-
     // Override defaults if set.
-    if (isset($storedconfig) && !empty($storedconfig)) {
+    foreach ($config as $key => $value) {
 
-        foreach ($storedconfig as $key => $value) {
+        $storedvalue = get_config_plugin('module', 'objectfs', $key);
+
+        if (!empty($storedvalue)) {
+
+            $config->$key = $storedvalue;
+        } else {
+
             $config->$key = $value;
         }
     }
