@@ -15,6 +15,7 @@ use module_objectfs\object_manipulator\logger;
 defined('INTERNAL') || die();
 
 require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
+require_once($CFG->docroot . 'module/objectfs/classes/s3_file_system.php');
 require_once($CFG->docroot . 'module/objectfs/classes/log/aggregate_logger.php');
 
 abstract class manipulator {
