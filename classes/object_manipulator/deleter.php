@@ -74,8 +74,8 @@ class deleter extends manipulator {
 
         $sql = 'SELECT af.artefact,
                        MAX(af.size) AS filesize
-                  FROM {artefact_file_files} af
-             LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
+                  FROM artefact_file_files af
+             LEFT JOIN module_objectfs_objects o ON af.artefact = o.contentid
                  WHERE o.timeduplicated <= ?
                        AND o.location = ?
               GROUP BY af.artefact,

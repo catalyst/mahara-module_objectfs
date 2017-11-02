@@ -64,9 +64,9 @@ class pusher extends manipulator {
                        MAX(af.size) AS filesize,
                        a.title,
                        o.contenthash
-                  FROM {artefact_file_files} af
-             LEFT JOIN {artefact} a ON af.artefact = a.id
-             LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
+                  FROM artefact_file_files af
+             LEFT JOIN artefact a ON af.artefact = a.id
+             LEFT JOIN module_objectfs_objects o ON af.artefact = o.contentid
               GROUP BY af.artefact,
                        af.size,
                        o.location,
