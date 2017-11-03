@@ -77,7 +77,8 @@ class pusher extends manipulator {
                        AND MAX(af.size) < 5000000000
                        AND (o.location IS NULL OR o.location = ?)';
 
-        $maxcreatedtimestamp = time() - $this->minimumage;
+        $maxcreated = time() - $this->minimumage;
+        $maxcreatedtimestamp = date('Y-m-d G:H:s', $maxcreated);
 
         $params = array($maxcreatedtimestamp, $this->sizethreshold, OBJECT_LOCATION_LOCAL);
 
