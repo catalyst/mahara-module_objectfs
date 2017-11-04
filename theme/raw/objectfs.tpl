@@ -12,11 +12,11 @@
           <th>Objectsum</th>
         </tr>
 
-        {foreach from=$sitedata['location'] key=key item=item}
+        {foreach $sitedata['location'] key item}
           <tr>
-            <td>{$item.0}</td>
-            <td>{$item.1}</td>
-            <td>{$item.2|display_size}</td>
+            <td>{$item->datakey}</td>
+            <td>{$item->objectcount}</td>
+            <td>{$item->objectsum|display_size}</td>
           </tr>
         {/foreach}
 
@@ -32,16 +32,16 @@
 
       <table class="table">
         <tr>
-          <th>Size ranges</th>
+          <th>File sizes</th>
           <th>Objectcount</th>
           <th>Objectsum</th>
         </tr>
 
-        {foreach from=$sitedata['logsize'] key=key item=item}
+        {foreach $sitedata['log_size'] key item}
           <tr>
-            <td>{$item.0}</td>
-            <td>{$item.1}</td>
-            <td>{$item.2|display_size}</td>
+            <td>{$item->datakey}</td>
+            <td>{$item->objectcount}</td>
+            <td>{$item->objectsum|display_size}</td>
           </tr>
         {/foreach}
 
@@ -59,11 +59,11 @@
           <th>Objectsum</th>
         </tr>
 
-        {foreach from=$sitedata['mimetypes'] key=key item=item}
+        {foreach $sitedata['mime_types'] key item}
           <tr>
-            <td>{$item.0}</td>
-            <td>{$item.1}</td>
-            <td>{$item.2|display_size}</td>
+            <td>{$item->datakey}</td>
+            <td>{$item->objectcount}</td>
+            <td>{$item->objectsum|display_size}</td>
           </tr>
         {/foreach}
 
