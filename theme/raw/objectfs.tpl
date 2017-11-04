@@ -59,7 +59,7 @@
           <th>Objectsum</th>
         </tr>
 
-        {foreach $sitedata['mime_types'] key item}
+        {foreach $sitedata['mime_type'] key item}
           <tr>
             <td>{$item->datakey}</td>
             <td>{$item->objectcount}</td>
