@@ -423,12 +423,12 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      */
     public static function generate_status_report_task() {
         global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report_builder.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report.php');
 
         $timestamp = date('Y-m-d H:i:s');
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
 
-        \module_objectfs\report\objectfs_report_builder::generate_status_report();
+        \module_objectfs\report\objectfs_report::generate_status_report();
     }
 
 }
