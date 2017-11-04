@@ -405,6 +405,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     public static function recover_error_objects() {
         global $CFG;
         require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
+        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/recoverer.php');
 
         $config = get_objectfs_config();
 
