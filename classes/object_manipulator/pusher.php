@@ -61,6 +61,7 @@ class pusher extends manipulator {
     public function get_candidate_objects() {
 
         $sql = 'SELECT af.artefact,
+                       a.artefacttype,
                        MAX(af.size) AS filesize,
                        a.title,
                        o.contenthash
@@ -68,6 +69,7 @@ class pusher extends manipulator {
              LEFT JOIN artefact a ON af.artefact = a.id
              LEFT JOIN module_objectfs_objects o ON af.artefact = o.contentid
               GROUP BY af.artefact,
+                       a.artefacttype,
                        af.size,
                        o.location,
                        a.title,
@@ -99,5 +101,3 @@ class pusher extends manipulator {
     }
 
 }
-
-
