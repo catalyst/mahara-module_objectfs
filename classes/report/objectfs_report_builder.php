@@ -22,7 +22,7 @@ abstract class objectfs_report_builder {
         $reportrows = $report->get_rows();
 
         // Remove old records.
-        delete_records('module_objectfs_reports', 'reporttype', $reporttype));
+        delete_records('module_objectfs_reports', 'reporttype', $reporttype);
 
         // Add report type to each row.
         foreach ($reportrows as $row) {
