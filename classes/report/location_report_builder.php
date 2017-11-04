@@ -47,6 +47,7 @@ class location_report_builder extends objectfs_report_builder {
             $result = get_record_sql($sql, array($location));
 
             $result->datakey = $location;
+            $result->objectsum = isset($result->objectsum) ? $result->objectsum : 0;
 
             $report->add_row($result->datakey, $result->objectcount, $result->objectsum);
 
