@@ -27,7 +27,7 @@ $string['object_status:mimetypes'] = 'Object mime types';
 $string['object_status:location:error'] = 'Missing from filedir and remote storage';
 $string['object_status:location:duplicated'] = 'Duplicated in filedir and remote storage';
 $string['object_status:location:local'] = 'Only in filedir';
-$string['object_status:location:remote'] = 'Only in remote storage';
+$string['object_status:location:external'] = 'Only in external storage';
 $string['object_status:location:unknown'] = 'Unknown object location';
 $string['object_status:location:total'] = 'Total';
 
