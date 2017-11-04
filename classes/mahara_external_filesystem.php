@@ -15,7 +15,7 @@ defined('INTERNAL') || die();
 require_once($CFG->docroot . 'module/objectfs/classes/object_file_system.php');
 require_once($CFG->docroot . 'artefact/file/externalfilesystem.php');
 
-class mahara_external_filesystem extends object_file_system implements \external_file_system {
+class mahara_external_filesystem implements \external_file_system {
 
     /**
      * Return a file path
@@ -51,7 +51,7 @@ class mahara_external_filesystem extends object_file_system implements \external
         $path = $this->get_external_path_from_hash($contenthash, false);
 
         // Note - it is not possible to perform content recovery safely from hash alone.
-        return is_readble($path);
+        return is_readable($path);
     }
 
     /**
@@ -132,5 +132,30 @@ class mahara_external_filesystem extends object_file_system implements \external
         $contenthash = $fileartefact->get('contenthash');
 
         return $this->delete_object_from_local_by_hash($contenthash);
+    }
+
+    /**
+     * Get a local file path from contenthash
+     *
+     * @param string $contenthash     This is the contenthash of the file
+     * @param bool   $fetchifnotfound Whether or not to attempt to retrieve file from external if not found
+     *
+     * @return string The full path to the content file.
+     */
+    protected function get_local_path_from_hash($contenthash, $fetchifnotfound = false) {
+        require_once(get_config('docroot') . 'artefact/file/lib.php');
+
+        $file = get_record('artefact_file_files', 'contenthash', $contenthash);
+
+        if (empty($file)) {
+
+            $path = '';
+        } else {
+
+            $fileartefact = new \ArtefactTypeFile($file->fileid);
+            $path = $fileartefact->get_local_path();
+        }
+
+        return $path;
     }
 }
