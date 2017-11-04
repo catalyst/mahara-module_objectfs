@@ -27,7 +27,11 @@ function update_object_record($fileartefact, $location) {
     $newobject->timeduplicated = time();
     $newobject->location = $location;
 
-    $oldobject = get_record('module_objectfs_objects', 'contenthash', $fileartefact->get('contenthash'));
+    $oldobject = get_record(
+        'module_objectfs_objects',
+        'contenthash', $fileartefact->get('contenthash'),
+        'contentid', $fileartefact->get('fileid')
+    );
 
     if ($oldobject) {
 
