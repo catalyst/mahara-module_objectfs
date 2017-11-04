@@ -74,7 +74,7 @@ class mahara_external_filesystem implements \external_file_system {
             $location = $this->get_file_location_status($fileartefact);
         }
 
-        update_object_record($contenthash, $location);
+        update_object_record($fileartefact, $location);
 
     }
 

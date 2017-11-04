@@ -19,14 +19,15 @@ define('OBJECTFS_REPORT_OBJECT_LOCATION', 0);
 define('OBJECTFS_REPORT_LOG_SIZE', 1);
 define('OBJECTFS_REPORT_MIME_TYPE', 2);
 
-function update_object_record($contenthash, $location) {
+function update_object_record($fileartefact, $location) {
 
     $newobject = new \stdClass();
-    $newobject->contenthash = $contenthash;
+    $newobject->contenthash = $fileartefact->get('contenthash');
+    $newobject->contentid = $fileartefact->get('fileid');
     $newobject->timeduplicated = time();
     $newobject->location = $location;
 
-    $oldobject = get_record('module_objectfs_objects', 'contenthash', $contenthash);
+    $oldobject = get_record('module_objectfs_objects', 'contenthash', $fileartefact->get('contenthash'));
 
     if ($oldobject) {
 

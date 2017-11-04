@@ -20,6 +20,7 @@ require_once($CFG->docroot . 'module/objectfs/classes/mahara_external_filesystem
 require_once($CFG->docroot . 'module/objectfs/classes/log/aggregate_logger.php');
 require_once($CFG->docroot . 'module/objectfs/classes/log/null_logger.php');
 require_once($CFG->docroot . 'module/objectfs/classes/log/real_time_logger.php');
+require_once(get_config('docroot') . 'artefact/file/lib.php');
 
 abstract class object_file_system extends mahara_external_filesystem {
 
@@ -77,7 +78,11 @@ abstract class object_file_system extends mahara_external_filesystem {
             if ($objectlock && !is_readable($path)) {
                 $location = $this->copy_object_from_external_to_local_by_hash($contenthash);
                 // We want this file to be deleted again later.
-                update_object_record($contenthash, $location);
+                
+                $file = get_record('artefact_file_files', 'contenthash', $contenthash);
+                $fileartefact = new \ArtefactTypeFile($file->fileid);
+
+                update_object_record($fileartefact, $location);
 
                 $objectlock->release();
             }
@@ -173,7 +178,11 @@ abstract class object_file_system extends mahara_external_filesystem {
             return OBJECT_LOCATION_EXTERNAL;
         } else {
             // Object is not anywhere - we toggle an error state in the DB.
-            update_object_record($contenthash, OBJECT_LOCATION_ERROR);
+
+            $file = get_record('artefact_file_files', 'contenthash', $contenthash);
+            $fileartefact = new \ArtefactTypeFile($file->fileid);
+
+            update_object_record($fileartefact, OBJECT_LOCATION_ERROR);
             return OBJECT_LOCATION_ERROR;
         }
     }
@@ -295,7 +304,10 @@ abstract class object_file_system extends mahara_external_filesystem {
         $this->logger->log_object_read('readfile', $path, $file->get_filesize());
 
         if (!$success) {
-            update_object_record($file->get_contenthash(), OBJECT_LOCATION_ERROR);
+            $file = get_record('artefact_file_files', 'contenthash', $file->get_contenthash());
+            $fileartefact = new \ArtefactTypeFile($file->fileid);
+
+            update_object_record($fileartefact, OBJECT_LOCATION_ERROR);
         }
     }
 
@@ -324,7 +336,10 @@ abstract class object_file_system extends mahara_external_filesystem {
         $this->logger->log_object_read('file_get_contents', $path, $file->get_filesize());
 
         if (!$contents) {
-            update_object_record($file->get_contenthash(), OBJECT_LOCATION_ERROR);
+            $file = get_record('artefact_file_files', 'contenthash', $file->get_contenthash());
+            $fileartefact = new \ArtefactTypeFile($file->fileid);
+
+            update_object_record($fileartefact, OBJECT_LOCATION_ERROR);
         }
 
         return $contents;
@@ -351,7 +366,10 @@ abstract class object_file_system extends mahara_external_filesystem {
         $this->logger->log_object_read('xsendfile', $path);
 
         if (!$success) {
-            update_object_record($contenthash, OBJECT_LOCATION_ERROR);
+            $file = get_record('artefact_file_files', 'contenthash', $file->get_contenthash());
+            $fileartefact = new \ArtefactTypeFile($file->fileid);
+
+            update_object_record($fileartefact, OBJECT_LOCATION_ERROR);
         }
 
         return $success;
@@ -381,7 +399,10 @@ abstract class object_file_system extends mahara_external_filesystem {
         $this->logger->log_object_read('get_file_handle_for_path', $path, $file->get_filesize());
 
         if (!$filehandle) {
-            update_object_record($file->get_contenthash(), OBJECT_LOCATION_ERROR);
+            $file = get_record('artefact_file_files', 'contenthash', $file->get_contenthash());
+            $fileartefact = new \ArtefactTypeFile($file->fileid);
+
+            update_object_record($fileartefact, OBJECT_LOCATION_ERROR);
         }
 
         return $filehandle;
