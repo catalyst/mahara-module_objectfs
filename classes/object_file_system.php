@@ -16,11 +16,12 @@ namespace module_objectfs;
 defined('INTERNAL') || die();
 
 require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
+require_once($CFG->docroot . 'module/objectfs/classes/mahara_external_filesystem.php');
 require_once($CFG->docroot . 'module/objectfs/classes/log/aggregate_logger.php');
 require_once($CFG->docroot . 'module/objectfs/classes/log/null_logger.php');
 require_once($CFG->docroot . 'module/objectfs/classes/log/real_time_logger.php');
 
-abstract class object_file_system {
+abstract class object_file_system extends mahara_external_filesystem {
 
     private $externalclient;
     private $preferexternal;
@@ -28,7 +29,6 @@ abstract class object_file_system {
 
     public function __construct() {
         global $CFG;
-        parent::__construct(); // Setup filedir.
 
         $config = get_objectfs_config();
 
@@ -131,8 +131,25 @@ abstract class object_file_system {
         return false;
     }
 
+    public function is_file_readable_locally_by_hash($contenthash) {
+
+        $file = get_record('artefact_file_files', 'contenthash', $contenthash);
+
+        // If we cannot find the file by contenthash then something is wrong, return false.
+        if (empty($file)) {
+
+            return false;
+        } else {
+
+            $fileartefact = new \ArtefactTypeFile($file->fileid);
+            $localpath = $fileartefact->get_local_path();
+
+            return is_readable($localpath);
+        }
+    }
+
     public function is_file_readable_externally_by_hash($contenthash) {
-        if ($contenthash === sha1('')) {
+        if ($contenthash === hash('sha256', '')) {
             // Files with empty size are either directories or empty.
             // We handle these virtually.
             return true;
