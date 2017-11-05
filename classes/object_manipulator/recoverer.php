@@ -45,7 +45,7 @@ class recoverer extends manipulator {
         $sql = 'SELECT af.artefact,
                        MAX(af.size) AS filesize
                   FROM artefact_file_files af
-             LEFT JOIN module_objectfs_objects}o ON af.artefact = o.contentid
+             LEFT JOIN module_objectfs_objects o ON af.artefact = o.contentid
                  WHERE o.location = ?
               GROUP BY af.artefact,
                        af.size,
