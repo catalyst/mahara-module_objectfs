@@ -103,6 +103,11 @@ abstract class manipulator {
                 continue;
             }
 
+            // Check to see if we have a contenthash because if not its pointless.
+            if (empty($fileartefact->get('contenthash'))) {
+                continue;
+            }
+
             $this->filesystem->acquire_object_lock($fileartefact);
 
             $newlocation = $this->manipulate_object($objectrecord, $fileartefact);
