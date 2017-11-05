@@ -178,7 +178,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'title'        => get_string('settings:sizethreshold', 'module.objectfs'),
                     'description'  => get_string('settings:sizethreshold_help', 'module.objectfs'),
                     'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'sizethreshold'),
+                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'sizethreshold') / 1024,
                 ),
                 'minimumage' => array(
                     'title'        => get_string('settings:minimumage', 'module.objectfs'),
@@ -251,7 +251,9 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     }
 
     public static function save_config_options(Pieform $form, $values) {
-        set_config_plugin('module', 'objectfs', 'sizethreshold', $values['sizethreshold']);
+        // Convert sizethreshold into Bytes.
+        $sizethreshold = $values['sizethreshold'] * 1024;
+        set_config_plugin('module', 'objectfs', 'sizethreshold', $sizethreshold);
         set_config_plugin('module', 'objectfs', 'minimumage', $values['minimumage']);
         set_config_plugin('module', 'objectfs', 'deletelocal', $values['deletelocal']);
         set_config_plugin('module', 'objectfs', 'enabletasks', $values['enabletasks']);
