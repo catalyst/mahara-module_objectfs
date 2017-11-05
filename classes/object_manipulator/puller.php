@@ -50,17 +50,6 @@ class puller extends manipulator {
      */
     public function get_candidate_objects() {
 
-        if (!empty($this->sizethreshold)) {
-
-            $having = 'HAVING MAX(af.size) <= ?
-                          AND (o.location = ?)';
-            $params = array($this->sizethreshold, OBJECT_LOCATION_EXTERNAL);
-        } else {
-
-            $having = 'HAVING (o.location = ?)';
-            $params = array(OBJECT_LOCATION_EXTERNAL);
-        }
-
         $sql = "SELECT af.contenthash,
                        af.artefact,
                        a.artefacttype,
@@ -72,7 +61,10 @@ class puller extends manipulator {
                        a.artefacttype,
                        af.size,
                        o.location
-                $having";
+                HAVING MAX(af.size) <= ?
+                       AND (o.location = ?)";
+
+        $params = array($this->sizethreshold, OBJECT_LOCATION_EXTERNAL);
 
         $this->logger->start_timing();
         $objects = get_records_sql_array($sql, $params);
