@@ -86,8 +86,7 @@ class deleter extends manipulator {
                        o.location
                  HAVING MAX(af.size) > ?';
 
-        $consistency = time() - $this->consistencydelay;
-        $consistencythreshold = date('Y-m-d G:H:s', $consistency);
+        $consistencythreshold = time() - $this->consistencydelay;
         $params = array($consistencythreshold, OBJECT_LOCATION_DUPLICATED, $this->sizethreshold);
 
         $this->logger->start_timing();
