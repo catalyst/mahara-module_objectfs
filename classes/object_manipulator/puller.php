@@ -61,7 +61,7 @@ class puller extends manipulator {
             $params = array(OBJECT_LOCATION_EXTERNAL);
         }
 
-        $sql = 'SELECT af.contenthash,
+        $sql = "SELECT af.contenthash,
                        MAX(af.size) AS filesize
                   FROM artefact_file_files af
              LEFT JOIN artefact a ON af.artefact = a.id
@@ -69,8 +69,7 @@ class puller extends manipulator {
               GROUP BY af.artefact,
                        af.size,
                        o.location
-                HAVING MAX(af.size) <= ?
-                   AND (o.location = ?)';
+                $having";
 
         $this->logger->start_timing();
         $objects = get_records_sql_array($sql, $params);
