@@ -21,6 +21,7 @@ require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator
 require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/puller.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/deleter.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/recoverer.php');
+require_once(get_config('docroot') . 'artefact/file/lib.php');
 
 abstract class manipulator {
 
@@ -82,18 +83,27 @@ abstract class manipulator {
                 break;
             }
 
-            $objectlock = $this->filesystem->acquire_object_lock($objectrecord->contenthash);
+            // Prepare the file artefact, and try and fix no content hash errors here.
+            $fileartefact = new \ArtefactTypeFile($objectrecord->artefact);
+
+            if (empty($fileartefact->get('contenthash'))) {
+                $contenthash = $fileartefact::generate_content_hash($fileartefact->get_local_path());
+                $fileartefact->set('contenthash', $contenthash);
+                $fileartefact->commit();
+            }
+
+            $this->filesystem->acquire_object_lock($fileartefact);
 
             // Object is currently being manipulated elsewhere.
-            if (!$objectlock) {
+            if (get_field('artefact', 'locked', 'id', $objectrecord->artefact)) {
                 continue;
             }
 
-            $newlocation = $this->manipulate_object($objectrecord);
+            $newlocation = $this->manipulate_object($objectrecord, $fileartefact);
 
-            update_object_record($objectrecord->contenthash, $newlocation);
+            update_object_record($fileartefact, $newlocation);
 
-            $objectlock->release();
+            $this->filesystem->release_object_lock($fileartefact);
         }
 
         $this->logger->end_timing();
@@ -128,8 +138,8 @@ abstract class manipulator {
             $logger = new \module_objectfs\log\aggregate_logger();
             $filesystem = new \module_objectfs\s3_file_system();
             $manipulator = new $manipulatorclassname($filesystem, $config, $logger);
-            $candidatehashes = $manipulator->get_candidate_objects();
-            $manipulator->execute($candidatehashes);
+            $candidateobjects = $manipulator->get_candidate_objects();
+            $manipulator->execute($candidateobjects);
         } else {
             mtrace(get_string('not_enabled', 'module_objectfs'));
         }

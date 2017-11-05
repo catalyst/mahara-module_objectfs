@@ -62,11 +62,14 @@ class puller extends manipulator {
         }
 
         $sql = "SELECT af.contenthash,
+                       af.artefact,
+                       a.artefacttype,
                        MAX(af.size) AS filesize
                   FROM artefact_file_files af
              LEFT JOIN artefact a ON af.artefact = a.id
-             LEFT JOIN module_objectfs_objects o ON af.artefact = o.contentid
+                  JOIN module_objectfs_objects o ON af.artefact = o.contentid
               GROUP BY af.artefact,
+                       a.artefacttype,
                        af.size,
                        o.location
                 $having";
@@ -82,8 +85,8 @@ class puller extends manipulator {
         return $objects;
     }
 
-    protected function manipulate_object($objectrecord) {
-        $newlocation = $this->filesystem->copy_object_from_external_to_local_by_hash($objectrecord->contenthash, $objectrecord->filesize);
+    protected function manipulate_object($objectrecord, $fileartefact) {
+        $newlocation = $this->filesystem->copy_object_from_external_to_local($fileartefact, $objectrecord->filesize);
         return $newlocation;
     }
 

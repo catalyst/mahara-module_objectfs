@@ -95,8 +95,9 @@ class pusher extends manipulator {
         return $objects;
     }
 
-    protected function manipulate_object($objectrecord) {
-        $newlocation = $this->filesystem->copy_object_from_local_to_external_by_hash($objectrecord->contenthash, $objectrecord->filesize);
+    protected function manipulate_object($objectrecord, $fileartefact) {
+        $newlocation = $this->filesystem->copy_object_from_local_to_external($fileartefact, $objectrecord->filesize);
+
         return $newlocation;
     }
 
