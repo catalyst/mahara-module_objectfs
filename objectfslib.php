@@ -90,7 +90,6 @@ function get_objectfs_config() {
             $config->$key = $value;
         }
     }
-    print_r($config);
 
     return $config;
 }
