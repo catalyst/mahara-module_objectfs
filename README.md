@@ -1,5 +1,5 @@
-<a href="https://travis-ci.org/catalyst/moodle-module_objectfs">
-<img src="https://travis-ci.org/catalyst/moodle-module_objectfs.svg?branch=master">
+<a href="https://travis-ci.org/catalyst/mahara-module_objectfs">
+<img src="https://travis-ci.org/catalyst/mahara-module_objectfs.svg?branch=master">
 </a>
 
 # mahara-module_objectfs
