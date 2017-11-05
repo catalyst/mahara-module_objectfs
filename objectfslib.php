@@ -82,7 +82,7 @@ function get_objectfs_config() {
 
         $storedvalue = get_config_plugin('module', 'objectfs', $key);
 
-        if (!empty($storedvalue)) {
+        if (isset($storedvalue)) {
 
             $config->$key = $storedvalue;
         } else {
@@ -90,6 +90,7 @@ function get_objectfs_config() {
             $config->$key = $value;
         }
     }
+    print_r($config);
 
     return $config;
 }
