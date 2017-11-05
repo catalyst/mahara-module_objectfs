@@ -78,7 +78,7 @@ abstract class manipulator {
             return;
         }
 
-        if (count($objectrecords) == 0) {
+        if (empty($objectrecords) || count($objectrecords) == 0) {
             log_info('No candidate objects found.');
             return;
         }
