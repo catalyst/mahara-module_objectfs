@@ -68,17 +68,20 @@ class deleter extends manipulator {
     public function get_candidate_objects() {
 
         if ($this->deletelocal == 0) {
-            mtrace("Delete local disabled, not running query \n");
+            log_info("Delete local disabled, not running query \n");
             return array();
         }
 
         $sql = 'SELECT af.artefact,
+                       a.artefacttype,
                        MAX(af.size) AS filesize
                   FROM artefact_file_files af
-             LEFT JOIN module_objectfs_objects o ON af.artefact = o.contentid
+             LEFT JOIN artefact a ON af.artefact = a.id
+                  JOIN module_objectfs_objects o ON af.artefact = o.contentid
                  WHERE o.timeduplicated <= ?
                        AND o.location = ?
               GROUP BY af.artefact,
+                       a.artefacttype,
                        af.size,
                        o.location
                  HAVING MAX(af.size) > ?';
@@ -106,7 +109,7 @@ class deleter extends manipulator {
 
     protected function manipulator_can_execute() {
         if ($this->deletelocal == 0) {
-            mtrace("Delete local disabled \n");
+            log_info("Delete local disabled \n");
             return false;
         }
 
