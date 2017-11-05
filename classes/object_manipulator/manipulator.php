@@ -17,6 +17,7 @@ defined('INTERNAL') || die();
 require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/s3_file_system.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/log/aggregate_logger.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/log/objectfs_statistic.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/pusher.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/puller.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/deleter.php');
@@ -48,8 +49,14 @@ abstract class manipulator {
      * @param int $maxruntime What time the file manipulator should finish execution by
      */
     public function __construct($filesystem, $config) {
-         $this->finishtime = time() + $config->maxtaskruntime;
-         $this->filesystem = $filesystem;
+
+        if (empty($config->maxtaskruntime)) {
+
+            // Set it to a sane maximum like 10 minutes or so.
+            $config->maxtaskruntime = 600;
+        }
+        $this->finishtime = time() + $config->maxtaskruntime;
+        $this->filesystem = $filesystem;
     }
 
     /**
@@ -67,12 +74,12 @@ abstract class manipulator {
     public function execute($objectrecords) {
 
         if (!$this->manipulator_can_execute()) {
-            mtrace('Objectfs manipulator exiting early');
+            log_info('Objectfs manipulator exiting early');
             return;
         }
 
         if (count($objectrecords) == 0) {
-            mtrace('No candidate objects found.');
+            log_info('No candidate objects found.');
             return;
         }
 
@@ -83,21 +90,20 @@ abstract class manipulator {
                 break;
             }
 
-            // Prepare the file artefact, and try and fix no content hash errors here.
-            $fileartefact = new \ArtefactTypeFile($objectrecord->artefact);
-
-            if (empty($fileartefact->get('contenthash'))) {
-                $contenthash = $fileartefact::generate_content_hash($fileartefact->get_local_path());
-                $fileartefact->set('contenthash', $contenthash);
-                $fileartefact->commit();
+            // At the moment we can only handle file artefacts.
+            if ($objectrecord->artefacttype != 'file') {
+                continue;
             }
 
-            $this->filesystem->acquire_object_lock($fileartefact);
+            // Prepare the file artefact, and try and fix no content hash errors here.
+            $fileartefact = new \ArtefactTypeFile($objectrecord->artefact);
 
             // Object is currently being manipulated elsewhere.
             if (get_field('artefact', 'locked', 'id', $objectrecord->artefact)) {
                 continue;
             }
+
+            $this->filesystem->acquire_object_lock($fileartefact);
 
             $newlocation = $this->manipulate_object($objectrecord, $fileartefact);
 
@@ -137,11 +143,12 @@ abstract class manipulator {
         if ($shouldtaskrun) {
             $logger = new \module_objectfs\log\aggregate_logger();
             $filesystem = new \module_objectfs\s3_file_system();
-            $manipulator = new $manipulatorclassname($filesystem, $config, $logger);
+            $manipulatorclass = '\\module_objectfs\\object_manipulator\\' . $manipulatorclassname;
+            $manipulator = new $manipulatorclass($filesystem, $config, $logger);
             $candidateobjects = $manipulator->get_candidate_objects();
             $manipulator->execute($candidateobjects);
         } else {
-            mtrace(get_string('not_enabled', 'module_objectfs'));
+            log_info(get_string('not_enabled', 'module_objectfs'));
         }
     }
 }

@@ -63,7 +63,7 @@ class aggregate_logger extends objectfs_logger {
 
     public function output_move_statistics() {
         $totaltime = $this->get_timing();
-        mtrace("$this->movement. Total time taken: $totaltime seconds. Location change summary:");
+        log_info("$this->movement. Total time taken: $totaltime seconds. Location change summary:");
         foreach ($this->movestatistics as $iniloc => $finlocarr) {
             foreach ($finlocarr as $finloc => $movestat) {
                 $this->output_move_statistic($movestat, $iniloc, $finloc);
@@ -78,7 +78,7 @@ class aggregate_logger extends objectfs_logger {
         $objectsum = display_size($objectsum);
         $initiallocation = $this->location_to_string($initiallocation);
         $finallocation = $this->location_to_string($finallocation);
-        mtrace("$initiallocation -> $finallocation. Objects moved: $objectcount. Total size: $objectsum. ");
+        log_info("$initiallocation -> $finallocation. Objects moved: $objectcount. Total size: $objectsum. ");
     }
 
     public function location_to_string($location) {
