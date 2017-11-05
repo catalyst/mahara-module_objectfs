@@ -19,7 +19,7 @@ define('OBJECTFS_REPORT_OBJECT_LOCATION', 0);
 define('OBJECTFS_REPORT_LOG_SIZE', 1);
 define('OBJECTFS_REPORT_MIME_TYPE', 2);
 
-function update_object_record($fileartefact, $location) {
+function update_object_record(\ArtefactTypeFile $fileartefact, $location) {
 
     $newobject = new \stdClass();
     $newobject->contenthash = $fileartefact->get('contenthash');
