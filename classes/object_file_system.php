@@ -69,41 +69,37 @@ abstract class object_file_system extends mahara_external_filesystem {
     protected function get_local_path_from_hash($contenthash, $fetchifnotfound = false) {
         $path = parent::get_local_path_from_hash($contenthash, $fetchifnotfound);
 
+        $file = get_record('artefact_file_files', 'contenthash', $contenthash);
+        $fileartefact = new \ArtefactTypeFile($file->fileid);
+
         if ($fetchifnotfound && !is_readable($path)) {
 
             // Try and pull from remote.
-            $objectlock = $this->acquire_object_lock($contenthash);
+            $objectlock = $this->acquire_object_lock($fileartefact);
 
             // While gaining lock object might have been moved locally so we recheck.
             if ($objectlock && !is_readable($path)) {
                 $location = $this->copy_object_from_external_to_local_by_hash($contenthash);
                 // We want this file to be deleted again later.
-                
-                $file = get_record('artefact_file_files', 'contenthash', $contenthash);
-                $fileartefact = new \ArtefactTypeFile($file->fileid);
 
                 update_object_record($fileartefact, $location);
 
-                $objectlock->release();
+                $this->release_object_lock($fileartefact);
             }
         }
 
         return $path;
     }
 
-    protected function get_remote_path_from_storedfile(\stored_file $file) {
-        return $this->get_remote_path_from_hash($file->get_contenthash());
-    }
-
     protected function get_remote_path_from_hash($contenthash) {
         if ($this->preferexternal) {
-            $location = $this->get_object_location_from_hash($contenthash);
+            $location = $this->get_object_location($contenthash);
             if ($location == OBJECT_LOCATION_DUPLICATED) {
                 return $this->get_external_path_from_hash($contenthash);
             }
         }
 
-        if ($this->is_file_readable_locally_by_hash($contenthash)) {
+        if ($this->is_file_readable_locally($contenthash)) {
             $path = $this->get_local_path_from_hash($contenthash);
         } else {
             // We assume it is remote, not checking if it's readable.
@@ -117,40 +113,11 @@ abstract class object_file_system extends mahara_external_filesystem {
         return $this->externalclient->get_fullpath_from_hash($contenthash);
     }
 
-    protected function get_external_path_from_storedfile(stored_file $file) {
-        return $this->get_external_path_from_hash($file);
-    }
+    public function is_file_readable_locally($fileartefact) {
 
-    public function is_file_readable_externally_by_storedfile(stored_file $file) {
-        if (!$file->get_filesize()) {
-            // Files with empty size are either directories or empty.
-            // We handle these virtually.
-            return true;
-        }
+        $localpath = $fileartefact->get_local_path();
 
-        $path = $this->get_external_path_from_storedfile($file);
-        if (is_readable($path)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function is_file_readable_locally_by_hash($contenthash) {
-
-        $file = get_record('artefact_file_files', 'contenthash', $contenthash);
-
-        // If we cannot find the file by contenthash then something is wrong, return false.
-        if (empty($file)) {
-
-            return false;
-        } else {
-
-            $fileartefact = new \ArtefactTypeFile($file->fileid);
-            $localpath = $fileartefact->get_local_path();
-
-            return is_readable($localpath);
-        }
+        return is_readable($localpath);
     }
 
     public function is_file_readable_externally_by_hash($contenthash) {
@@ -166,9 +133,9 @@ abstract class object_file_system extends mahara_external_filesystem {
         return is_readable($path);
     }
 
-    public function get_object_location_from_hash($contenthash) {
-        $localreadable = $this->is_file_readable_locally_by_hash($contenthash);
-        $externalreadable = $this->is_file_readable_externally_by_hash($contenthash);
+    public function get_object_location($fileartefact) {
+        $localreadable = $this->is_file_readable_locally($fileartefact);
+        $externalreadable = $this->is_file_readable_externally_by_hash($fileartefact->get('contenthash'));
 
         if ($localreadable && $externalreadable) {
             return OBJECT_LOCATION_DUPLICATED;
@@ -178,34 +145,34 @@ abstract class object_file_system extends mahara_external_filesystem {
             return OBJECT_LOCATION_EXTERNAL;
         } else {
             // Object is not anywhere - we toggle an error state in the DB.
-
-            $file = get_record('artefact_file_files', 'contenthash', $contenthash);
-            $fileartefact = new \ArtefactTypeFile($file->fileid);
-
             update_object_record($fileartefact, OBJECT_LOCATION_ERROR);
             return OBJECT_LOCATION_ERROR;
         }
     }
 
     // Acquire the obect lock any time you are moving an object between locations.
-    public function acquire_object_lock($contenthash) {
-        $timeout = 600; // 10 minutes before giving up.
-        $resource = "object: $contenthash";
-        $lockfactory = \core\lock\lock_config::get_lock_factory('module_objectfs_object');
-        $lock = $lockfactory->get_lock($resource, $timeout);
-        return $lock;
+    public function acquire_object_lock($fileartefact) {
+
+        set_field_select('artefact', 'locked', 1, "locked = 0 AND id = ?", array($fileartefact->get('id')));
     }
 
-    public function copy_object_from_external_to_local_by_hash($contenthash, $objectsize = 0) {
-        $initiallocation = $this->get_object_location_from_hash($contenthash);
+    // Release the lock once we are done moving objects between locations.
+    public function release_object_lock($fileartefact) {
+
+        set_field_select('artefact', 'locked', 0, "locked = 1 AND id = ?", array($fileartefact->get('id')));
+    }
+
+    public function copy_object_from_external_to_local($fileartefact, $objectsize = 0) {
+        $contenthash = $fileartefact->get('contenthash');
+        $initiallocation = $this->get_object_location($fileartefact);
         $finallocation = $initiallocation;
 
         if ($initiallocation === OBJECT_LOCATION_EXTERNAL) {
 
-            $localpath = $this->get_local_path_from_hash($contenthash);
+            $localpath = $fileartefact->get_local_path();
             $externalpath = $this->get_external_path_from_hash($contenthash);
 
-            $localdirpath = $this->get_fulldir_from_hash($contenthash);
+            $localdirpath = get_config('dataroot')."/".$fileartefact::get_file_directory($fileartefact->get('fileid'));
 
             // Folder may not exist yet if pulling a file that came from another environment.
             if (!is_dir($localdirpath)) {
@@ -231,13 +198,14 @@ abstract class object_file_system extends mahara_external_filesystem {
         return $finallocation;
     }
 
-    public function copy_object_from_local_to_external_by_hash($contenthash, $objectsize = 0) {
-        $initiallocation = $this->get_object_location_from_hash($contenthash);
+    public function copy_object_from_local_to_external($fileartefact, $objectsize = 0) {
+        $contenthash = $fileartefact->get('contenthash');
+        $initiallocation = $this->get_object_location($fileartefact);
         $finallocation = $initiallocation;
 
         if ($initiallocation === OBJECT_LOCATION_LOCAL) {
 
-            $localpath = $this->get_local_path_from_hash($contenthash);
+            $localpath = $fileartefact->get_local_path();
             $externalpath = $this->get_external_path_from_hash($contenthash);
 
             $success = copy($localpath, $externalpath);
@@ -255,20 +223,22 @@ abstract class object_file_system extends mahara_external_filesystem {
         return $finallocation;
     }
 
-    public function verify_external_object_from_hash($contenthash) {
-        $localpath = $this->get_local_path_from_hash($contenthash);
+    public function verify_external_object($fileartefact) {
+        $contenthash = $fileartefact->get('contenthash');
+        $localpath = $fileartefact->get_local_path();
         $objectisvalid = $this->externalclient->verify_object($contenthash, $localpath);
         return $objectisvalid;
     }
 
-    public function delete_object_from_local_by_hash($contenthash, $objectsize = 0) {
-        $initiallocation = $this->get_object_location_from_hash($contenthash);
+    public function delete_object_from_local($fileartefact, $objectsize = 0) {
+        $contenthash = $fileartefact->get('contenthash');
+        $initiallocation = $this->get_object_location($fileartefact);
         $finallocation = $initiallocation;
 
         if ($initiallocation === OBJECT_LOCATION_DUPLICATED) {
-            $localpath = $this->get_local_path_from_hash($contenthash);
+            $localpath = $fileartefact->get_local_path();
 
-            if ($this->verify_external_object_from_hash($contenthash)) {
+            if ($this->verify_external_object($fileartefact)) {
                 $success = unlink($localpath);
 
                 if ($success) {
