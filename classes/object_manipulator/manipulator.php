@@ -14,13 +14,13 @@ use module_objectfs\object_manipulator\logger;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
-require_once($CFG->docroot . 'module/objectfs/classes/s3_file_system.php');
-require_once($CFG->docroot . 'module/objectfs/classes/log/aggregate_logger.php');
-require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/pusher.php');
-require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/puller.php');
-require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/deleter.php');
-require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/recoverer.php');
+require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/s3_file_system.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/log/aggregate_logger.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/pusher.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/puller.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/deleter.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/recoverer.php');
 
 abstract class manipulator {
 

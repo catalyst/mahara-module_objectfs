@@ -12,8 +12,8 @@ namespace module_objectfs;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . 'module/objectfs/classes/object_file_system.php');
-require_once($CFG->docroot . 'artefact/file/externalfilesystem.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/object_file_system.php');
+require_once(get_config('docroot') . 'artefact/file/externalfilesystem.php');
 
 class mahara_external_filesystem implements \external_file_system {
 

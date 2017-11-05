@@ -15,11 +15,11 @@ namespace module_objectfs;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
-require_once($CFG->docroot . 'module/objectfs/classes/mahara_external_filesystem.php');
-require_once($CFG->docroot . 'module/objectfs/classes/log/aggregate_logger.php');
-require_once($CFG->docroot . 'module/objectfs/classes/log/null_logger.php');
-require_once($CFG->docroot . 'module/objectfs/classes/log/real_time_logger.php');
+require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/mahara_external_filesystem.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/log/aggregate_logger.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/log/null_logger.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/log/real_time_logger.php');
 require_once(get_config('docroot') . 'artefact/file/lib.php');
 
 abstract class object_file_system extends mahara_external_filesystem {

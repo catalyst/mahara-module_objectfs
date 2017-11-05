@@ -18,8 +18,8 @@ defined('INTERNAL') || die();
 use module_objectfs\object_file_system;
 use module_objectfs\client\s3_client;
 
-require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
-require_once($CFG->docroot . 'module/objectfs/classes/object_file_system.php');
+require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/object_file_system.php');
 
 class s3_file_system extends object_file_system {
 

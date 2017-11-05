@@ -12,7 +12,7 @@ namespace module_objectfs\object_manipulator;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
+require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
 
 use Aws\S3\Exception\S3Exception;
 

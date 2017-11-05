@@ -10,7 +10,7 @@
 
 namespace module_objectfs\report;
 
-require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report_builder.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/report/objectfs_report_builder.php');
 
 defined('INTERNAL') || die();
 

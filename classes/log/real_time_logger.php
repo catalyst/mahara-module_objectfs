@@ -12,7 +12,7 @@ namespace module_objectfs\log;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . 'module/objectfs/classes/log/objectfs_logger.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/log/objectfs_logger.php');
 
 class real_time_logger extends objectfs_logger {
 

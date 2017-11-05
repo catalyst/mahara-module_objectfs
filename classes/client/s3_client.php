@@ -12,8 +12,8 @@ namespace module_objectfs\client;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . 'module/aws/sdk/aws-autoloader.php');
-require_once($CFG->docroot . 'module/objectfs/classes/client/object_client.php');
+require_once(get_config('docroot') . 'module/aws/sdk/aws-autoloader.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/client/object_client.php');
 
 use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;

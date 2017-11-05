@@ -12,7 +12,7 @@ namespace module_objectfs\log;
 
 defined('INTERNAL') || die();
 
-require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
+require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
 
 class objectfs_statistic {
 

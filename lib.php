@@ -9,12 +9,10 @@
 
 defined('INTERNAL') || die();
 
-global $CFG;
-
-require_once($CFG->docroot . 'module/objectfs/objectfslib.php');
-require_once($CFG->docroot . 'module/objectfs/classes/client/s3_client.php');
-require_once($CFG->docroot . 'artefact/lib.php');
-require_once($CFG->docroot . 'artefact/file/lib.php');
+require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/client/s3_client.php');
+require_once(get_config('docroot') . 'artefact/lib.php');
+require_once(get_config('docroot') . 'artefact/file/lib.php');
 
 use module_objectfs\client\s3_client;
 use module_objectfs\object_manipulator\pusher;
@@ -343,9 +341,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     * Push to S3
     */
     public static function push_objects_to_storage() {
-        global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/pusher.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/manipulator.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/pusher.php');
 
         $config = get_objectfs_config();
 
@@ -363,9 +360,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * Pull from S3
      */
     public static function pull_objects_from_storage() {
-        global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/puller.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/manipulator.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/puller.php');
 
         $config = get_objectfs_config();
 
@@ -383,9 +379,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * Delete from local
      */
     public static function delete_local_objects() {
-        global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/deleter.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/manipulator.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/deleter.php');
 
         $config = get_objectfs_config();
 
@@ -403,9 +398,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * Recover error objects
      */
     public static function recover_error_objects() {
-        global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/manipulator.php');
-        require_once($CFG->docroot . 'module/objectfs/classes/object_manipulator/recoverer.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/manipulator.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/recoverer.php');
 
         $config = get_objectfs_config();
 
@@ -423,8 +417,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
      * Generate reports task
      */
     public static function generate_status_report_task() {
-        global $CFG;
-        require_once($CFG->docroot . 'module/objectfs/classes/report/objectfs_report.php');
+        require_once(get_config('docroot') . 'module/objectfs/classes/report/objectfs_report.php');
 
         $timestamp = date('Y-m-d H:i:s');
         set_config_plugin('module', 'objectfs', 'lastrun', $timestamp);
