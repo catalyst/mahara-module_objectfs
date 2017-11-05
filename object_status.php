@@ -11,7 +11,6 @@
 define('INTERNAL', 1);
 
 require(dirname(dirname(dirname(__FILE__))).'/init.php');
-global $CFG;
 require_once(get_config('docroot') . 'module/objectfs/classes/report/objectfs_report.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/report/objectfs_report_builder.php');
 
