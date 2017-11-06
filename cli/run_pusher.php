@@ -11,7 +11,7 @@
 define('CLI', true);
 define('INTERNAL', true);
 
-require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) .'/init.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) .'/init.php');
 require_once(get_config('libroot') . 'cli.php');
 
 require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');

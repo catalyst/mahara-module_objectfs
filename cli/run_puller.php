@@ -13,7 +13,7 @@ namespace module_objectfs\object_manipulator;
 define('CLI', true);
 define('INTERNAL', true);
 
-require_once(dirname(dirname(dirname(dirname(dirname(dirname(__FILE__)))))) .'/init.php');
+require_once(dirname(dirname(dirname(dirname(__FILE__)))) .'/init.php');
 require_once(get_config('libroot') . 'cli.php');
 
 require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
@@ -27,7 +27,7 @@ $options = array();
 
 $settings = new \stdClass();
 $settings->options = $options;
-$settings->info = 'CLI script to push files to S3';
+$settings->info = 'CLI script to pull files from S3';
 
 $cli->setup($settings);
 
