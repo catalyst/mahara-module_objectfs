@@ -20,7 +20,7 @@ require_once(get_config('docroot') . 'module/objectfs/classes/mahara_external_fi
 require_once(get_config('docroot') . 'module/objectfs/classes/log/aggregate_logger.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/log/null_logger.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/log/real_time_logger.php');
-require_once(get_config('doctoot') . 'artefact/lib.php');
+require_once(get_config('docroot') . 'artefact/lib.php');
 require_once(get_config('docroot') . 'artefact/file/lib.php');
 
 abstract class object_file_system {
