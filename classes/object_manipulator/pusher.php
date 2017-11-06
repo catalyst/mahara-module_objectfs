@@ -60,7 +60,7 @@ class pusher extends manipulator {
      */
     public function get_candidate_objects() {
 
-        $sql = 'SELECT af.artefact,
+        $sql = "SELECT af.artefact,
                        a.artefacttype,
                        MAX(af.size) AS filesize,
                        a.title,
@@ -77,7 +77,8 @@ class pusher extends manipulator {
                 HAVING MIN(a.ctime) <= ?
                        AND MAX(af.size) > ?
                        AND MAX(af.size) < 5000000000
-                       AND (o.location IS NULL OR o.location = ?)';
+                       AND (o.location IS NULL OR o.location = ?)
+                       AND a.artefacttype = 'file'";
 
         $maxcreated = time() - $this->minimumage;
         $maxcreatedtimestamp = date('Y-m-d G:H:s', $maxcreated);
