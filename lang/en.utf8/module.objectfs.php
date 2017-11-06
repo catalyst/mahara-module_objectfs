@@ -76,3 +76,5 @@ $string['settings:deletesuccess'] = 'Could delete object from the S3 bucket - It
 $string['settings:deleteerror'] = 'An unspecified error occured. ';
 $string['settings:permissioncheckpassed'] = 'Permissions check passed.';
 $string['settings:handlernotset'] = '$CFG->alternative_file_system_class is not set, the file system will not be able to read from S3. Background tasks can still function.';
+
+$string['validationerror:notint'] = 'Please enter integers only';
