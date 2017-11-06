@@ -248,6 +248,23 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     }
 
     public static function validate_config_options($form, $values) {
+
+        if (!is_numeric($values['sizethreshold'])) {
+
+            $form->set_error('sizethreshold', get_string('validationerror:notint', 'module.objectfs'));
+        }
+        if (!is_numeric($values['minimumage'])) {
+
+            $form->set_error('minimumage', get_string('validationerror:notint', 'module.objectfs'));
+        }
+        if (!is_numeric($values['maxtaskruntime'])) {
+
+            $form->set_error('maxtaskruntime', get_string('validationerror:notint', 'module.objectfs'));
+        }
+        if (!is_numeric($values['consistencydelay'])) {
+
+            $form->set_error('consistencydelay', get_string('validationerror:notint', 'module.objectfs'));
+        }
     }
 
     public static function save_config_options(Pieform $form, $values) {
