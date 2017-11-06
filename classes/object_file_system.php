@@ -100,7 +100,7 @@ abstract class object_file_system {
             }
         }
 
-        if ($this->is_file_readable_locally($contenthash)) {
+        if ($this->is_file_readable_locally($fileartefact)) {
             $path = $this->get_local_path_from_hash($contenthash);
         } else {
             // We assume it is remote, not checking if it's readable.
