@@ -158,6 +158,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'description'  => get_string('settings:maxtaskruntime_help', 'module.objectfs'),
                     'type'         => 'text',
                     'defaultvalue' => get_config_plugin('module', 'objectfs', 'maxtaskruntime'),
+                    // Lets set the maximum run time to one day.
+                    'rules'        => array('integer' => true, 'minvalue' => 0, 'maxvalue' => (24 * 60 * 60))
                 ),
                 'preferremote' => array(
                     'title'        => get_string('settings:preferremote', 'module.objectfs'),
@@ -179,12 +181,15 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'description'  => get_string('settings:sizethreshold_help', 'module.objectfs'),
                     'type'         => 'text',
                     'defaultvalue' => get_config_plugin('module', 'objectfs', 'sizethreshold') / 1024,
+                    // The limit for Amazon S3 is 5GB.
+                    'rules'        => array('integer' => true, 'minvalue' => 0, 'maxvalue' => 5000000)
                 ),
                 'minimumage' => array(
                     'title'        => get_string('settings:minimumage', 'module.objectfs'),
                     'description'  => get_string('settings:minimumage_help', 'module.objectfs'),
                     'type'         => 'text',
                     'defaultvalue' => get_config_plugin('module', 'objectfs', 'minimumage'),
+                    'rules'        => array('integer' => true, 'minvalue' => 0)
                 ),
                 'deletelocal' => array(
                     'title'        => get_string('settings:deletelocal', 'module.objectfs'),
@@ -197,6 +202,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'description'  => get_string('settings:consistencydelay_help', 'module.objectfs'),
                     'type'         => 'text',
                     'defaultvalue' => get_config_plugin('module', 'objectfs', 'consistencydelay'),
+                    'rules'        => array('integer' => true, 'minvalue' => 0)
                 ),
             ),
         );
@@ -249,21 +255,21 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
     public static function validate_config_options($form, $values) {
 
-        if (!is_numeric($values['sizethreshold'])) {
+        if ($values['sizethreshold'] < 0) {
 
-            $form->set_error('sizethreshold', get_string('validationerror:notint', 'module.objectfs'));
+            $form->set_error('sizethreshold', get_string('validationerror:negative', 'module.objectfs'));
         }
-        if (!is_numeric($values['minimumage'])) {
+        if ($values['minimumage'] < 0) {
 
-            $form->set_error('minimumage', get_string('validationerror:notint', 'module.objectfs'));
+            $form->set_error('minimumage', get_string('validationerror:negative', 'module.objectfs'));
         }
-        if (!is_numeric($values['maxtaskruntime'])) {
+        if ($values['maxtaskruntime'] < 0) {
 
-            $form->set_error('maxtaskruntime', get_string('validationerror:notint', 'module.objectfs'));
+            $form->set_error('maxtaskruntime', get_string('validationerror:negative', 'module.objectfs'));
         }
-        if (!is_numeric($values['consistencydelay'])) {
+        if ($values['consistencydelay'] < 0) {
 
-            $form->set_error('consistencydelay', get_string('validationerror:notint', 'module.objectfs'));
+            $form->set_error('consistencydelay', get_string('validationerror:negative', 'module.objectfs'));
         }
     }
 
