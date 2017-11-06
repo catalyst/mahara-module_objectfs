@@ -105,6 +105,10 @@ abstract class manipulator {
 
             // Check to see if we have a contenthash because if not its pointless.
             if (empty($fileartefact->get('contenthash'))) {
+
+                // Set it to an error state so that in the event the files magically
+                // appear, it will heal itself.
+                update_object_record($fileartefact, OBJECT_LOCATION_ERROR);
                 continue;
             }
 
