@@ -22,7 +22,7 @@ require_once(get_config('docroot') . 'module/objectfs/classes/log/null_logger.ph
 require_once(get_config('docroot') . 'module/objectfs/classes/log/real_time_logger.php');
 require_once(get_config('docroot') . 'artefact/file/lib.php');
 
-abstract class object_file_system extends mahara_external_filesystem {
+abstract class object_file_system {
 
     private $externalclient;
     private $preferexternal;
@@ -67,10 +67,10 @@ abstract class object_file_system extends mahara_external_filesystem {
      * @return string The full path to the content file
      */
     protected function get_local_path_from_hash($contenthash, $fetchifnotfound = false) {
-        $path = parent::get_local_path_from_hash($contenthash, $fetchifnotfound);
 
         $file = get_record('artefact_file_files', 'contenthash', $contenthash);
         $fileartefact = new \ArtefactTypeFile($file->fileid);
+        $path = $fileartefact->get_local_path();
 
         if ($fetchifnotfound && !is_readable($path)) {
 
@@ -79,7 +79,7 @@ abstract class object_file_system extends mahara_external_filesystem {
 
             // While gaining lock object might have been moved locally so we recheck.
             if ($objectlock && !is_readable($path)) {
-                $location = $this->copy_object_from_external_to_local_by_hash($contenthash);
+                $location = $this->copy_object_from_external_to_local($fileartefact, $fileartefact->get('size'));
                 // We want this file to be deleted again later.
 
                 update_object_record($fileartefact, $location);
@@ -91,9 +91,10 @@ abstract class object_file_system extends mahara_external_filesystem {
         return $path;
     }
 
-    protected function get_remote_path_from_hash($contenthash) {
+    protected function get_remote_path($fileartefact) {
+        $contenthash = $fileartefact->get('contenthash');
         if ($this->preferexternal) {
-            $location = $this->get_object_location($contenthash);
+            $location = $this->get_object_location($fileartefact);
             if ($location == OBJECT_LOCATION_DUPLICATED) {
                 return $this->get_external_path_from_hash($contenthash);
             }
