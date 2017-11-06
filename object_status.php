@@ -61,7 +61,7 @@ function format_location_report($report) {
         $row->datakey = get_file_location_string($row->datakey); // Turn int location into string.
     }
 
-    return $rows;
+    return augment_barchart($rows);
 }
 
 function format_logsize_report($report) {
@@ -77,7 +77,7 @@ function format_logsize_report($report) {
 		$row->datakey = get_size_range_from_logsize($row->datakey); // Turn logsize into a byte range.
 	}
 
-	return $rows;
+	return augment_barchart($rows);
 }
 
 function format_mimetype_report($report) {
@@ -88,7 +88,7 @@ function format_mimetype_report($report) {
 		return '';
     }
 
-	return $rows;
+	return augment_barchart($rows);
 }
 
 function get_file_location_string($filelocation) {
@@ -125,4 +125,33 @@ function get_size_range_from_logsize($logsize) {
 	$sizerange = "$floor - $roof";
 
 	return $sizerange;
+}
+
+function augment_barchart($rows) {
+
+    $maxobjectcount = 0;
+    $maxobjectsum = 0;
+
+    // Iterate through and calculate the max first.
+    foreach ($rows as $row) {
+        
+        if ($row->objectcount > $maxobjectcount) {
+
+            $maxobjectcount = $row->objectcount;
+        }
+
+        if ($row->objectsum > $maxobjectsum) {
+
+            $maxobjectsum = $row->objectsum;
+        }
+    }
+
+    // Then calculate the percentages for each row.
+    foreach ($rows as $row) {
+
+        $row->relativeobjectcount = 100 * $row->objectcount / $maxobjectcount;
+        $row->relativeobjectsum = 100 * $row->objectsum / $maxobjectsum;
+    }
+
+    return $rows;
 }

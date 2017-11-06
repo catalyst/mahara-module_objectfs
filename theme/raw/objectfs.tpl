@@ -15,8 +15,8 @@
         {foreach $sitedata['location'] key item}
           <tr>
             <td>{$item->datakey}</td>
-            <td>{$item->objectcount}</td>
-            <td>{$item->objectsum|display_size}</td>
+            <td><div class="ofs-bar" style="width:{$item->relativeobjectcount}%; background: #17a5eb;">{$item->objectcount}</div></td>
+            <td><div class="ofs-bar" style="width:{$item->relativeobjectsum}%; background: #17a5eb;">{$item->objectsum|display_size}</div></td>
           </tr>
         {/foreach}
 
@@ -40,8 +40,8 @@
         {foreach $sitedata['log_size'] key item}
           <tr>
             <td>{$item->datakey}</td>
-            <td>{$item->objectcount}</td>
-            <td>{$item->objectsum|display_size}</td>
+            <td><div class="ofs-bar" style="width:{$item->relativeobjectcount}%; background: #17a5eb;">{$item->objectcount}</div></td>
+            <td><div class="ofs-bar" style="width:{$item->relativeobjectsum}%; background: #17a5eb;">{$item->objectsum|display_size}</div></td>
           </tr>
         {/foreach}
 
@@ -62,8 +62,8 @@
         {foreach $sitedata['mime_type'] key item}
           <tr>
             <td>{$item->datakey}</td>
-            <td>{$item->objectcount}</td>
-            <td>{$item->objectsum|display_size}</td>
+            <td><div class="ofs-bar" style="width:{$item->relativeobjectcount}%; background: #17a5eb;">{$item->objectcount}</div></td>
+            <td><div class="ofs-bar" style="width:{$item->relativeobjectsum}%; background: #17a5eb;">{$item->objectsum|display_size}</div></td>
           </tr>
         {/foreach}
 
