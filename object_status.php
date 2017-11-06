@@ -149,8 +149,8 @@ function augment_barchart($rows) {
     // Then calculate the percentages for each row.
     foreach ($rows as $row) {
 
-        $row->relativeobjectcount = 100 * $row->objectcount / $maxobjectcount;
-        $row->relativeobjectsum = 100 * $row->objectsum / $maxobjectsum;
+        $row->relativeobjectcount = round(100 * $row->objectcount / $maxobjectcount);
+        $row->relativeobjectsum = round(100 * $row->objectsum / $maxobjectsum);
     }
 
     return $rows;
