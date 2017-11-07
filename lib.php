@@ -101,17 +101,21 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         $connection = $client->test_connection();
 
         if ($connection) {
-            $connection = get_string('settings:connectionsuccess', 'module.objectfs');
+            $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+            $connection .= get_string('settings:connectionsuccess', 'module.objectfs');
+            $connection .= '</span>';
             $permissions = $client->test_permissions();
 
             $errormsg = '';
             if ($permissions->success) {
-                $permissionsmsg = get_string('settings:permissioncheckpassed', 'module.objectfs');
+                $permissionsmsg = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+                $permissionsmsg .= get_string('settings:permissioncheckpassed', 'module.objectfs') . '</span>';
             } else {
                 foreach ($permissions->messages as $message) {
-                    $errormsg .=$message;
+                    $errormsg .= $message;
                 }
-                $permissionsmsg = $errormsg;
+                $permissionsmsg = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+                $permissionsmsg .= $errormsg . '</span>';
             }
 
             $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
@@ -119,7 +123,8 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                                        'value' => $permissionsmsg,
                 );
         } else {
-            $connection = get_string('settings:connectionfailure', 'module.objectfs');
+            $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+            $connection .= get_string('settings:connectionfailure', 'module.objectfs') . '</span>';
             $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
                                        'type'  => 'html',
                                        'value' => $connection,
