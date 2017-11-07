@@ -55,7 +55,11 @@ class objectfs_report {
             $reportbuilderclass = "module_objectfs\\report\\{$reporttype}_report_builder";
             $reportbuilder = new $reportbuilderclass();
             $report = $reportbuilder->build_report();
-            objectfs_report_builder::save_report_to_database($report);
+
+            if (!empty($report)) {
+
+                objectfs_report_builder::save_report_to_database($report);
+            }
         }
     }
 
