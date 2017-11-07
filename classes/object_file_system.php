@@ -256,4 +256,17 @@ abstract class object_file_system {
                                         $objectsize);
         return $finallocation;
     }
+
+
+    /**
+     * Will return a externally seekable file handle for supplied path and mode
+     *
+     * @param string $path object path
+     * @param string $mode fopen mode
+     * @return file pointer resource on success, or FALSE on error
+     */
+    protected function get_object_file_handle($path, $mode) {
+        $context = $this->externalclient->get_seekable_stream_context();
+        return fopen($path, $mode, false, $context);
+    }
 }
