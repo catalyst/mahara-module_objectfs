@@ -43,6 +43,13 @@ abstract class manipulator {
     protected $logger;
 
     /**
+     * Supported artefact types for manipulating
+     *
+     * @var array
+     */
+    protected $supportedartefacttypes = array('file', 'archive', 'video', 'audio');
+
+    /**
      * Manipulator constructor
      *
      * @param object_file_system $filesystem object file system
@@ -91,12 +98,14 @@ abstract class manipulator {
             }
 
             // At the moment we can only handle file artefacts.
-            if ($objectrecord->artefacttype != 'file') {
+            if (!in_array($objectrecord->artefacttype, $this->supportedartefacttypes)) {
                 continue;
             }
 
+            $artefactclassname = "\ArtefactType" . ucfirst($objectrecord->artefacttype);
+
             // Prepare the file artefact, and try and fix no content hash errors here.
-            $fileartefact = new \ArtefactTypeFile($objectrecord->artefact);
+            $fileartefact = new $artefactclassname($objectrecord->artefact);
 
             // Object is currently being manipulated elsewhere.
             if (get_field('artefact', 'locked', 'id', $objectrecord->artefact)) {
@@ -128,8 +137,6 @@ abstract class manipulator {
     protected function manipulator_can_execute() {
         return true;
     }
-
-
 
     public static function get_all_manipulator_classnames() {
         $manipulators = array('deleter',
