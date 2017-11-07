@@ -84,19 +84,20 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
     public static function get_config_options() {
 
-        $configtemp = get_objectfs_config();
+        // Get default config;
+        $defaultconfig = get_objectfs_config();
 
         if (isset($_POST)) {
             foreach ($_POST as $key => $value) {
-                foreach ($configtemp as $key1 => $value1) {
+                foreach ($defaultconfig as $key1 => $value1) {
                     if ($key == $key1) {
-                        $configtemp->$key1 = $value;
+                        $defaultconfig->$key1 = $value;
                     }
                 }
             }
         }
 
-        $client = new s3_client($configtemp);
+        $client = new s3_client($defaultconfig);
         $connection = $client->test_connection();
 
         if ($connection) {
@@ -151,13 +152,13 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'title'        => get_string('settings:enabletasks', 'module.objectfs'),
                     'description'  => get_string('settings:enabletasks_help', 'module.objectfs'),
                     'type'         => 'checkbox',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'enabletasks'),
+                    'defaultvalue' => $defaultconfig->enabletasks,
                 ),
                 'maxtaskruntime' => array(
                     'title'        => get_string('settings:maxtaskruntime', 'module.objectfs'),
                     'description'  => get_string('settings:maxtaskruntime_help', 'module.objectfs'),
                     'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'maxtaskruntime'),
+                    'defaultvalue' => $defaultconfig->maxtaskruntime,
                     // Lets set the maximum run time to one day.
                     'rules'        => array('integer' => true, 'minvalue' => 0, 'maxvalue' => (24 * 60 * 60))
                 ),
@@ -165,7 +166,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'title'        => get_string('settings:preferexternal', 'module.objectfs'),
                     'description'  => get_string('settings:preferexternal_help', 'module.objectfs'),
                     'type'         => 'checkbox',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'preferexternal'),
+                    'defaultvalue' => $defaultconfig->preferexternal,
                 ),
             ),
         );
@@ -180,7 +181,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'title'        => get_string('settings:sizethreshold', 'module.objectfs'),
                     'description'  => get_string('settings:sizethreshold_help', 'module.objectfs'),
                     'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'sizethreshold') / 1024,
+                    'defaultvalue' => $defaultconfig->sizethreshold / 1024,
                     // The limit for Amazon S3 is 5GB.
                     'rules'        => array('integer' => true, 'minvalue' => 0, 'maxvalue' => 5000000)
                 ),
@@ -188,20 +189,20 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     'title'        => get_string('settings:minimumage', 'module.objectfs'),
                     'description'  => get_string('settings:minimumage_help', 'module.objectfs'),
                     'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'minimumage'),
+                    'defaultvalue' => $defaultconfig->minimumage,
                     'rules'        => array('integer' => true, 'minvalue' => 0)
                 ),
                 'deletelocal' => array(
                     'title'        => get_string('settings:deletelocal', 'module.objectfs'),
                     'description'  => get_string('settings:deletelocal_help', 'module.objectfs'),
                     'type'         => 'checkbox',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'deletelocal'),
+                    'defaultvalue' => $defaultconfig->deletelocal,
                 ),
                 'consistencydelay' => array(
                     'title'        => get_string('settings:consistencydelay', 'module.objectfs'),
                     'description'  => get_string('settings:consistencydelay_help', 'module.objectfs'),
                     'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'consistencydelay'),
+                    'defaultvalue' => $defaultconfig->consistencydelay,
                     'rules'        => array('integer' => true, 'minvalue' => 0)
                 ),
             ),
@@ -216,33 +217,33 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                 'connectiontest' => array(
                     'title'        => get_string('settings:connection', 'module.objectfs'),
                     'type'         => 'html',
-                    'value' => $connection,
+                    'value'        => $connection,
                 ),
                 'permissionstest' => $permissionsoutput,
                 'key' => array(
                     'title'        => get_string('settings:key', 'module.objectfs'),
                     'description'  => get_string('settings:key_help', 'module.objectfs'),
                     'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'key'),
+                    'defaultvalue' => $defaultconfig->key,
                 ),
                 'secret' => array(
                     'title'        => get_string('settings:secret', 'module.objectfs'),
                     'description'  => get_string('settings:secret_help', 'module.objectfs'),
                     'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'secret'),
+                    'defaultvalue' => $defaultconfig->secret,
                 ),
                 'bucket' => array(
                     'title'        => get_string('settings:bucket', 'module.objectfs'),
                     'description'  => get_string('settings:bucket_help', 'module.objectfs'),
                     'type'         => 'text',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'bucket'),
+                    'defaultvalue' => $defaultconfig->bucket,
                 ),
                 'region' => array(
                     'title'        => get_string('settings:region', 'module.objectfs'),
                     'description'  => get_string('settings:region_help', 'module.objectfs'),
                     'type'         => 'select',
-                    'options'     => $regionoptions,
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'region'),
+                    'options'      => $regionoptions,
+                    'defaultvalue' => $defaultconfig->region,
                 ),
             ),
         );
