@@ -35,8 +35,12 @@ class mime_type_report_builder extends objectfs_report_builder {
                       WHEN filetype =    'application/vnd.oasis.opendocument.spreadsheet' THEN 'spreadsheet'
                       WHEN filetype like 'application/vnd.ms-excel%'                      THEN 'spreadsheet'
                       WHEN filetype =    'application/g-zip'                              THEN 'archive'
+                      WHEN filetype =    'application/g-unzip'                            THEN 'archive'
                       WHEN filetype =    'application/x-7z-compressed'                    THEN 'archive'
+                      WHEN filetype =    'application/x-rar'                              THEN 'archive'
                       WHEN filetype =    'application/x-rar-compressed'                   THEN 'archive'
+                      WHEN filetype =    'application/x-zip-compressed'                   THEN 'archive'
+                      WHEN filetype =    'application/zip'                                THEN 'archive'
                       WHEN filetype like 'application/%'                                  THEN 'other'
                       ELSE         substr(filetype,0,position('/' IN filetype))
                    END AS filetype
