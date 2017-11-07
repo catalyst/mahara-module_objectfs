@@ -19,10 +19,7 @@ use module_objectfs\object_manipulator\pusher;
 use module_objectfs\object_manipulator\puller;
 use module_objectfs\object_manipulator\deleter;
 
-abstract class PluginModuleObjectfs extends ArtefactTypeFile {
-
-    private $externalclient;
-    private $preferexternal;
+class PluginModuleObjectfs {
 
     /**
      * API-Function get the Plugin ShortName
@@ -325,19 +322,6 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
     public static function is_deprecated() {
         return false;
     }
-
-    public function __construct() {
-        parent::__construct(-1, array("id" => -1)); // Setup filedir. // This should be fixed properly, need file id before creating filesystem
-
-        $config = get_objectfs_config();
-
-        $this->externalclient = $this->get_external_client($config);
-        $this->externalclient->register_stream_wrapper();
-
-        $this->preferexternal = $config->preferexternal;
-    }
-
-    protected abstract function get_external_client($config);
 
     /**
      * Scheduled tasks for S3
