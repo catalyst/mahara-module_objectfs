@@ -21,8 +21,8 @@ use module_objectfs\object_manipulator\deleter;
 
 abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
-    private $remoteclient;
-    private $preferremote;
+    private $externalclient;
+    private $preferexternal;
 
     /**
      * API-Function get the Plugin ShortName
@@ -161,11 +161,11 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
                     // Lets set the maximum run time to one day.
                     'rules'        => array('integer' => true, 'minvalue' => 0, 'maxvalue' => (24 * 60 * 60))
                 ),
-                'preferremote' => array(
-                    'title'        => get_string('settings:preferremote', 'module.objectfs'),
-                    'description'  => get_string('settings:preferremote_help', 'module.objectfs'),
+                'preferexternal' => array(
+                    'title'        => get_string('settings:preferexternal', 'module.objectfs'),
+                    'description'  => get_string('settings:preferexternal_help', 'module.objectfs'),
                     'type'         => 'checkbox',
-                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'preferremote'),
+                    'defaultvalue' => get_config_plugin('module', 'objectfs', 'preferexternal'),
                 ),
             ),
         );
@@ -280,7 +280,7 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
         set_config_plugin('module', 'objectfs', 'minimumage', $values['minimumage']);
         set_config_plugin('module', 'objectfs', 'deletelocal', $values['deletelocal']);
         set_config_plugin('module', 'objectfs', 'enabletasks', $values['enabletasks']);
-        set_config_plugin('module', 'objectfs', 'preferremote', $values['preferremote']);
+        set_config_plugin('module', 'objectfs', 'preferexternal', $values['preferexternal']);
         set_config_plugin('module', 'objectfs', 'maxtaskruntime', $values['maxtaskruntime']);
         set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
         set_config_plugin('module', 'objectfs', 'key', $values['key']);
@@ -325,13 +325,13 @@ abstract class PluginModuleObjectfs extends ArtefactTypeFile {
 
         $config = get_objectfs_config();
 
-        $this->remoteclient = $this->get_remote_client($config);
-        $this->remoteclient->register_stream_wrapper();
+        $this->externalclient = $this->get_external_client($config);
+        $this->externalclient->register_stream_wrapper();
 
-        $this->preferremote = $config->preferremote;
+        $this->preferexternal = $config->preferexternal;
     }
 
-    protected abstract function get_remote_client($config);
+    protected abstract function get_external_client($config);
 
     /**
      * Scheduled tasks for S3
