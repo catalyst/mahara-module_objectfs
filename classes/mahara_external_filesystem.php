@@ -122,4 +122,15 @@ abstract class mahara_external_filesystem extends object_file_system implements 
 
         return $this->delete_object_from_local($fileartefact, $fileartefact->get('size'));
     }
+
+    /**
+     * Will return a externally seekable file handle for supplied path and mode
+     *
+     * @param string $path object path
+     * @param string $mode fopen mode
+     * @return file pointer resource on success, or FALSE on error
+     */
+    public function get_file_handle($path, $mode) {
+        return $this->get_object_file_handle($path, $mode);
+    }
 }
