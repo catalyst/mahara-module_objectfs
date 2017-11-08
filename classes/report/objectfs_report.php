@@ -23,7 +23,7 @@ class objectfs_report {
 
     public function __construct($reporttype) {
         $this->reporttype = $reporttype;
-        $rows = array();
+        $this->rows = array();
     }
 
     public function add_row($datakey, $objectcount, $objectsum) {
@@ -56,10 +56,7 @@ class objectfs_report {
             $reportbuilder = new $reportbuilderclass();
             $report = $reportbuilder->build_report();
 
-            if (!empty($report)) {
-
-                objectfs_report_builder::save_report_to_database($report);
-            }
+            objectfs_report_builder::save_report_to_database($report);
         }
     }
 
