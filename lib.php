@@ -97,7 +97,7 @@ class PluginModuleObjectfs {
         $client = new s3_client($defaultconfig);
         $connection = $client->test_connection();
 
-        if ($connection) {
+        if ($connection->success) {
             $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
             $connection .= get_string('settings:connectionsuccess', 'module.objectfs');
             $connection .= '</span>';
