@@ -61,18 +61,13 @@ abstract class mahara_external_filesystem extends object_file_system implements 
      */
     public function ensure_local($fileartefact) {
 
-        $success = $this->copy_object_from_external_to_local($fileartefact);
+        $status = $this->get_file_location_status($fileartefact);
 
-        if ($success) {
+        if ($status == OBJECT_LOCATION_EXTERNAL) {
 
-            $location = OBJECT_LOCATION_DUPLICATED;
-        } else {
-
-            $location = $this->get_file_location_status($fileartefact);
+            $location = $this->copy_object_from_external_to_local($fileartefact);
+            update_object_record($fileartefact, $location);
         }
-
-        update_object_record($fileartefact, $location);
-
     }
 
     /**
