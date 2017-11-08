@@ -139,6 +139,17 @@ class PluginModuleObjectfs {
                                 'eu-central-1'      => 'eu-central-1',
                                 'eu-west-1'         => 'eu-west-1');
 
+        $extfsconfig = get_config('externalfilesystem', false);
+
+        if (!$extfsconfig) {
+            $extfsconf = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+            $extfsconf .= get_string('settings:handlernotset', 'module.objectfs') . '</span>';
+        } else {
+
+            $extfsconf = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+            $extfsconf .= get_string('settings:handlerset', 'module.objectfs') . '</span>';
+        }
+        
         $config = array();
 
         $config['generalsettings'] = array(
@@ -146,6 +157,11 @@ class PluginModuleObjectfs {
             'legend' => get_string('settings:generalheader', 'module.objectfs'),
             'collapsible' => true,
             'elements' => array(
+                'extfsconfig' => array(
+                    'title'        => get_string('settings:handler', 'module.objectfs'),
+                    'type'         => 'html',
+                    'value'        => $extfsconf
+                ),
                 'report' => array(
                     'type'         => 'html',
                     'value'        => '<a href="/module/objectfs/object_status.php">Object status</a>',
