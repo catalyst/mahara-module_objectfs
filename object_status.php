@@ -146,6 +146,16 @@ function augment_barchart($rows) {
         }
     }
 
+    // Fail safe so that the universe stays intact, div by 0 errors yada yada.
+    if (empty($maxobjectcount)) {
+
+        $maxobjectcount = 100;
+    }
+    if (empty($maxobjectsum)) {
+
+        $maxobjectsum = 100;
+    }
+
     // Then calculate the percentages for each row.
     foreach ($rows as $row) {
 
