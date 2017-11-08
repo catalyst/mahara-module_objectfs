@@ -44,10 +44,14 @@ Using this plugin we can configure production to have full read write to the rem
 2. Setup your remote object storage. See [Remote object storage setup](#remote-object-storage-setup)
 3. Clone this repository into module/objectfs
 4. Clone [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws
-4. Install the plugins through the mahara GUI.
-5. Configure the plugin. See [Mahara configuration](#mahara-configuration)
+5. Install the plugins through the mahara GUI.
+6. Configure the plugin. See [Mahara configuration](#mahara-configuration)
+7. Place the following in htdocs/config.php:
 ```
-$cfg->alternative_file_system = 1;
+$cfg->externalfilesystem = array(
+    "includefilepath" => "module/objectfs/classes/s3_file_system.php",
+    "class" => "module_objectfs\\s3_file_system"
+);
 ```
 
 ## Currently supported object stores
