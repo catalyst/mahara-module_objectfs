@@ -75,7 +75,9 @@ $string['settings:readfailure'] = 'Could not read object from the S3 bucket. ';
 $string['settings:deletesuccess'] = 'Could delete object from the S3 bucket - It is not recommended for the AWS user to have delete permissions. ';
 $string['settings:deleteerror'] = 'An unspecified error occured. ';
 $string['settings:permissioncheckpassed'] = 'Permissions check passed.';
-$string['settings:handlernotset'] = '$CFG->alternative_file_system_class is not set, the file system will not be able to read from S3. Background tasks can still function.';
+$string['settings:handlernotset'] = '$cfg->externalfilesystem is not set, the file system will not be able to read from S3. Background tasks can still function.';
+$string['settings:handlerset'] = '$cfg->externalfilesystem is set, the file system will be able to read from S3 and background tasks will function normally';
+$string['settings:handler'] = 'Global config handler';
 
 $string['validationerror:notint'] = 'Please enter integers only';
 $string['validationerror:negative'] = 'Only positive integers allowed';
