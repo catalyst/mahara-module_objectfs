@@ -51,7 +51,10 @@ class mime_type_report_builder extends objectfs_report_builder {
 
         $result = get_records_sql_array($sql);
 
-        $report->add_rows($result);
+        if (!empty($result)) {
+
+            $report->add_rows($result);
+        }
 
         return $report;
     }
