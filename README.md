@@ -41,7 +41,7 @@ Using this plugin we can configure production to have full read write to the rem
 
 ## Installation
 1. If not on Mahara 17.04, backport the file system API. See [Backporting](#backporting)
-2. Setup your remote object storage. See [Remote object storage setup](#remote-object-storage-setup)
+2. Setup your remote object storage. See [Remote object storage setup](#amazon-s3)
 3. Clone this repository into module/objectfs
 4. Clone [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws
 5. Install the plugins through the mahara GUI.
