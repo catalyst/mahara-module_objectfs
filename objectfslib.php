@@ -77,6 +77,10 @@ function get_objectfs_config() {
     $config->logging = 0;
     $config->preferexternal = 0;
 
+    $config->azure_accountname = '';
+    $config->azure_container = '';
+    $config->azure_sastoken = '';
+
     // Override defaults if set.
     foreach ($config as $key => $value) {
 
