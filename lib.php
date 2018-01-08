@@ -266,10 +266,50 @@ class PluginModuleObjectfs {
             ),
         );
 
+        $config['azuresettings'] = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:azureheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => true,
+            'elements' => array(
+                'azureconnectiontest' => array(
+                    'title'        => get_string('settings:azureconnection', 'module.objectfs'),
+                    'type'         => 'html',
+                    'value'        => $connection,
+                ),
+                'azurepermissionstest' => self::check_azure_permissions(),
+                'azure_accountname' => array(
+                    'title'        => get_string('settings:azure_accountname', 'module.objectfs'),
+                    'description'  => get_string('settings:azure_accountname_help', 'module.objectfs'),
+                    'type'         => 'text',
+                    'defaultvalue' => $defaultconfig->azure_accountname,
+                ),
+                'azure_container' => array(
+                    'title'        => get_string('settings:azure_container', 'module.objectfs'),
+                    'description'  => get_string('settings:azure_container_help', 'module.objectfs'),
+                    'type'         => 'text',
+                    'defaultvalue' => $defaultconfig->azure_container,
+                ),
+                'azure_sastoken' => array(
+                    'title'        => get_string('settings:azure_sastoken', 'module.objectfs'),
+                    'description'  => get_string('settings:azure_sastoken_help', 'module.objectfs'),
+                    'type'         => 'text',
+                    'defaultvalue' => $defaultconfig->azure_sastoken,
+                ),
+            ),
+        );
+
         return array(
             'elements' => $config,
         );
 
+    }
+
+    public function check_azure_permissions() {
+            return array('title' => get_string('settings:permissions', 'module.objectfs'),
+                                       'type'  => 'html',
+                                       'value' => 'A message',
+                                     );
     }
 
     public static function validate_config_options($form, $values) {
@@ -306,6 +346,10 @@ class PluginModuleObjectfs {
         set_config_plugin('module', 'objectfs', 'secret', $values['secret']);
         set_config_plugin('module', 'objectfs', 'bucket', $values['bucket']);
         set_config_plugin('module', 'objectfs', 'region', $values['region']);
+
+        set_config_plugin('module', 'objectfs', 'azure_accountname', $values['azure_accountname']);
+        set_config_plugin('module', 'objectfs', 'azure_container', $values['azure_container']);
+        set_config_plugin('module', 'objectfs', 'azure_sastoken', $values['azure_sastoken']);
     }
 
     public static function postinst($fromversion) {
