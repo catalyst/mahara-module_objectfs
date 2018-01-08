@@ -81,52 +81,10 @@ class PluginModuleObjectfs {
 
     public static function get_config_options() {
 
-        // Get default config;
-        $defaultconfig = get_objectfs_config();
+      $defaultconfig = self::get_default_config();
 
-        if (isset($_POST)) {
-            foreach ($_POST as $key => $value) {
-                foreach ($defaultconfig as $key1 => $value1) {
-                    if ($key == $key1) {
-                        $defaultconfig->$key1 = $value;
-                    }
-                }
-            }
-        }
-
-        $client = new s3_client($defaultconfig);
-        $connection = $client->test_connection();
-
-        if ($connection->success) {
-            $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
-            $connection .= get_string('settings:connectionsuccess', 'module.objectfs');
-            $connection .= '</span>';
-            $permissions = $client->test_permissions();
-
-            $errormsg = '';
-            if ($permissions->success) {
-                $permissionsmsg = '<span class="icon icon-check text-success"></span><span class="bg-success">';
-                $permissionsmsg .= get_string('settings:permissioncheckpassed', 'module.objectfs') . '</span>';
-            } else {
-                foreach ($permissions->messages as $message) {
-                    $errormsg .= $message;
-                }
-                $permissionsmsg = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
-                $permissionsmsg .= $errormsg . '</span>';
-            }
-
-            $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
-                                       'type'  => 'html',
-                                       'value' => $permissionsmsg,
-                );
-        } else {
-            $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
-            $connection .= get_string('settings:connectionfailure', 'module.objectfs') . '</span>';
-            $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
-                                       'type'  => 'html',
-                                       'value' => $connection,
-            );
-        }
+      $connection = self::check_s3_connection($defaultconfig);
+      $permissionsoutput = self::check_s3_permissions();
 
         $regionoptions = array( 'us-east-1'         => 'us-east-1',
                                 'us-east-2'         => 'us-east-2',
@@ -149,7 +107,7 @@ class PluginModuleObjectfs {
             $extfsconf = '<span class="icon icon-check text-success"></span><span class="bg-success">';
             $extfsconf .= get_string('settings:handlerset', 'module.objectfs') . '</span>';
         }
-        
+
         $config = array();
 
         $config['generalsettings'] = array(
@@ -303,6 +261,70 @@ class PluginModuleObjectfs {
             'elements' => $config,
         );
 
+    }
+
+    private function get_default_config() {
+      // Get default config;
+      $defaultconfig = get_objectfs_config();
+
+      if (isset($_POST)) {
+        foreach ($_POST as $key => $value) {
+          foreach ($defaultconfig as $key1 => $value1) {
+            if ($key == $key1) {
+              $defaultconfig->$key1 = $value;
+            }
+          }
+        }
+      }
+      return $defaultconfig;
+    }
+
+    private function check_s3_connection($defaultconfig) {
+      $client = new s3_client($defaultconfig);
+      $connection = $client->test_connection();
+
+      if ($connection->success) {
+        $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+        $connection .= get_string('settings:connectionsuccess', 'module.objectfs');
+        $connection .= '</span>';
+      } else {
+        $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+        $connection .= get_string('settings:connectionfailure', 'module.objectfs') . '</span>';
+      }
+      return $connection;
+    }
+
+    private function check_s3_permissions($defaultconfig) {
+        $client = new s3_client($defaultconfig);
+        $connection = $client->test_connection();
+
+        if ($connection->success) {
+            $permissions = $client->test_permissions();
+
+            $errormsg = '';
+            if ($permissions->success) {
+                $permissionsmsg = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+                $permissionsmsg .= get_string('settings:permissioncheckpassed', 'module.objectfs') . '</span>';
+            } else {
+                foreach ($permissions->messages as $message) {
+                    $errormsg .= $message;
+                }
+                $permissionsmsg = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+                $permissionsmsg .= $errormsg . '</span>';
+            }
+
+            $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
+                                       'type'  => 'html',
+                                       'value' => $permissionsmsg,
+                );
+        } else {
+            $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
+                                       'type'  => 'html',
+                                       'value' => $connection,
+            );
+        }
+
+       return $permissionsoutput;
     }
 
     public function check_azure_permissions() {
