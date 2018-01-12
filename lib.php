@@ -11,13 +11,16 @@ defined('INTERNAL') || die();
 
 require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/client/s3_client.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/client/azure_client.php');
 require_once(get_config('docroot') . 'artefact/lib.php');
 require_once(get_config('docroot') . 'artefact/file/lib.php');
 
 use module_objectfs\client\s3_client;
+use module_objectfs\client\azure_client;
 use module_objectfs\object_manipulator\pusher;
 use module_objectfs\object_manipulator\puller;
 use module_objectfs\object_manipulator\deleter;
+
 
 class PluginModuleObjectfs {
 
@@ -84,7 +87,9 @@ class PluginModuleObjectfs {
       $defaultconfig = self::get_default_config();
 
       $connection = self::check_s3_connection($defaultconfig);
-      $permissionsoutput = self::check_s3_permissions();
+      $permissionsoutput = self::check_s3_permissions($defaultconfig);
+
+      $azureconnection = self::check_azure_connection($defaultconfig);
 
         $regionoptions = array( 'us-east-1'         => 'us-east-1',
                                 'us-east-2'         => 'us-east-2',
@@ -184,7 +189,9 @@ class PluginModuleObjectfs {
             ),
         );
 
-        $config['objectfssettings'] = array(
+        $config['objectfssettingsfilesystem'] = self::define_client_selection($defaultconfig);
+
+        $config['objectfsawss3settings'] = array(
             'type' => 'fieldset',
             'legend' => get_string('settings:awsheader', 'module.objectfs'),
             'collapsible' => true,
@@ -233,9 +240,9 @@ class PluginModuleObjectfs {
                 'azureconnectiontest' => array(
                     'title'        => get_string('settings:azureconnection', 'module.objectfs'),
                     'type'         => 'html',
-                    'value'        => $connection,
+                    'value'        => $azureconnection,
                 ),
-                'azurepermissionstest' => self::check_azure_permissions(),
+                'azurepermissionstest' => self::check_azure_permissions($defaultconfig),
                 'azure_accountname' => array(
                     'title'        => get_string('settings:azure_accountname', 'module.objectfs'),
                     'description'  => get_string('settings:azure_accountname_help', 'module.objectfs'),
@@ -261,6 +268,66 @@ class PluginModuleObjectfs {
             'elements' => $config,
         );
 
+    }
+
+    public static function define_client_selection($config) {
+
+        $names = self::tool_objectfs_get_client_components('file_system');
+
+        $clientlist = array_combine($names, $names);
+
+        return array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:storagefilesystemselectionheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => false,
+            'elements' => array(
+                'filesystem' => array(
+                    'title'        => get_string('settings:storagefilesystem', 'module.objectfs'),
+                    'description'        => get_string('settings:storagefilesystem_help', 'module.objectfs'),
+                    'type'         => 'select',
+                    'options'      => $clientlist,
+                    //'defaultvalue' => $config->filesystem,
+                ),
+            ),
+        );
+
+    }
+
+    public static function tool_objectfs_get_client_components($type = 'base') {
+        global $CFG;
+
+        $found = [];
+
+        $path = $CFG->docroot . '/module/objectfs/classes/client/*_client.php';
+
+        $clients = glob($path);
+
+        foreach ($clients as $client) {
+            $client = str_replace('_client.php', '', $client);
+            $basename = basename($client);
+
+            // Ignore the abstract class.
+            if ($basename == 'object') {
+                continue;
+            }
+
+            switch ($type) {
+                case 'file_system':
+                    $found[$basename] = '\\tool_objectfs\\' . $basename . '_file_system';
+                    break;
+                case 'client':
+                    $found[$basename] = '\\tool_objectfs\\client\\' . $basename . '_client';
+                    break;
+                case 'base':
+                    $found[$basename] = $basename;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $found;
     }
 
     private function get_default_config() {
@@ -327,10 +394,48 @@ class PluginModuleObjectfs {
        return $permissionsoutput;
     }
 
-    public function check_azure_permissions() {
-            return array('title' => get_string('settings:permissions', 'module.objectfs'),
+    public static function check_azure_connection($defaultconfig) {
+
+        $client = new azure_client($defaultconfig);
+        $connection = $client->test_connection();
+
+        if ($connection->success) {
+          $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+          $connection .= get_string('settings:azureconnectionsuccess', 'module.objectfs');
+          $connection .= '</span>';
+        } else {
+          $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+          $connection .= get_string('settings:azureconnectionfailure', 'module.objectfs') . '</span>';
+        }
+
+
+        return $connection;
+    }
+
+    public static function check_azure_permissions($config) {
+
+        $client = new azure_client($config);
+        $connection = $client->test_connection();
+        if ($connection->success) {
+            // Check permissions if we can connect.
+            $permissions = $client->test_permissions();
+            if ($permissions->success) {
+                $permissionmessage = $permissions->messages[0];
+            } else {
+                $permissionmessages = array();
+                foreach ($permissions->messages as $message) {
+                    $permissionmessages[] = $message;
+                }
+                $permissionmessage = implode('<br />', $permissionmessages);
+            }
+        }
+        else {
+          $permissionmessage = 'Connection failed';
+        }
+
+        return array('title' => get_string('settings:azurepermissions', 'module.objectfs'),
                                        'type'  => 'html',
-                                       'value' => 'A message',
+                                       'value' => $permissionmessage,
                                      );
     }
 

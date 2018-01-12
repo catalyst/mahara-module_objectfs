@@ -77,15 +77,29 @@ $string['settings:connection'] = 'Test connection to the AWS S3 bucket.';
 $string['settings:connectionsuccess'] = 'Could establish connection to the AWS S3 bucket.';
 $string['settings:connectionfailure'] = 'Could not establish connection to the AWS S3 bucket.';
 $string['settings:azureconnection'] = 'Test connection to the Azure object storage.';
+$string['settings:azureconnectionsuccess'] = 'Could establish connection to the Azure object storage container.';
+$string['settings:azureconnectionfailure'] = 'Could not establish connection to the Azure object storage container.';
+
 $string['settings:permissions'] = 'Test file permissions in the AWS S3 bucket.';
 $string['settings:writefailure'] = 'Could not write object to the S3 bucket. ';
 $string['settings:readfailure'] = 'Could not read object from the S3 bucket. ';
 $string['settings:deletesuccess'] = 'Could delete object from the S3 bucket - It is not recommended for the AWS user to have delete permissions. ';
 $string['settings:deleteerror'] = 'An unspecified error occured. ';
 $string['settings:permissioncheckpassed'] = 'Permissions check passed.';
+
+$string['settings:azurepermissions'] = 'Test file permissions in the Azure storage container.';
+$string['settings:azurepermissioncheckpassed'] = 'Azure Permissions check passed.';
+$string['settings:azurewritefailure'] = 'Could not write object to the Azure container. ';
+$string['settings:azurereadfailure'] = 'Could not read object from the Azure container. ';
+$string['settings:azuredeletesuccess'] = 'Could delete object from the Azure container - It is not recommended for the Azure user to have delete permissions. ';
+
 $string['settings:handlernotset'] = '$cfg->externalfilesystem is not set, the file system will not be able to read from S3. Background tasks can still function.';
 $string['settings:handlerset'] = '$cfg->externalfilesystem is set, the file system will be able to read from S3 and background tasks will function normally';
 $string['settings:handler'] = 'Global config handler';
+
+$string['settings:storagefilesystemselectionheader'] = 'Storage File System Selection';
+$string['settings:storagefilesystem'] = 'Storage File System';
+$string['settings:storagefilesystem_help'] = 'The storage file system. This is also the active file system for the background tasks.';
 
 $string['validationerror:notint'] = 'Please enter integers only';
 $string['validationerror:negative'] = 'Only positive integers allowed';
