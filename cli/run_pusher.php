@@ -21,14 +21,10 @@ use module_objectfs\object_manipulator\manipulator;
 
 $cli = get_cli();
 
-$options = array();
-
 $settings = new \stdClass();
-$settings->options = $options;
-$settings->info = 'CLI script to push files to S3';
+$settings->options = array();
+$settings->info = 'CLI script to push files to object storage';
 
 $cli->setup($settings);
-
-$config = get_objectfs_config();
 
 manipulator::setup_and_run_object_manipulator('pusher');
