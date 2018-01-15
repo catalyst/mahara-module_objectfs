@@ -287,7 +287,7 @@ class PluginModuleObjectfs {
                     'description'        => get_string('settings:storagefilesystem_help', 'module.objectfs'),
                     'type'         => 'select',
                     'options'      => $clientlist,
-                    //'defaultvalue' => $config->filesystem,
+                    'defaultvalue' => $config->filesystem,
                 ),
             ),
         );
@@ -477,6 +477,8 @@ class PluginModuleObjectfs {
         set_config_plugin('module', 'objectfs', 'azure_accountname', $values['azure_accountname']);
         set_config_plugin('module', 'objectfs', 'azure_container', $values['azure_container']);
         set_config_plugin('module', 'objectfs', 'azure_sastoken', $values['azure_sastoken']);
+        set_config_plugin('module', 'objectfs', 'filesystem', $values['filesystem']);
+
     }
 
     public static function postinst($fromversion) {
