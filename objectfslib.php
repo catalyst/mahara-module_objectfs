@@ -81,6 +81,8 @@ function get_objectfs_config() {
     $config->azure_container = '';
     $config->azure_sastoken = '';
 
+    $config->filesystem = '';
+
     // Override defaults if set.
     foreach ($config as $key => $value) {
 
