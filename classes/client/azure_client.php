@@ -14,6 +14,8 @@ defined('INTERNAL') || die();
 
 require_once(get_config('docroot') . 'module/azure/vendor/autoload.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/client/object_client.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/azure/StreamWrapper.php');
+
 
 use GuzzleHttp\Exception\ConnectException;
 use MicrosoftAzure\Storage\Blob\BlobRestProxy;
@@ -22,7 +24,7 @@ use MicrosoftAzure\Storage\Common\ServicesBuilder;
 use MicrosoftAzure\Storage\Common\Exceptions\ServiceException;
 use SimpleXMLElement;
 use stdClass;
-use tool_objectfs\azure\StreamWrapper;
+use module_objectfs\azure\StreamWrapper;
 
 class azure_client implements object_client {
     /** @var BlobRestProxy $client The Blob client. */

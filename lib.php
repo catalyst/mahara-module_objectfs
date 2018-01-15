@@ -272,7 +272,7 @@ class PluginModuleObjectfs {
 
     public static function define_client_selection($config) {
 
-        $names = self::tool_objectfs_get_client_components('file_system');
+        $names = self::module_objectfs_get_client_components('file_system');
 
         $clientlist = array_combine($names, $names);
 
@@ -294,7 +294,7 @@ class PluginModuleObjectfs {
 
     }
 
-    public static function tool_objectfs_get_client_components($type = 'base') {
+    public static function module_objectfs_get_client_components($type = 'base') {
         global $CFG;
 
         $found = [];
@@ -314,10 +314,10 @@ class PluginModuleObjectfs {
 
             switch ($type) {
                 case 'file_system':
-                    $found[$basename] = '\\tool_objectfs\\' . $basename . '_file_system';
+                    $found[$basename] = '\\module_objectfs\\' . $basename . '_file_system';
                     break;
                 case 'client':
-                    $found[$basename] = '\\tool_objectfs\\client\\' . $basename . '_client';
+                    $found[$basename] = '\\module_objectfs\\client\\' . $basename . '_client';
                     break;
                 case 'base':
                     $found[$basename] = $basename;

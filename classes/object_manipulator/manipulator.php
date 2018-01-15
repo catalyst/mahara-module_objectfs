@@ -158,7 +158,6 @@ abstract class manipulator {
 
         if ($shouldtaskrun) {
             $logger = new \module_objectfs\log\aggregate_logger();
-            $filesystem = new \module_objectfs\s3_file_system();
 
             $filesystem = new $config->filesystem();
 
