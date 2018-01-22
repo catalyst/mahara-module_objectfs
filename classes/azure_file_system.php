@@ -1,9 +1,9 @@
 <?php
 /**
- * object_file_system abstract class.
+ * azure_file_system class.
  *
- * Remote object storage providers extent this class.
- * At minimum you need to impletment get_remote_client.
+ * Remote object storage providers extend this class.
+ * At minimum you need to impletment get_external_client.
  *
  * @package    mahara
  * @subpackage module_objectfs
