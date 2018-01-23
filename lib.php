@@ -84,23 +84,23 @@ class PluginModuleObjectfs {
 
     public static function get_config_options() {
 
-      $defaultconfig = self::get_default_config();
+        $defaultconfig = self::get_default_config();
 
-      $connection = self::check_s3_connection($defaultconfig);
-      $permissionsoutput = self::check_s3_permissions($defaultconfig);
+        $connection = self::check_s3_connection($defaultconfig);
+        $permissionsoutput = self::check_s3_permissions($defaultconfig);
 
-      $azureconnection = self::check_azure_connection($defaultconfig);
+        $azureconnection = self::check_azure_connection($defaultconfig);
 
         $regionoptions = array( 'us-east-1'         => 'us-east-1',
-                                'us-east-2'         => 'us-east-2',
-                                'us-west-1'         => 'us-west-1',
-                                'us-west-2'         => 'us-west-2',
-                                'ap-northeast-2'    => 'ap-northeast-2',
-                                'ap-southeast-1'    => 'ap-southeast-1',
-                                'ap-southeast-2'    => 'ap-southeast-2',
-                                'ap-northeast-1'    => 'ap-northeast-1',
-                                'eu-central-1'      => 'eu-central-1',
-                                'eu-west-1'         => 'eu-west-1');
+            'us-east-2'         => 'us-east-2',
+            'us-west-1'         => 'us-west-1',
+            'us-west-2'         => 'us-west-2',
+            'ap-northeast-2'    => 'ap-northeast-2',
+            'ap-southeast-1'    => 'ap-southeast-1',
+            'ap-southeast-2'    => 'ap-southeast-2',
+            'ap-northeast-1'    => 'ap-northeast-1',
+            'eu-central-1'      => 'eu-central-1',
+            'eu-west-1'         => 'eu-west-1');
 
         $extfsconfig = get_config('externalfilesystem', false);
 
@@ -331,34 +331,34 @@ class PluginModuleObjectfs {
     }
 
     private function get_default_config() {
-      // Get default config;
-      $defaultconfig = get_objectfs_config();
+        // Get default config.
+        $defaultconfig = get_objectfs_config();
 
-      if (isset($_POST)) {
-        foreach ($_POST as $key => $value) {
-          foreach ($defaultconfig as $key1 => $value1) {
-            if ($key == $key1) {
-              $defaultconfig->$key1 = $value;
+        if (isset($_POST)) {
+            foreach ($_POST as $key => $value) {
+                foreach ($defaultconfig as $key1 => $value1) {
+                    if ($key == $key1) {
+                        $defaultconfig->$key1 = $value;
+                    }
+                }
             }
-          }
         }
-      }
-      return $defaultconfig;
+        return $defaultconfig;
     }
 
     private function check_s3_connection($defaultconfig) {
-      $client = new s3_client($defaultconfig);
-      $connection = $client->test_connection();
+        $client = new s3_client($defaultconfig);
+        $connection = $client->test_connection();
 
-      if ($connection->success) {
-        $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
-        $connection .= get_string('settings:connectionsuccess', 'module.objectfs');
-        $connection .= '</span>';
-      } else {
-        $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
-        $connection .= get_string('settings:connectionfailure', 'module.objectfs') . '</span>';
-      }
-      return $connection;
+        if ($connection->success) {
+            $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+            $connection .= get_string('settings:connectionsuccess', 'module.objectfs');
+            $connection .= '</span>';
+        } else {
+            $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+            $connection .= get_string('settings:connectionfailure', 'module.objectfs') . '</span>';
+        }
+        return $connection;
     }
 
     private function check_s3_permissions($defaultconfig) {
@@ -381,17 +381,17 @@ class PluginModuleObjectfs {
             }
 
             $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
-                                       'type'  => 'html',
-                                       'value' => $permissionsmsg,
-                );
+                'type'  => 'html',
+                'value' => $permissionsmsg,
+            );
         } else {
             $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
-                                       'type'  => 'html',
-                                       'value' => $connection,
+                'type'  => 'html',
+                'value' => $connection,
             );
         }
 
-       return $permissionsoutput;
+        return $permissionsoutput;
     }
 
     public static function check_azure_connection($defaultconfig) {
@@ -400,14 +400,13 @@ class PluginModuleObjectfs {
         $connection = $client->test_connection();
 
         if ($connection->success) {
-          $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
-          $connection .= get_string('settings:azureconnectionsuccess', 'module.objectfs');
-          $connection .= '</span>';
+            $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+            $connection .= get_string('settings:azureconnectionsuccess', 'module.objectfs');
+            $connection .= '</span>';
         } else {
-          $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
-          $connection .= get_string('settings:azureconnectionfailure', 'module.objectfs') . '</span>';
+            $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+            $connection .= get_string('settings:azureconnectionfailure', 'module.objectfs') . '</span>';
         }
-
 
         return $connection;
     }
@@ -428,15 +427,14 @@ class PluginModuleObjectfs {
                 }
                 $permissionmessage = implode('<br />', $permissionmessages);
             }
-        }
-        else {
-          $permissionmessage = 'Connection failed';
+        } else {
+            $permissionmessage = 'Connection failed';
         }
 
         return array('title' => get_string('settings:azurepermissions', 'module.objectfs'),
-                                       'type'  => 'html',
-                                       'value' => $permissionmessage,
-                                     );
+            'type'  => 'html',
+            'value' => $permissionmessage,
+        );
     }
 
     public static function validate_config_options($form, $values) {
@@ -500,7 +498,8 @@ class PluginModuleObjectfs {
 
     }
 
-    public static function menu_items() { // All these default methods need to make some sense, need them to install plugin, some mahara stuff??????????
+    // All these default methods need to make some sense, need them to install plugin, some mahara stuff??????????
+    public static function menu_items() {
         return array();
     }
 
@@ -541,9 +540,9 @@ class PluginModuleObjectfs {
         );
     }
 
-   /**
-    * Push to S3
-    */
+    /**
+     * Push to S3
+     */
     public static function push_objects_to_storage() {
         require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/manipulator.php');
         require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/pusher.php');
