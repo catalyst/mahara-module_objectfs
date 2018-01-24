@@ -161,7 +161,7 @@ class azure_client implements object_client {
                 'permissionstest' => array(
                     'title' => get_string('settings:azurepermissions', 'module.objectfs'),
                     'type' => 'html',
-                    'value' => $connection->message,
+                    'value' => $permissionstest->messages[0],
                 ),
                 'azure_accountname' => array(
                     'title' => get_string('settings:azure_accountname', 'module.objectfs'),
