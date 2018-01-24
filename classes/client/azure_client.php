@@ -31,6 +31,9 @@ class azure_client implements object_client {
     protected $client;
     /** @var string $container The current container. */
     protected $container;
+
+    protected $defaultconfig;
+
     /**
      * The azure_client constructor.
      *
@@ -38,6 +41,7 @@ class azure_client implements object_client {
      */
     public function __construct($config) {
         $this->container = $config->azure_container;
+        $this->defaultconfig = $config;
         $this->set_client($config);
     }
     /**
@@ -76,6 +80,7 @@ class azure_client implements object_client {
         $sasconnectionstring = str_replace(' ', '', $sasconnectionstring);
         $this->client = ServicesBuilder::getInstance()->createBlobService($sasconnectionstring);
     }
+
     /**
      * Sets the StreamWrapper to allow accessing the remote content via a blob:// path.
      */
@@ -134,6 +139,53 @@ class azure_client implements object_client {
         $l2 = $contenthash[2] . $contenthash[3];
         return "$l1/$l2/$contenthash";
     }
+    /**
+     * @return mixed
+     */
+    public function define_settings_form() {
+
+        $connection = $this->test_connection();
+        $permissionstest = $this->test_permissions();
+
+        $config = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:azureheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => true,
+            'elements' => array(
+                'azureconnectiontest' => array(
+                    'title' => get_string('settings:azureconnection', 'module.objectfs'),
+                    'type' => 'html',
+                    'value' => $connection->message,
+                ),
+                'permissionstest' => array(
+                    'title' => get_string('settings:azurepermissions', 'module.objectfs'),
+                    'type' => 'html',
+                    'value' => $connection->message,
+                ),
+                'azure_accountname' => array(
+                    'title' => get_string('settings:azure_accountname', 'module.objectfs'),
+                    'description' => get_string('settings:azure_accountname_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->azure_accountname,
+                ),
+                'azure_container' => array(
+                    'title' => get_string('settings:azure_container', 'module.objectfs'),
+                    'description' => get_string('settings:azure_container_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->azure_container,
+                ),
+                'azure_sastoken' => array(
+                    'title' => get_string('settings:azure_sastoken', 'module.objectfs'),
+                    'description' => get_string('settings:azure_sastoken_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->azure_sastoken,
+                ),
+            ),
+        );
+        return $config;
+    }
+
     public function test_connection() {
         $connection = new \stdClass();
         $connection->success = true;

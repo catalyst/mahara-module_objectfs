@@ -28,9 +28,11 @@ class s3_client implements object_client {
 
     protected $client;
     protected $bucket;
+    protected $defaultconfig;
 
     public function __construct($config) {
         $this->bucket = $config->bucket;
+        $this->defaultconfig = $config;
         $this->set_client($config);
     }
 
@@ -52,6 +54,72 @@ class s3_client implements object_client {
         'region' => $config->region,
         'version' => AWS_API_VERSION
         ));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function define_settings_form() {
+        $connectiontest = self::test_connection();
+        $permissiontest = self::test_permissions();
+
+        $regionoptions = array(
+            'us-east-1' => 'us-east-1',
+            'us-east-2' => 'us-east-2',
+            'us-west-1' => 'us-west-1',
+            'us-west-2' => 'us-west-2',
+            'ap-northeast-2' => 'ap-northeast-2',
+            'ap-southeast-1' => 'ap-southeast-1',
+            'ap-southeast-2' => 'ap-southeast-2',
+            'ap-northeast-1' => 'ap-northeast-1',
+            'eu-central-1' => 'eu-central-1',
+            'eu-west-1' => 'eu-west-1'
+        );
+
+        $config = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:awsheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => true,
+            'elements' => array(
+                'connectiontest' => array(
+                    'title' => get_string('settings:connection', 'module.objectfs'),
+                    'type' => 'html',
+                    'value' => $connectiontest->message,
+                ),
+                'permissionstest' => array(
+                    'title' => get_string('settings:permissions', 'module.objectfs'),
+                    'type' => 'html',
+                    'value' => $permissiontest->messages[0],
+                ),
+                'key' => array(
+                    'title' => get_string('settings:key', 'module.objectfs'),
+                    'description' => get_string('settings:key_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->key,
+                ),
+                'secret' => array(
+                    'title' => get_string('settings:secret', 'module.objectfs'),
+                    'description' => get_string('settings:secret_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->secret,
+                ),
+                'bucket' => array(
+                    'title' => get_string('settings:bucket', 'module.objectfs'),
+                    'description' => get_string('settings:bucket_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->bucket,
+                ),
+                'region' => array(
+                    'title' => get_string('settings:region', 'module.objectfs'),
+                    'description' => get_string('settings:region_help', 'module.objectfs'),
+                    'type' => 'select',
+                    'options' => $regionoptions,
+                    'defaultvalue' => $this->defaultconfig->region,
+                ),
+            ),
+        );
+        return $config;
     }
 
     public function register_stream_wrapper() {

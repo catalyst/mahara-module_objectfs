@@ -20,4 +20,5 @@ interface object_client {
     public function verify_object($contenthash, $localpath);
     public function test_connection();
     public function test_permissions();
+    public function define_settings_form();
 }
