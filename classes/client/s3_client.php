@@ -12,7 +12,22 @@ namespace module_objectfs\client;
 
 defined('INTERNAL') || die();
 
-require_once(get_config('docroot') . 'module/aws/sdk/aws-autoloader.php');
+$autoloader = get_config('docroot') . 'module/aws/sdk/aws-autoloader.php';
+
+if (!file_exists($autoloader)) {
+    // Stub class with bare implementation for when the SDK prerequisite does not exist.
+    class s3_client {
+        public function get_availability() {
+            return false;
+        }
+        public function register_stream_wrapper() {
+            return false;
+        }
+    }
+    return;
+}
+require_once($autoloader);
+
 require_once(get_config('docroot') . 'module/objectfs/classes/client/object_client.php');
 
 use Aws\S3\S3Client;
@@ -48,6 +63,15 @@ class s3_client implements object_client {
         $this->client->registerStreamWrapper();
     }
 
+    /**
+     * Returns true if the AWS S3 Storage SDK exists and has been loaded.
+     *
+     * @return bool
+     */
+    public function get_availability() {
+        return true;
+    }
+
     public function set_client($config) {
         $this->client = S3Client::factory(array(
         'credentials' => array('key' => $config->key, 'secret' => $config->secret),
@@ -60,8 +84,8 @@ class s3_client implements object_client {
      * @return mixed
      */
     public function define_settings_form() {
-        $connectiontest = self::test_connection();
-        $permissiontest = self::test_permissions();
+        $connectiontest = $this->test_connection();
+        $permissiontest = $this->test_permissions();
 
         $regionoptions = array(
             'us-east-1' => 'us-east-1',

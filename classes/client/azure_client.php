@@ -12,7 +12,22 @@ namespace module_objectfs\client;
 
 defined('INTERNAL') || die();
 
-require_once(get_config('docroot') . 'module/azure/vendor/autoload.php');
+$autoloader = get_config('docroot') . 'module/azure/vendor/autoload.php';
+
+if (!file_exists($autoloader)) {
+    // Stub class with bare implementation for when the SDK prerequisite does not exist.
+    class azure_client {
+        public function get_availability() {
+            return false;
+        }
+        public function register_stream_wrapper() {
+            return false;
+        }
+    }
+    return;
+}
+require_once($autoloader);
+
 require_once(get_config('docroot') . 'module/objectfs/classes/client/object_client.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/azure/StreamWrapper.php');
 
@@ -191,7 +206,7 @@ class azure_client implements object_client {
         $connection->success = true;
         $connection->message = '';
         try {
-            $result = $this->client->createBlockBlob($this->container, 'connection_check_file', 'connection_check_file');
+            $this->client->createBlockBlob($this->container, 'connection_check_file', 'connection_check_file');
             $connection->message = get_string('settings:connectionsuccess', 'module.objectfs');
         } catch (ServiceException $e) {
             $connection->success = false;
@@ -210,14 +225,14 @@ class azure_client implements object_client {
         $permissions->success = true;
         $permissions->messages = array();
         try {
-            $result = $this->client->createBlockBlob($this->container, 'permissions_check_file', 'permissions_check_file');
+            $this->client->createBlockBlob($this->container, 'permissions_check_file', 'permissions_check_file');
         } catch (ServiceException $e) {
             $details = $this->get_exception_details($e);
             $permissions->messages[] = get_string('settings:azurewritefailure', 'module.objectfs') . $details;
             $permissions->success = false;
         }
         try {
-            $result = $this->client->getBlob($this->container, 'permissions_check_file');
+            $this->client->getBlob($this->container, 'permissions_check_file');
         } catch (ServiceException $e) {
             $errorcode = $this->get_body_error_code($e);
             // Write could have failed.
@@ -228,7 +243,7 @@ class azure_client implements object_client {
             }
         }
         try {
-            $result = $this->client->deleteBlob($this->container, 'permissions_check_file');
+            $this->client->deleteBlob($this->container, 'permissions_check_file');
             $permissions->messages[] = get_string('settings:azuredeletesuccess', 'module.objectfs');
             $permissions->success = false;
         } catch (ServiceException $e) {

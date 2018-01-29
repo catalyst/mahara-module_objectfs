@@ -91,7 +91,9 @@ class PluginModuleObjectfs {
         foreach ($clients as $name => $classname) {
             /** @var \module_objectfs\client\object_client $client */
             $client = new $classname($defaultconfig);
-            $config[$name . 'settings'] = $client->define_settings_form();
+            if ($client->get_availability()) {
+                $config[$name . 'settings'] = $client->define_settings_form();
+            }
         }
         return array(
             'elements' => $config,
