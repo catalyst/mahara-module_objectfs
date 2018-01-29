@@ -116,30 +116,30 @@ class s3_client implements object_client {
                     'type' => 'html',
                     'value' => $permissiontest->messages[0],
                 ),
-                'key' => array(
+                's3_key' => array(
                     'title' => get_string('settings:key', 'module.objectfs'),
                     'description' => get_string('settings:key_help', 'module.objectfs'),
                     'type' => 'text',
-                    'defaultvalue' => $this->defaultconfig->key,
+                    'defaultvalue' => $this->defaultconfig->s4_key,
                 ),
-                'secret' => array(
+                's3_secret' => array(
                     'title' => get_string('settings:secret', 'module.objectfs'),
                     'description' => get_string('settings:secret_help', 'module.objectfs'),
                     'type' => 'text',
-                    'defaultvalue' => $this->defaultconfig->secret,
+                    'defaultvalue' => $this->defaultconfig->s3_secret,
                 ),
-                'bucket' => array(
+                's3_bucket' => array(
                     'title' => get_string('settings:bucket', 'module.objectfs'),
                     'description' => get_string('settings:bucket_help', 'module.objectfs'),
                     'type' => 'text',
-                    'defaultvalue' => $this->defaultconfig->bucket,
+                    'defaultvalue' => $this->defaultconfig->s3_bucket,
                 ),
                 'region' => array(
                     'title' => get_string('settings:region', 'module.objectfs'),
                     'description' => get_string('settings:region_help', 'module.objectfs'),
                     'type' => 'select',
                     'options' => $regionoptions,
-                    'defaultvalue' => $this->defaultconfig->region,
+                    'defaultvalue' => $this->defaultconfig->s3_region,
                 ),
             ),
         );
