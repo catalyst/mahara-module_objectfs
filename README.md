@@ -103,13 +103,22 @@ These settings control the movement of files to and from object storage.
 - **Delete local objects**: Delete local objects once they are in remote object storage after the consistency delay.
 - **Consistency delay**: How long an object must have existed after being transfered to remote object storage before they are a candidate for deletion locally.
 
+### Storage File System Selection
+This settings controls which object storage type to use, depending on installed modules the current choices are `\module_objectfs\s3_filesystem`
+and `\module_objectfs\azure_file_system`
+
+### Azure Blob Storage Settings
+Azure specific settings
+- **Account name**: The name of the storage account created in Azure
+- **Container name**: The name of the container in azure that will store the blobs
+- **Share access signature**: The Shared Access Signature that you created for access to the container
+
 ### Amazon S3 settings
 S3 specific settings
 - **Key**: AWS credential key
 - **Secret**: AWS credential secret
 - **Bucket**: S3 bucket name to store files in
 - **AWS region**: AWS API endpoint region to use.
-
 
 ## Backporting
 
