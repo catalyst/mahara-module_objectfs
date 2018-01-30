@@ -4,7 +4,9 @@
 
 # mahara-module_objectfs
 
-A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. This plug-in requires [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) to function.
+A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution.
+
+This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws)or[mahara-module_azure](https://github.com/catalyst/mahara-module_azure) to function.
 
 * [Use cases](#use-cases)
   * [Offloading large and old files to save money](#offloading-large-and-old-files-to-save-money)
@@ -43,16 +45,9 @@ Using this plugin we can configure production to have full read write to the rem
 1. If not on Mahara 17.04, backport the file system API. See [Backporting](#backporting)
 2. Setup your remote object storage. See [Remote object storage setup](#remote-object-storage-setup)
 3. Clone this repository into module/objectfs
-4. Clone [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws
+4. Clone either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws or [mahara-module_azure](https://github.com/catalyst/mahara-module_azure) into module/azure
 5. Install the plugins through the mahara GUI.
 6. Configure the plugin. See [Mahara configuration](#mahara-configuration)
-7. Place the following in htdocs/config.php:
-```
-$cfg->externalfilesystem = array(
-    "includefilepath" => "module/objectfs/classes/s3_file_system.php",
-    "class" => "module_objectfs\\s3_file_system"
-);
-```
 
 ## Currently supported object stores
 
@@ -89,6 +84,8 @@ There is support for more object stores planed, in particular enabling Openstack
   ]
 }
 ```
+
+
 
 ## Mahara configuration
 Go to Administration -> Extensions -> objectfs. Descriptions for the various settings are as follows:
