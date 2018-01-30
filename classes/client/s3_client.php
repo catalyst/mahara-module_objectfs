@@ -120,7 +120,7 @@ class s3_client implements object_client {
                     'title' => get_string('settings:key', 'module.objectfs'),
                     'description' => get_string('settings:key_help', 'module.objectfs'),
                     'type' => 'text',
-                    'defaultvalue' => $this->defaultconfig->s4_key,
+                    'defaultvalue' => $this->defaultconfig->s3_key,
                 ),
                 's3_secret' => array(
                     'title' => get_string('settings:secret', 'module.objectfs'),
