@@ -207,15 +207,15 @@ class azure_client implements object_client {
         $connection->message = '';
         try {
             $this->client->createBlockBlob($this->container, 'connection_check_file', 'connection_check_file');
-            $connection->message = get_string('settings:connectionsuccess', 'module.objectfs');
+            $connection->message = get_string('settings:azureconnectionsuccess', 'module.objectfs');
         } catch (ServiceException $e) {
             $connection->success = false;
             $details = $this->get_exception_details($e);
-            $connection->message = get_string('settings:connectionfailure', 'module.objectfs') . $details;
+            $connection->message = get_string('settings:azureconnectionfailure', 'module.objectfs') . $details;
         } catch (ConnectException $e) {
             $connection->success = false;
             $details = $e->getMessage();
-            $connection->message = get_string('settings:connectionfailure', 'module.objectfs') . $details;
+            $connection->message = get_string('settings:azureconnectionfailure', 'module.objectfs') . $details;
         }
         return $connection;
     }
