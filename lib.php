@@ -230,16 +230,16 @@ class PluginModuleObjectfs {
 
     public static function postinst($fromversion) {
         $t = new StdClass;
-        $t->name = 'file_s3_file_system';
-        $t->plugin = 'file';
+        $t->plugin = 'file_s3_file_system';
+        $t->name = 'file';
 
         if (!record_exists('artefact_installed_type', 'plugin', $t->name, 'name', $t->plugin)) {
             insert_record('artefact_installed_type', $t);
         }
 
         $t1 = new StdClass;
-        $t1->name = 'file_test_file_system';
-        $t1->plugin = 'file';
+        $t1->plugin = 'file_test_file_system';
+        $t1->name = 'file';
 
         if (!record_exists('artefact_installed_type', 'plugin', $t1->name, 'name', $t1->plugin)) {
             insert_record('artefact_installed_type', $t1);
