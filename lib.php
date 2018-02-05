@@ -217,10 +217,10 @@ class PluginModuleObjectfs {
         set_config_plugin('module', 'objectfs', 'preferexternal', $values['preferexternal']);
         set_config_plugin('module', 'objectfs', 'maxtaskruntime', $values['maxtaskruntime']);
         set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
-        set_config_plugin('module', 'objectfs', 's3_key', $values['key']);
-        set_config_plugin('module', 'objectfs', 's3_secret', $values['secret']);
-        set_config_plugin('module', 'objectfs', 's3_bucket', $values['bucket']);
-        set_config_plugin('module', 'objectfs', 's3_region', $values['region']);
+        set_config_plugin('module', 'objectfs', 's3_key', $values['s3_key']);
+        set_config_plugin('module', 'objectfs', 's3_secret', $values['s3_secret']);
+        set_config_plugin('module', 'objectfs', 's3_bucket', $values['s3_bucket']);
+        set_config_plugin('module', 'objectfs', 's3_region', $values['s3_region']);
 
         set_config_plugin('module', 'objectfs', 'azure_accountname', $values['azure_accountname']);
         set_config_plugin('module', 'objectfs', 'azure_container', $values['azure_container']);

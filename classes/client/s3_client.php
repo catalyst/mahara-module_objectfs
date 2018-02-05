@@ -39,7 +39,8 @@ define('AWS_CAN_READ_OBJECT', 0);
 define('AWS_CAN_WRITE_OBJECT', 1);
 define('AWS_CAN_DELETE_OBJECT', 2);
 
-class s3_client implements object_client {
+class s3_client implements object_client
+{
 
     protected $client;
     protected $bucket;
@@ -48,6 +49,11 @@ class s3_client implements object_client {
     public function __construct($config) {
         $this->bucket = $config->bucket;
         $this->defaultconfig = $config;
+        $this->setMissingDefaultConfigPropertyToEmptyString('s3_key');
+        $this->setMissingDefaultConfigPropertyToEmptyString('s3_secret');
+        $this->setMissingDefaultConfigPropertyToEmptyString('s3_bucket');
+        $this->setMissingDefaultConfigPropertyToEmptyString('s3_region');
+
         $this->set_client($config);
     }
 
@@ -74,9 +80,9 @@ class s3_client implements object_client {
 
     public function set_client($config) {
         $this->client = S3Client::factory(array(
-        'credentials' => array('key' => $config->key, 'secret' => $config->secret),
-        'region' => $config->region,
-        'version' => AWS_API_VERSION
+            'credentials' => array('key' => $config->key, 'secret' => $config->secret),
+            'region' => $config->region,
+            'version' => AWS_API_VERSION
         ));
     }
 
@@ -134,16 +140,22 @@ class s3_client implements object_client {
                     'type' => 'text',
                     'defaultvalue' => $this->defaultconfig->s3_bucket,
                 ),
-                'region' => array(
+                's3_region' => array(
                     'title' => get_string('settings:region', 'module.objectfs'),
                     'description' => get_string('settings:region_help', 'module.objectfs'),
                     'type' => 'select',
                     'options' => $regionoptions,
-                    'defaultvalue' => $this->defaultconfig->s3_region,
+                    'defaultvalue' => (!empty($this->defaultconfig->s3_region)) ? $this->defaultconfig->s3_region : 'us-east-1',
                 ),
             ),
         );
         return $config;
+    }
+
+    protected function setMissingDefaultConfigPropertyToEmptyString($propertyname) {
+        if (empty($this->defaultconfig->$propertyname)) {
+            $this->defaultconfig->$propertyname = "";
+        }
     }
 
     public function register_stream_wrapper() {
