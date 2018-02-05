@@ -4,7 +4,7 @@
 
 # mahara-module_objectfs
 
-A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution.
+A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. Currently supports both AWS S3 and azure blob storage.
 
 This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws)or[mahara-module_azure](https://github.com/catalyst/mahara-module_azure) to function.
 
@@ -123,6 +123,13 @@ S3 specific settings
 ## Backporting
 
 If you are on an older mahara then you can backport the necessary API's in order to support this plugin. Use with caution!
+
+Warm thanks
+-----------
+
+Thanks to Microsoft for sponsoring the Azure Storage implementation.
+
+![Microsoft](/pix/Microsoft-logo_rgb_c-gray.png?raw=true)
 
 Crafted by Catalyst IT
 ----------------------
