@@ -159,6 +159,7 @@ abstract class manipulator {
         if ($shouldtaskrun) {
             $logger = new \module_objectfs\log\aggregate_logger();
 
+            \PluginModuleObjectfs::get_client_components('file_system');
             $filesystem = new $config->filesystem();
 
             $manipulatorclass = '\\module_objectfs\\object_manipulator\\' . $manipulatorclassname;

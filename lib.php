@@ -398,14 +398,14 @@ class PluginModuleObjectfs {
             'legend' => get_string('settings:generalheader', 'module.objectfs'),
             'collapsible' => true,
             'elements' => array(
+                'report' => array(
+                    'type' => 'html',
+                    'value' => '<a href="/module/objectfs/object_status.php" class="objectfs_object_status_link">View object status</a>',
+                ),
                 'extfsconfig' => array(
                     'title' => get_string('settings:handler', 'module.objectfs'),
                     'type' => 'html',
                     'value' => $extfsconf
-                ),
-                'report' => array(
-                    'type' => 'html',
-                    'value' => '<a href="/module/objectfs/object_status.php">Object status</a>',
                 ),
                 'enabletasks' => array(
                     'title' => get_string('settings:enabletasks', 'module.objectfs'),
@@ -499,6 +499,7 @@ class PluginModuleObjectfs {
             switch ($type) {
                 case 'file_system':
                     $found[$clientname] = '\\module_objectfs\\' . $clientname . '_file_system';
+                    require_once($clientpath);
                     break;
                 case 'client':
                     $found[$clientname] = '\\module_objectfs\\client\\' . $clientname . '_client';
@@ -506,6 +507,7 @@ class PluginModuleObjectfs {
                     break;
                 case 'base':
                     $found[$clientname] = $clientname;
+                    require_once($clientpath);
                     break;
                 default:
                     break;
