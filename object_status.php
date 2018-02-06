@@ -65,19 +65,22 @@ function format_location_report($report) {
 }
 
 function format_logsize_report($report) {
+    // The Logsize report needs information from the location report
+    // in order to build the progress bar.
+    $logsizereport = objectfs_report_builder::load_report_from_database('location');
+    $logsizerows = $logsizereport->get_rows();
 
-	$rows = $report->get_rows();
+    $rows = $report->get_rows();
 
-	if (empty($rows)) {
-		return '';
-	}
+    if (empty($rows)) {
+        return '';
+    }
 
-	foreach ($rows as $row) {
+    foreach ($rows as $row) {
+        $row->datakey = get_size_range_from_logsize($row->datakey); // Turn logsize into a byte range.
+    }
 
-		$row->datakey = get_size_range_from_logsize($row->datakey); // Turn logsize into a byte range.
-	}
-
-	return augment_barchart($rows);
+    return augment_barchart($rows);
 }
 
 function format_mimetype_report($report) {
@@ -131,6 +134,7 @@ function augment_barchart($rows) {
 
     $maxobjectcount = 0;
     $maxobjectsum = 0;
+    $totalobjectsum = 0;
 
     // Iterate through and calculate the max first.
     foreach ($rows as $row) {
@@ -144,6 +148,8 @@ function augment_barchart($rows) {
 
             $maxobjectsum = $row->objectsum;
         }
+
+        $totalobjectsum += $row->objectsum;
     }
 
     // Fail safe so that the universe stays intact, div by 0 errors yada yada.
@@ -158,7 +164,6 @@ function augment_barchart($rows) {
 
     // Then calculate the percentages for each row.
     foreach ($rows as $row) {
-
         $row->relativeobjectcount = round(100 * $row->objectcount / $maxobjectcount);
         $row->relativeobjectsum = round(100 * $row->objectsum / $maxobjectsum);
     }

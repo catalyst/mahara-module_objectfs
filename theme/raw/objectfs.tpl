@@ -30,6 +30,18 @@
     <div class="panel panel-info">
       <h3 class="panel-heading"> {str tag=object_status:fileranges section=module.objectfs} <span class="icon icon-info pull-right" role="presentation" aria-hidden="true"></span></h3>
 
+      <style>
+        .ofs-bar-deleted {
+          background: hsla(120, 75%, 75%, 1);
+        }
+        .ofs-bar-isexternal {
+          background: hsla(39, 75%, 75%, 1);
+        }
+        .ofs-bar-total {
+          background: hsla(0, 75%, 75%, 1);
+        }
+      </style>
+
       <table class="table">
         <tr>
           <th>File sizes</th>
@@ -38,10 +50,21 @@
         </tr>
 
         {foreach $sitedata['log_size'] key item}
+
           <tr>
             <td>{$item->datakey}</td>
-            <td><div class="ofs-bar" style="width:{$item->relativeobjectcount}%; background: #17a5eb;">{$item->objectcount}</div></td>
-            <td><div class="ofs-bar" style="width:{$item->relativeobjectsum}%; background: #17a5eb;">{$item->objectsum|display_size}</div></td>
+            <td>
+            <!--<div class="ofs-bar" style="width:{$item->relativeobjectcount}%; background: #17a5eb;">{$item->objectcount}</div>-->
+              <div class="ofs-bar-total" style="width:90%;">
+                <div class="ofs-bar-isexternal" style="width: 20%;">
+                  <div class="ofs-bar-deleted" style="width: 20%;"><35.1GB</div>
+                </div>
+              </div>
+
+            </td>
+            <td>
+              <div class="ofs-bar" style="width:{$item->relativeobjectsum}%; background: #17a5eb;">{$item->objectsum|display_size}</div>
+            </td>
           </tr>
         {/foreach}
 
