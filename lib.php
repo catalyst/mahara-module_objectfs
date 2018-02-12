@@ -217,6 +217,9 @@ class PluginModuleObjectfs {
         set_config_plugin('module', 'objectfs', 'preferexternal', $values['preferexternal']);
         set_config_plugin('module', 'objectfs', 'maxtaskruntime', $values['maxtaskruntime']);
         set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
+        set_config_plugin('module', 'objectfs', 'filesystem', $values['filesystem']);
+
+        /*
         set_config_plugin('module', 'objectfs', 's3_key', $values['s3_key']);
         set_config_plugin('module', 'objectfs', 's3_secret', $values['s3_secret']);
         set_config_plugin('module', 'objectfs', 's3_bucket', $values['s3_bucket']);
@@ -225,7 +228,19 @@ class PluginModuleObjectfs {
         set_config_plugin('module', 'objectfs', 'azure_accountname', $values['azure_accountname']);
         set_config_plugin('module', 'objectfs', 'azure_container', $values['azure_container']);
         set_config_plugin('module', 'objectfs', 'azure_sastoken', $values['azure_sastoken']);
-        set_config_plugin('module', 'objectfs', 'filesystem', $values['filesystem']);
+         */
+
+        $clients = self::get_client_components('client');
+        foreach ($clients as $name => $classname) {
+            /** @var \module_objectfs\client\object_client $client */
+            $client = new $classname(get_objectfs_config());
+            if ($client->get_availability()) {
+                foreach ($client->define_settings_form()['elements'] as $name => $def) {
+                    if ($def['type'] == 'html') continue;
+                    set_config_plugin('module', 'objectfs', $name, $values[$name]);
+                }
+            }
+        }
     }
 
     public static function postinst($fromversion) {
