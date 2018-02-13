@@ -2,7 +2,7 @@
 <phpunit
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="lib/phpunit/phpunit.xsd"
-        bootstrap="../../../lib/phpunit/bootstrap.php"
+        bootstrap="../../lib/tests/phpunit/bootstrap.php"
         convertErrorsToExceptions="true"
         convertNoticesToExceptions="true"
         convertWarningsToExceptions="true"
@@ -13,11 +13,13 @@
         stopOnFailure="false"
         stopOnIncomplete="false"
         stopOnSkipped="false"
-        printerClass="Hint_ResultPrinter"
-        testSuiteLoaderClass="phpunit_autoloader"
+        printerClass="PHPUnit_TextUI_ResultPrinter"
+        testSuiteLoaderClass="PHPUnit_Runner_StandardTestSuiteLoader"
         >
 
     <php>
+        <var name="TESTDBPREFIX" value="tst_" />
+        <var name="TESTDROPSTALEDB" value="true" />
         <!--<const name="PHPUNIT_LONGTEST" value="1"/> uncomment to execute also slow or otherwise expensive tests-->
         <!-- <const name="PHPUNIT_SEQUENCE_START" value="132000"/> -->
 

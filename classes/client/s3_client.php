@@ -47,7 +47,7 @@ class s3_client implements object_client
     protected $defaultconfig;
 
     public function __construct($config) {
-        $this->bucket = $config->bucket;
+        $this->bucket = $config->s3_bucket;
         $this->defaultconfig = $config;
         $this->setMissingDefaultConfigPropertyToEmptyString('s3_key');
         $this->setMissingDefaultConfigPropertyToEmptyString('s3_secret');
@@ -80,8 +80,8 @@ class s3_client implements object_client
 
     public function set_client($config) {
         $this->client = S3Client::factory(array(
-            'credentials' => array('key' => $config->key, 'secret' => $config->secret),
-            'region' => $config->region,
+            'credentials' => array('key' => $config->s3_key, 'secret' => $config->s3_secret),
+            'region' => $config->s3_region,
             'version' => AWS_API_VERSION
         ));
     }
