@@ -19,6 +19,7 @@ use module_objectfs\object_file_system;
 use module_objectfs\client\s3_client;
 
 require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/client/s3_client.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/mahara_external_filesystem.php');
 
 class s3_file_system extends mahara_external_filesystem {
