@@ -18,7 +18,7 @@ use module_objectfs\object_manipulator\puller;
 use module_objectfs\object_manipulator\deleter;
 
 
-class PluginModuleObjectfs {
+class PluginModuleObjectfs extends PluginModule {
 
     /**
      * API-Function get the Plugin ShortName
