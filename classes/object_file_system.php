@@ -94,7 +94,7 @@ abstract class object_file_system {
 
     protected function get_remote_path($fileartefact) {
         $contenthash = $fileartefact->get('contenthash');
-        if ($this->preferexternal) {
+        if ($contenthash && $this->preferexternal) {
             $location = $this->get_object_location($fileartefact);
             if ($location == OBJECT_LOCATION_DUPLICATED) {
                 return $this->get_external_path_from_hash($contenthash);
@@ -102,13 +102,15 @@ abstract class object_file_system {
         }
 
         if ($this->is_file_readable_locally($fileartefact)) {
-            $path = $fileartefact->get_local_path();
-        } else {
+            return $fileartefact->get_local_path();
+        }
+
+        if ($contenthash) {
             // We assume it is remote, not checking if it's readable.
             $path = $this->get_external_path_from_hash($contenthash);
         }
 
-        return $path;
+        return null;
     }
 
     protected function get_external_path_from_hash($contenthash) {
