@@ -47,7 +47,7 @@ abstract class manipulator {
      *
      * @var array
      */
-    protected $supportedartefacttypes = array('file', 'archive', 'video', 'audio');
+    protected $supportedartefacttypes = array('file', 'archive', 'video', 'audio', 'image');
 
     /**
      * Manipulator constructor
