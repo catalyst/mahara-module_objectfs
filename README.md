@@ -48,7 +48,22 @@ Using this plugin we can configure production to have full read write to the rem
 4. Clone either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws or [mahara-module_azure](https://github.com/catalyst/mahara-module_azure) into module/azure
 5. Install the plugins through the mahara GUI.
 6. Configure the plugin. See [Mahara configuration](#mahara-configuration)
+7. Place one of the following in htdocs/config.php depending on your choice of remote storage (azure or s3):
 
+For AWS S3:
+```
+$cfg->externalfilesystem = array(
+   "includefilepath" => "module/objectfs/classes/s3_file_system.php",
+   "class" => "module_objectfs\\s3_file_system"
+);
+```
+For Azure:
+```
+$cfg->externalfilesystem = array(
+    "includefilepath" => "module/objectfs/classes/azure_file_system.php",
+    "class" => "module_objectfs\\azure_file_system"
+);
+```
 ## Currently supported object stores
 
 ### Roadmap
