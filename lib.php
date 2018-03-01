@@ -118,7 +118,7 @@ class PluginModuleObjectfs extends PluginModule {
                     'description'        => get_string('settings:storagefilesystem_help', 'module.objectfs'),
                     'type'         => 'select',
                     'options'      => $clientlist,
-                    'defaultvalue' => $config->filesystem,
+                    'defaultvalue' => (empty($config->filesystem)) ? '\module_objectfs\azure_file_system' : $config->filesystem,
                 ),
             ),
         );
