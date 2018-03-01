@@ -20,6 +20,7 @@ use module_objectfs\client\azure_client;
 
 require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/mahara_external_filesystem.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/client/azure_client.php');
 
 class azure_file_system extends mahara_external_filesystem {
 
