@@ -205,6 +205,11 @@ class azure_client implements object_client {
         $connection = new \stdClass();
         $connection->success = true;
         $connection->message = '';
+        if (empty($this->defaultconfig->azure_accountname)) {
+            $connection->message = get_string('settings:azurenoaccountspecified', 'module.objectfs');
+            $connection->success = false;
+            return $connection;
+        }
         try {
             $this->client->createBlockBlob($this->container, 'connection_check_file', 'connection_check_file');
             $connection->message = get_string('settings:azureconnectionsuccess', 'module.objectfs');
@@ -224,6 +229,12 @@ class azure_client implements object_client {
         $permissions = new \stdClass();
         $permissions->success = true;
         $permissions->messages = array();
+        if (empty($this->defaultconfig->azure_accountname)) {
+            $permissions->messages[] = get_string('settings:azurenoaccountspecified', 'module.objectfs');
+            $permissions->success = false;
+            return $permissions;
+        }
+
         try {
             $this->client->createBlockBlob($this->container, 'permissions_check_file', 'permissions_check_file');
         } catch (ServiceException $e) {
