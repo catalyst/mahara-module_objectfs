@@ -1,9 +1,9 @@
 <?php
 /**
- * object_file_system abstract class.
+ * azure_file_system class.
  *
- * Remote object storage providers extent this class.
- * At minimum you need to impletment get_remote_client.
+ * Remote object storage providers extend this class.
+ * At minimum you need to impletment get_external_client.
  *
  * @package    mahara
  * @subpackage module_objectfs
@@ -16,16 +16,16 @@ namespace module_objectfs;
 defined('INTERNAL') || die();
 
 use module_objectfs\object_file_system;
-use module_objectfs\client\s3_client;
+use module_objectfs\client\azure_client;
 
 require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
-require_once(get_config('docroot') . 'module/objectfs/classes/client/s3_client.php');
 require_once(get_config('docroot') . 'module/objectfs/classes/mahara_external_filesystem.php');
+require_once(get_config('docroot') . 'module/objectfs/classes/client/azure_client.php');
 
-class s3_file_system extends mahara_external_filesystem {
+class azure_file_system extends mahara_external_filesystem {
 
     protected function get_external_client($config) {
-        $s3client = new s3_client($config);
-        return $s3client;
+        $azureclient = new azure_client($config);
+        return $azureclient;
     }
 }

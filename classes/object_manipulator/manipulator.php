@@ -47,7 +47,7 @@ abstract class manipulator {
      *
      * @var array
      */
-    protected $supportedartefacttypes = array('file', 'archive', 'video', 'audio');
+    protected $supportedartefacttypes = array('file', 'archive', 'video', 'audio', 'image');
 
     /**
      * Manipulator constructor
@@ -158,7 +158,10 @@ abstract class manipulator {
 
         if ($shouldtaskrun) {
             $logger = new \module_objectfs\log\aggregate_logger();
-            $filesystem = new \module_objectfs\s3_file_system();
+
+            \PluginModuleObjectfs::get_client_components('file_system');
+            $filesystem = new $config->filesystem();
+
             $manipulatorclass = '\\module_objectfs\\object_manipulator\\' . $manipulatorclassname;
             $manipulator = new $manipulatorclass($filesystem, $config, $logger);
             $candidateobjects = $manipulator->get_candidate_objects();

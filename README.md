@@ -4,7 +4,9 @@
 
 # mahara-module_objectfs
 
-A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. This plug-in requires [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) to function.
+A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. Currently supports both AWS S3 and azure blob storage.
+
+This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws)or[mahara-module_azure](https://github.com/catalyst/mahara-module_azure) to function.
 
 * [Use cases](#use-cases)
   * [Offloading large and old files to save money](#offloading-large-and-old-files-to-save-money)
@@ -43,17 +45,25 @@ Using this plugin we can configure production to have full read write to the rem
 1. If not on Mahara 17.04, backport the file system API. See [Backporting](#backporting)
 2. Setup your remote object storage. See [Remote object storage setup](#amazon-s3)
 3. Clone this repository into module/objectfs
-4. Clone [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws
+4. Clone either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws or [mahara-module_azure](https://github.com/catalyst/mahara-module_azure) into module/azure
 5. Install the plugins through the mahara GUI.
 6. Configure the plugin. See [Mahara configuration](#mahara-configuration)
-7. Place the following in htdocs/config.php:
+7. Place one of the following in htdocs/config.php depending on your choice of remote storage (azure or s3):
+
+For AWS S3:
 ```
 $cfg->externalfilesystem = array(
-    "includefilepath" => "module/objectfs/classes/s3_file_system.php",
-    "class" => "module_objectfs\\s3_file_system"
+   "includefilepath" => "module/objectfs/classes/s3_file_system.php",
+   "class" => "module_objectfs\\s3_file_system"
 );
 ```
-
+For Azure:
+```
+$cfg->externalfilesystem = array(
+    "includefilepath" => "module/objectfs/classes/azure_file_system.php",
+    "class" => "module_objectfs\\azure_file_system"
+);
+```
 ## Currently supported object stores
 
 ### Roadmap
@@ -90,6 +100,8 @@ There is support for more object stores planed, in particular enabling Openstack
 }
 ```
 
+
+
 ## Mahara configuration
 Go to Administration -> Extensions -> objectfs. Descriptions for the various settings are as follows:
 
@@ -106,6 +118,16 @@ These settings control the movement of files to and from object storage.
 - **Delete local objects**: Delete local objects once they are in remote object storage after the consistency delay.
 - **Consistency delay**: How long an object must have existed after being transfered to remote object storage before they are a candidate for deletion locally.
 
+### Storage File System Selection
+This settings controls which object storage type to use, depending on installed modules the current choices are `\module_objectfs\s3_filesystem`
+and `\module_objectfs\azure_file_system`
+
+### Azure Blob Storage Settings
+Azure specific settings
+- **Account name**: The name of the storage account created in Azure
+- **Container name**: The name of the container in azure that will store the blobs
+- **Share access signature**: The Shared Access Signature that you created for access to the container
+
 ### Amazon S3 settings
 S3 specific settings
 - **Key**: AWS credential key
@@ -113,10 +135,16 @@ S3 specific settings
 - **Bucket**: S3 bucket name to store files in
 - **AWS region**: AWS API endpoint region to use.
 
-
 ## Backporting
 
 If you are on an older mahara then you can backport the necessary API's in order to support this plugin. Use with caution!
+
+Warm thanks
+-----------
+
+Thanks to Microsoft for sponsoring the Azure Storage implementation.
+
+![Microsoft](/pix/Microsoft-logo_rgb_c-gray.png?raw=true)
 
 Crafted by Catalyst IT
 ----------------------

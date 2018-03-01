@@ -10,16 +10,15 @@
 defined('INTERNAL') || die();
 
 require_once(get_config('docroot') . 'module/objectfs/objectfslib.php');
-require_once(get_config('docroot') . 'module/objectfs/classes/client/s3_client.php');
 require_once(get_config('docroot') . 'artefact/lib.php');
 require_once(get_config('docroot') . 'artefact/file/lib.php');
 
-use module_objectfs\client\s3_client;
 use module_objectfs\object_manipulator\pusher;
 use module_objectfs\object_manipulator\puller;
 use module_objectfs\object_manipulator\deleter;
 
-class PluginModuleObjectfs {
+
+class PluginModuleObjectfs extends PluginModule {
 
     /**
      * API-Function get the Plugin ShortName
@@ -81,7 +80,53 @@ class PluginModuleObjectfs {
 
     public static function get_config_options() {
 
-        // Get default config;
+        $defaultconfig = self::get_default_config();
+
+        $config = array();
+        $config['generalsettings']            = self::define_general_settings($defaultconfig);
+        $config['transfersettings']           = self::define_transfer_settings($defaultconfig);
+        $config['objectfssettingsfilesystem'] = self::define_client_selection($defaultconfig);
+        $clients = self::get_client_components('client');
+
+        foreach ($clients as $name => $classname) {
+            /** @var \module_objectfs\client\object_client $client */
+            $client = new $classname($defaultconfig);
+            if ($client->get_availability()) {
+                $config[$name . 'settings'] = $client->define_settings_form();
+            }
+        }
+        return array(
+            'elements' => $config,
+        );
+
+    }
+
+    public static function define_client_selection($config) {
+
+        $names = self::get_client_components('file_system');
+
+        $clientlist = array_combine($names, $names);
+
+        return array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:storagefilesystemselectionheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => false,
+            'elements' => array(
+                'filesystem' => array(
+                    'title'        => get_string('settings:storagefilesystem', 'module.objectfs'),
+                    'description'        => get_string('settings:storagefilesystem_help', 'module.objectfs'),
+                    'type'         => 'select',
+                    'options'      => $clientlist,
+                    'defaultvalue' => (empty($config->filesystem)) ? '\module_objectfs\azure_file_system' : $config->filesystem,
+                ),
+            ),
+        );
+
+    }
+
+    private static function get_default_config() {
+        // Get default config.
         $defaultconfig = get_objectfs_config();
 
         if (isset($_POST)) {
@@ -93,14 +138,27 @@ class PluginModuleObjectfs {
                 }
             }
         }
+        return $defaultconfig;
+    }
 
-        $client = new s3_client($defaultconfig);
+    private static function check_connection($client) {
         $connection = $client->test_connection();
 
         if ($connection->success) {
             $connection = '<span class="icon icon-check text-success"></span><span class="bg-success">';
             $connection .= get_string('settings:connectionsuccess', 'module.objectfs');
             $connection .= '</span>';
+        } else {
+            $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+            $connection .= get_string('settings:connectionfailure', 'module.objectfs') . '</span>';
+        }
+        return $connection;
+    }
+
+    private static function check_permissions($client) {
+        $connection = $client->test_connection();
+
+        if ($connection->success) {
             $permissions = $client->test_permissions();
 
             $errormsg = '';
@@ -116,163 +174,20 @@ class PluginModuleObjectfs {
             }
 
             $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
-                                       'type'  => 'html',
-                                       'value' => $permissionsmsg,
-                );
+                'type'  => 'html',
+                'value' => $permissionsmsg,
+            );
         } else {
-            $connection = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
-            $connection .= get_string('settings:connectionfailure', 'module.objectfs') . '</span>';
             $permissionsoutput = array('title' => get_string('settings:permissions', 'module.objectfs'),
-                                       'type'  => 'html',
-                                       'value' => $connection,
+                'type'  => 'html',
+                'value' => $connection,
             );
         }
 
-        $regionoptions = array( 'us-east-1'         => 'us-east-1',
-                                'us-east-2'         => 'us-east-2',
-                                'us-west-1'         => 'us-west-1',
-                                'us-west-2'         => 'us-west-2',
-                                'ap-northeast-2'    => 'ap-northeast-2',
-                                'ap-southeast-1'    => 'ap-southeast-1',
-                                'ap-southeast-2'    => 'ap-southeast-2',
-                                'ap-northeast-1'    => 'ap-northeast-1',
-                                'eu-central-1'      => 'eu-central-1',
-                                'eu-west-1'         => 'eu-west-1');
-
-        $extfsconfig = get_config('externalfilesystem', false);
-
-        if (!$extfsconfig) {
-            $extfsconf = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
-            $extfsconf .= get_string('settings:handlernotset', 'module.objectfs') . '</span>';
-        } else {
-
-            $extfsconf = '<span class="icon icon-check text-success"></span><span class="bg-success">';
-            $extfsconf .= get_string('settings:handlerset', 'module.objectfs') . '</span>';
-        }
-        
-        $config = array();
-
-        $config['generalsettings'] = array(
-            'type' => 'fieldset',
-            'legend' => get_string('settings:generalheader', 'module.objectfs'),
-            'collapsible' => true,
-            'elements' => array(
-                'extfsconfig' => array(
-                    'title'        => get_string('settings:handler', 'module.objectfs'),
-                    'type'         => 'html',
-                    'value'        => $extfsconf
-                ),
-                'report' => array(
-                    'type'         => 'html',
-                    'value'        => '<a href="/module/objectfs/object_status.php">Object status</a>',
-                ),
-                'enabletasks' => array(
-                    'title'        => get_string('settings:enabletasks', 'module.objectfs'),
-                    'description'  => get_string('settings:enabletasks_help', 'module.objectfs'),
-                    'type'         => 'checkbox',
-                    'defaultvalue' => $defaultconfig->enabletasks,
-                ),
-                'maxtaskruntime' => array(
-                    'title'        => get_string('settings:maxtaskruntime', 'module.objectfs'),
-                    'description'  => get_string('settings:maxtaskruntime_help', 'module.objectfs'),
-                    'type'         => 'text',
-                    'defaultvalue' => $defaultconfig->maxtaskruntime,
-                    // Lets set the maximum run time to one day.
-                    'rules'        => array('integer' => true, 'minvalue' => 0, 'maxvalue' => (24 * 60 * 60))
-                ),
-                'preferexternal' => array(
-                    'title'        => get_string('settings:preferexternal', 'module.objectfs'),
-                    'description'  => get_string('settings:preferexternal_help', 'module.objectfs'),
-                    'type'         => 'checkbox',
-                    'defaultvalue' => $defaultconfig->preferexternal,
-                ),
-            ),
-        );
-
-        $config['transfersettings'] = array(
-            'type' => 'fieldset',
-            'legend' => get_string('settings:filetransferheader', 'module.objectfs'),
-            'collapsible' => true,
-            'collapsed' => true,
-            'elements' => array(
-                'sizethreshold' => array(
-                    'title'        => get_string('settings:sizethreshold', 'module.objectfs'),
-                    'description'  => get_string('settings:sizethreshold_help', 'module.objectfs'),
-                    'type'         => 'text',
-                    'defaultvalue' => $defaultconfig->sizethreshold / 1024,
-                    // The limit for Amazon S3 is 5GB.
-                    'rules'        => array('integer' => true, 'minvalue' => 0, 'maxvalue' => 5000000)
-                ),
-                'minimumage' => array(
-                    'title'        => get_string('settings:minimumage', 'module.objectfs'),
-                    'description'  => get_string('settings:minimumage_help', 'module.objectfs'),
-                    'type'         => 'text',
-                    'defaultvalue' => $defaultconfig->minimumage,
-                    'rules'        => array('integer' => true, 'minvalue' => 0)
-                ),
-                'deletelocal' => array(
-                    'title'        => get_string('settings:deletelocal', 'module.objectfs'),
-                    'description'  => get_string('settings:deletelocal_help', 'module.objectfs'),
-                    'type'         => 'checkbox',
-                    'defaultvalue' => $defaultconfig->deletelocal,
-                ),
-                'consistencydelay' => array(
-                    'title'        => get_string('settings:consistencydelay', 'module.objectfs'),
-                    'description'  => get_string('settings:consistencydelay_help', 'module.objectfs'),
-                    'type'         => 'text',
-                    'defaultvalue' => $defaultconfig->consistencydelay,
-                    'rules'        => array('integer' => true, 'minvalue' => 0)
-                ),
-            ),
-        );
-
-        $config['objectfssettings'] = array(
-            'type' => 'fieldset',
-            'legend' => get_string('settings:awsheader', 'module.objectfs'),
-            'collapsible' => true,
-            'collapsed' => true,
-            'elements' => array(
-                'connectiontest' => array(
-                    'title'        => get_string('settings:connection', 'module.objectfs'),
-                    'type'         => 'html',
-                    'value'        => $connection,
-                ),
-                'permissionstest' => $permissionsoutput,
-                'key' => array(
-                    'title'        => get_string('settings:key', 'module.objectfs'),
-                    'description'  => get_string('settings:key_help', 'module.objectfs'),
-                    'type'         => 'text',
-                    'defaultvalue' => $defaultconfig->key,
-                ),
-                'secret' => array(
-                    'title'        => get_string('settings:secret', 'module.objectfs'),
-                    'description'  => get_string('settings:secret_help', 'module.objectfs'),
-                    'type'         => 'text',
-                    'defaultvalue' => $defaultconfig->secret,
-                ),
-                'bucket' => array(
-                    'title'        => get_string('settings:bucket', 'module.objectfs'),
-                    'description'  => get_string('settings:bucket_help', 'module.objectfs'),
-                    'type'         => 'text',
-                    'defaultvalue' => $defaultconfig->bucket,
-                ),
-                'region' => array(
-                    'title'        => get_string('settings:region', 'module.objectfs'),
-                    'description'  => get_string('settings:region_help', 'module.objectfs'),
-                    'type'         => 'select',
-                    'options'      => $regionoptions,
-                    'defaultvalue' => $defaultconfig->region,
-                ),
-            ),
-        );
-
-        return array(
-            'elements' => $config,
-        );
-
+        return $permissionsoutput;
     }
 
-    public static function validate_config_options($form, $values) {
+    public static function validate_config_options(Pieform $form, $values) {
 
         if ($values['sizethreshold'] < 0) {
 
@@ -302,32 +217,37 @@ class PluginModuleObjectfs {
         set_config_plugin('module', 'objectfs', 'preferexternal', $values['preferexternal']);
         set_config_plugin('module', 'objectfs', 'maxtaskruntime', $values['maxtaskruntime']);
         set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
-        set_config_plugin('module', 'objectfs', 'key', $values['key']);
-        set_config_plugin('module', 'objectfs', 'secret', $values['secret']);
-        set_config_plugin('module', 'objectfs', 'bucket', $values['bucket']);
-        set_config_plugin('module', 'objectfs', 'region', $values['region']);
+        set_config_plugin('module', 'objectfs', 'filesystem', $values['filesystem']);
+
+        /*
+        set_config_plugin('module', 'objectfs', 's3_key', $values['s3_key']);
+        set_config_plugin('module', 'objectfs', 's3_secret', $values['s3_secret']);
+        set_config_plugin('module', 'objectfs', 's3_bucket', $values['s3_bucket']);
+        set_config_plugin('module', 'objectfs', 's3_region', $values['s3_region']);
+
+        set_config_plugin('module', 'objectfs', 'azure_accountname', $values['azure_accountname']);
+        set_config_plugin('module', 'objectfs', 'azure_container', $values['azure_container']);
+        set_config_plugin('module', 'objectfs', 'azure_sastoken', $values['azure_sastoken']);
+         */
+
+        $clients = self::get_client_components('client');
+        foreach ($clients as $name => $classname) {
+            /** @var \module_objectfs\client\object_client $client */
+            $client = new $classname(get_objectfs_config());
+            if ($client->get_availability()) {
+                foreach ($client->define_settings_form()['elements'] as $name => $def) {
+                    if ($def['type'] == 'html') continue;
+                    set_config_plugin('module', 'objectfs', $name, $values[$name]);
+                }
+            }
+        }
     }
 
     public static function postinst($fromversion) {
-        $t = new StdClass;
-        $t->name = 'file_s3_file_system';
-        $t->plugin = 'file';
-
-        if (!record_exists('artefact_installed_type', 'plugin', $t->name, 'name', $t->plugin)) {
-            insert_record('artefact_installed_type', $t);
-        }
-
-        $t1 = new StdClass;
-        $t1->name = 'file_test_file_system';
-        $t1->plugin = 'file';
-
-        if (!record_exists('artefact_installed_type', 'plugin', $t1->name, 'name', $t1->plugin)) {
-            insert_record('artefact_installed_type', $t1);
-        }
-
     }
 
-    public static function menu_items() { // All these default methods need to make some sense, need them to install plugin, some mahara stuff??????????
+    // All these default methods need to make some sense, need them to install plugin, some mahara stuff??????????
+    public static function menu_items() {
         return array();
     }
 
@@ -368,9 +288,9 @@ class PluginModuleObjectfs {
         );
     }
 
-   /**
-    * Push to S3
-    */
+    /**
+     * Push to S3
+     */
     public static function push_objects_to_storage() {
         require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/manipulator.php');
         require_once(get_config('docroot') . 'module/objectfs/classes/object_manipulator/pusher.php');
@@ -456,4 +376,143 @@ class PluginModuleObjectfs {
         \module_objectfs\report\objectfs_report::generate_status_report();
     }
 
+    /**
+     * @param $defaultconfig
+     * @return mixed
+     */
+    public static function define_general_settings($defaultconfig) {
+        $extfsconfig = get_config('externalfilesystem', false);
+
+        if (!$extfsconfig) {
+            $extfsconf = '<span class="icon icon-times text-danger"></span><span class="bg-danger">';
+            $extfsconf .= get_string('settings:handlernotset', 'module.objectfs') . '</span>';
+        } else {
+
+            $extfsconf = '<span class="icon icon-check text-success"></span><span class="bg-success">';
+            $extfsconf .= get_string('settings:handlerset', 'module.objectfs') . '</span>';
+        }
+
+        $config = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:generalheader', 'module.objectfs'),
+            'collapsible' => true,
+            'elements' => array(
+                'report' => array(
+                    'type' => 'html',
+                    'value' => '<a href="/module/objectfs/object_status.php" class="objectfs_object_status_link">View object status</a>',
+                ),
+                'extfsconfig' => array(
+                    'title' => get_string('settings:handler', 'module.objectfs'),
+                    'type' => 'html',
+                    'value' => $extfsconf
+                ),
+                'enabletasks' => array(
+                    'title' => get_string('settings:enabletasks', 'module.objectfs'),
+                    'description' => get_string('settings:enabletasks_help', 'module.objectfs'),
+                    'type' => 'checkbox',
+                    'defaultvalue' => $defaultconfig->enabletasks,
+                ),
+                'maxtaskruntime' => array(
+                    'title' => get_string('settings:maxtaskruntime', 'module.objectfs'),
+                    'description' => get_string('settings:maxtaskruntime_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $defaultconfig->maxtaskruntime,
+                    // Lets set the maximum run time to one day.
+                    'rules' => array('integer' => true, 'minvalue' => 0, 'maxvalue' => (24 * 60 * 60))
+                ),
+                'preferexternal' => array(
+                    'title' => get_string('settings:preferexternal', 'module.objectfs'),
+                    'description' => get_string('settings:preferexternal_help', 'module.objectfs'),
+                    'type' => 'checkbox',
+                    'defaultvalue' => $defaultconfig->preferexternal,
+                ),
+            ),
+        );
+        return $config;
+    }
+
+    /**
+     * @param $defaultconfig
+     * @return mixed
+     */
+    public static function define_transfer_settings($defaultconfig) {
+        $config = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:filetransferheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => true,
+            'elements' => array(
+                'sizethreshold' => array(
+                    'title' => get_string('settings:sizethreshold', 'module.objectfs'),
+                    'description' => get_string('settings:sizethreshold_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $defaultconfig->sizethreshold / 1024,
+                    // The limit for Amazon S3 is 5GB.
+                    'rules' => array('integer' => true, 'minvalue' => 0, 'maxvalue' => 5000000)
+                ),
+                'minimumage' => array(
+                    'title' => get_string('settings:minimumage', 'module.objectfs'),
+                    'description' => get_string('settings:minimumage_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $defaultconfig->minimumage,
+                    'rules' => array('integer' => true, 'minvalue' => 0)
+                ),
+                'deletelocal' => array(
+                    'title' => get_string('settings:deletelocal', 'module.objectfs'),
+                    'description' => get_string('settings:deletelocal_help', 'module.objectfs'),
+                    'type' => 'checkbox',
+                    'defaultvalue' => $defaultconfig->deletelocal,
+                ),
+                'consistencydelay' => array(
+                    'title' => get_string('settings:consistencydelay', 'module.objectfs'),
+                    'description' => get_string('settings:consistencydelay_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $defaultconfig->consistencydelay,
+                    'rules' => array('integer' => true, 'minvalue' => 0)
+                ),
+            ),
+        );
+        return $config;
+    }
+
+    public static function get_client_components($type = 'base') {
+        global $CFG;
+
+        $found = array();
+
+        $path = $CFG->docroot . '/module/objectfs/classes/client/*_client.php';
+
+        $clientpaths = glob($path);
+
+        foreach ($clientpaths as $clientpath) {
+
+            $basename = basename($clientpath);
+
+            $clientname = str_replace('_client.php', '', $basename);
+
+            // Ignore the abstract class.
+            if ($clientname == 'object') {
+                continue;
+            }
+
+            switch ($type) {
+                case 'file_system':
+                    $found[$clientname] = '\\module_objectfs\\' . $clientname . '_file_system';
+                    require_once($clientpath);
+                    break;
+                case 'client':
+                    $found[$clientname] = '\\module_objectfs\\client\\' . $clientname . '_client';
+                    require_once($clientpath);
+                    break;
+                case 'base':
+                    $found[$clientname] = $clientname;
+                    require_once($clientpath);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return $found;
+    }
 }

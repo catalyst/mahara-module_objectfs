@@ -12,7 +12,22 @@ namespace module_objectfs\client;
 
 defined('INTERNAL') || die();
 
-require_once(get_config('docroot') . 'module/aws/sdk/aws-autoloader.php');
+$autoloader = get_config('docroot') . 'module/aws/sdk/aws-autoloader.php';
+
+if (!file_exists($autoloader)) {
+    // Stub class with bare implementation for when the SDK prerequisite does not exist.
+    class s3_client {
+        public function get_availability() {
+            return false;
+        }
+        public function register_stream_wrapper() {
+            return false;
+        }
+    }
+    return;
+}
+require_once($autoloader);
+
 require_once(get_config('docroot') . 'module/objectfs/classes/client/object_client.php');
 
 use Aws\S3\S3Client;
@@ -24,13 +39,21 @@ define('AWS_CAN_READ_OBJECT', 0);
 define('AWS_CAN_WRITE_OBJECT', 1);
 define('AWS_CAN_DELETE_OBJECT', 2);
 
-class s3_client implements object_client {
+class s3_client implements object_client
+{
 
     protected $client;
     protected $bucket;
+    protected $defaultconfig;
 
     public function __construct($config) {
-        $this->bucket = $config->bucket;
+        $this->bucket = $config->s3_bucket;
+        $this->defaultconfig = $config;
+        $this->setMissingDefaultConfigPropertyToEmptyString('s3_key');
+        $this->setMissingDefaultConfigPropertyToEmptyString('s3_secret');
+        $this->setMissingDefaultConfigPropertyToEmptyString('s3_bucket');
+        $this->setMissingDefaultConfigPropertyToEmptyString('s3_region');
+
         $this->set_client($config);
     }
 
@@ -46,12 +69,93 @@ class s3_client implements object_client {
         $this->client->registerStreamWrapper();
     }
 
+    /**
+     * Returns true if the AWS S3 Storage SDK exists and has been loaded.
+     *
+     * @return bool
+     */
+    public function get_availability() {
+        return true;
+    }
+
     public function set_client($config) {
         $this->client = S3Client::factory(array(
-        'credentials' => array('key' => $config->key, 'secret' => $config->secret),
-        'region' => $config->region,
-        'version' => AWS_API_VERSION
+            'credentials' => array('key' => $config->s3_key, 'secret' => $config->s3_secret),
+            'region' => $config->s3_region,
+            'version' => AWS_API_VERSION
         ));
+    }
+
+    /**
+     * @return mixed
+     */
+    public function define_settings_form() {
+        $connectiontest = $this->test_connection();
+        $permissiontest = $this->test_permissions();
+
+        $regionoptions = array(
+            'us-east-1' => 'us-east-1',
+            'us-east-2' => 'us-east-2',
+            'us-west-1' => 'us-west-1',
+            'us-west-2' => 'us-west-2',
+            'ap-northeast-2' => 'ap-northeast-2',
+            'ap-southeast-1' => 'ap-southeast-1',
+            'ap-southeast-2' => 'ap-southeast-2',
+            'ap-northeast-1' => 'ap-northeast-1',
+            'eu-central-1' => 'eu-central-1',
+            'eu-west-1' => 'eu-west-1'
+        );
+
+        $config = array(
+            'type' => 'fieldset',
+            'legend' => get_string('settings:awsheader', 'module.objectfs'),
+            'collapsible' => true,
+            'collapsed' => true,
+            'elements' => array(
+                'connectiontest' => array(
+                    'title' => get_string('settings:connection', 'module.objectfs'),
+                    'type' => 'html',
+                    'value' => $connectiontest->message,
+                ),
+                'permissionstest' => array(
+                    'title' => get_string('settings:permissions', 'module.objectfs'),
+                    'type' => 'html',
+                    'value' => $permissiontest->messages[0],
+                ),
+                's3_key' => array(
+                    'title' => get_string('settings:key', 'module.objectfs'),
+                    'description' => get_string('settings:key_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->s3_key,
+                ),
+                's3_secret' => array(
+                    'title' => get_string('settings:secret', 'module.objectfs'),
+                    'description' => get_string('settings:secret_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->s3_secret,
+                ),
+                's3_bucket' => array(
+                    'title' => get_string('settings:bucket', 'module.objectfs'),
+                    'description' => get_string('settings:bucket_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $this->defaultconfig->s3_bucket,
+                ),
+                's3_region' => array(
+                    'title' => get_string('settings:region', 'module.objectfs'),
+                    'description' => get_string('settings:region_help', 'module.objectfs'),
+                    'type' => 'select',
+                    'options' => $regionoptions,
+                    'defaultvalue' => (!empty($this->defaultconfig->s3_region)) ? $this->defaultconfig->s3_region : 'us-east-1',
+                ),
+            ),
+        );
+        return $config;
+    }
+
+    protected function setMissingDefaultConfigPropertyToEmptyString($propertyname) {
+        if (empty($this->defaultconfig->$propertyname)) {
+            $this->defaultconfig->$propertyname = "";
+        }
     }
 
     public function register_stream_wrapper() {

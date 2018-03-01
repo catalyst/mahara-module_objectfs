@@ -77,6 +77,17 @@ function get_objectfs_config() {
     $config->logging = 0;
     $config->preferexternal = 0;
 
+    $config->s3_key = '';
+    $config->s3_secret = '';
+    $config->s3_bucket = '';
+    $config->s3_region = '';
+
+    $config->azure_accountname = '';
+    $config->azure_container = '';
+    $config->azure_sastoken = '';
+
+    $config->filesystem = '';
+
     // Override defaults if set.
     foreach ($config as $key => $value) {
 

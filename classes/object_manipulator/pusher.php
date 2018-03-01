@@ -62,27 +62,26 @@ class pusher extends manipulator {
 
         $sql = "SELECT af.artefact,
                        a.artefacttype,
-                       MAX(af.size) AS filesize,
                        a.title,
-                       o.contenthash
+                       o.contenthash,
+                       MAX(af.size) AS filesize,
+                       MIN(a.ctime) AS ctime
                   FROM artefact_file_files af
-             LEFT JOIN artefact a ON af.artefact = a.id
+                  JOIN artefact a ON af.artefact = a.id
              LEFT JOIN module_objectfs_objects o ON af.artefact = o.contentid
+                 WHERE (o.location IS NULL OR o.location = ?)
+                   AND a.artefacttype in ('" . join("','", $this->supportedartefacttypes) . "')
               GROUP BY af.artefact,
                        a.artefacttype,
-                       af.size,
-                       o.location,
                        a.title,
                        o.contenthash
                 HAVING MIN(a.ctime) <= ?
                        AND MAX(af.size) > ?
-                       AND MAX(af.size) < 5000000000
-                       AND (o.location IS NULL OR o.location = ?)
-                       AND a.artefacttype in ('" . join("','", $this->supportedartefacttypes) . "')";
+                       AND MAX(af.size) < 5000000000";
         $maxcreated = time() - $this->minimumage;
         $maxcreatedtimestamp = db_format_timestamp($maxcreated);
 
-        $params = array($maxcreatedtimestamp, $this->sizethreshold, OBJECT_LOCATION_LOCAL);
+        $params = array(OBJECT_LOCATION_LOCAL, $maxcreatedtimestamp, $this->sizethreshold);
 
         $this->logger->start_timing();
         $objects = get_records_sql_array($sql, $params);
