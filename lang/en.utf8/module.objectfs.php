@@ -61,13 +61,13 @@ $string['settings:region_help'] = 'Amazon S3 API gateway region.';
 
 $string['settings:filetransferheader'] = 'File Transfer Settings';
 $string['settings:sizethreshold'] = 'Minimum size threshold (KB)';
-$string['settings:sizethreshold_help'] = 'Minimum size threshold for transfering objects to external object storage. If objects are over this size they will be transfered.';
+$string['settings:sizethreshold_help'] = 'Minimum size threshold for transfering objects to external object storage. If objects are over this size they will be transferred.';
 $string['settings:minimumage'] = 'Minimum age (seconds)';
 $string['settings:minimumage_help'] = 'Minimum age that a object must exist on the local filedir before it will be considered for transfer.';
 $string['settings:deletelocal'] = 'Delete local objects';
 $string['settings:deletelocal_help'] = 'Delete local objects once they are in external object storage after the consistency delay.';
 $string['settings:consistencydelay'] = 'Consistency delay (seconds)';
-$string['settings:consistencydelay_help'] = 'How long an object must have existed after being transfered to external object storage before they are a candidate for deletion locally.';
+$string['settings:consistencydelay_help'] = 'How long an object must have existed after being transferred to external object storage before they are a candidate for deletion locally.';
 $string['settings:maxtaskruntime'] = 'Maximum transfer task runtime (seconds)';
 $string['settings:maxtaskruntime_help'] = 'Background tasks handle the transfer of objects to and from external object storage. This setting controlls the maximum runtime for all object transfer related tasks.';
 $string['settings:preferexternal'] = 'Prefer external objects';
@@ -89,12 +89,13 @@ $string['settings:permissioncheckpassed'] = 'Permissions check passed.';
 
 $string['settings:azurepermissions'] = 'Test file permissions in the Azure storage container.';
 $string['settings:azurepermissioncheckpassed'] = 'Azure Permissions check passed.';
+$string['settings:azurenoaccountspecified'] = 'You must specify and account name.';
 $string['settings:azurewritefailure'] = 'Could not write object to the Azure container. ';
 $string['settings:azurereadfailure'] = 'Could not read object from the Azure container. ';
 $string['settings:azuredeletesuccess'] = 'Could delete object from the Azure container - It is not recommended for the Azure user to have delete permissions. ';
 
-$string['settings:handlernotset'] = '$cfg->externalfilesystem is not set, the file system will not be able to read from S3. Background tasks can still function.';
-$string['settings:handlerset'] = '$cfg->externalfilesystem is set, the file system will be able to read from S3 and background tasks will function normally';
+$string['settings:handlernotset'] = '$cfg->externalfilesystem is not set, the file system will not be able to read from object storage. Background tasks can still function.';
+$string['settings:handlerset'] = '$cfg->externalfilesystem is set, the file system will be able to read from object storage and background tasks will function normally';
 $string['settings:handler'] = 'Global config handler';
 
 $string['settings:storagefilesystemselectionheader'] = 'Storage File System Selection';
