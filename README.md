@@ -4,9 +4,9 @@
 
 # mahara-module_objectfs
 
-A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. Currently supports both AWS S3 and azure blob storage.
+A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. Currently supports both AWS S3 and Azure Blob Storage.
 
-This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws)or[mahara-module_azure](https://github.com/catalyst/mahara-module_azure) to function.
+This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) or [mahara-module_azure](https://github.com/catalyst/mahara-module_azure) to function.
 
 * [Use cases](#use-cases)
   * [Offloading large and old files to save money](#offloading-large-and-old-files-to-save-money)
@@ -16,9 +16,11 @@ This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mah
 * [Currently supported object stores](#currently-supported-object-stores)
   * [Roadmap](#roadmap)
   * [Amazon S3](#amazon-s3)
+  * [Azure Blob Storage](#azure-blob-storage)
 * [Mahara configuration](#mahara-configuration)
   * [General Settings](#general-settings)
   * [File Transfer settings](#file-transfer-settings)
+  * [Azure Blob Storage settings](#azure-blob-storage-settings)
   * [Amazon S3 settings](#amazon-s3-settings)
 * [Backporting](#backporting)
 * [Crafted by Catalyst IT](#crafted-by-catalyst-it)
@@ -100,6 +102,67 @@ There is support for more object stores planed, in particular enabling Openstack
 }
 ```
 
+### Azure Blob Storage
+
+*Azure Storage container guide with the CLI*
+
+The following commands will help setup the shared acccess signature which is required to access the blob storage with the plugin.
+
+It is possible to install the Azure CLI locally to administer the storage account. [The Azure CLI can be obtained here.](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+
+Visit the [Online Azure Portal](https://portal.azure.com) or use the Azure CLI to obtain the storage account keys. These keys are used to setup the container, configure an access policy and acquire a [Shared Access Signature](https://docs.microsoft.com/en-us/azure/storage/common/storage-dotnet-shared-access-signature-part-1) that has Read and Write capabilities on the container.
+
+It will be assumed at this point that a [resource group](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) and [blob storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-introduction) exists.
+
+- Obtain the account keys.
+```
+az login
+
+az storage account keys list \
+  --resource-group <resource_group_name> \
+  --account-name <storage_account_name>
+```
+
+- Create a private container in a storage account.
+```
+az storage container create \
+    --name <container_name> \
+    --account-name <storage_account_name> \
+    --account-key <storage_account_key> \
+    --public-access off \
+    --fail-on-exist
+```
+
+- Create a stored access policy on the containing object.
+```
+az storage container policy create \
+    --account-name <storage_account_name> \
+    --account-key <storage_account_key> \
+    --container-name <container_name> \
+    --name <policy_name> \
+    --start <YYYY-MM-DD> \
+    --expiry <YYYY-MM-DD> \
+    --permissions rw
+```
+
+- Generate a shared access signature for the container. This is associated with a policy.
+```
+az storage container generate-sas \
+    --account-name <storage_account_name> \
+    --account-key <storage_account_key> \
+    --name <container_name> \
+    --policy <policy_name> \
+    --output tsv
+```
+
+- If you wish to revoke access to the container, remove the policy which will invalidate the SAS.
+```
+az storage container policy delete \
+    --account-name <storage_account_name> \
+    --account-key <storage_account_key> \
+    --container-name <container_name>
+    --name <policy_name>
+```
 
 
 ## Mahara configuration
