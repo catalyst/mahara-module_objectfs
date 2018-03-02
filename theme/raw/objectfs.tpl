@@ -46,7 +46,11 @@
         <tr>
           <th>File sizes</th>
           <th>Objectcount</th>
-          <th>Objectsum</th>
+          <th>Objectsum
+            <span class="ofs-bar-deleted">deleted</span>
+            <span class="ofs-bar-isexternal">duplicated</span>
+            <span class="ofs-bar-total">filedir</span>
+          </th>
         </tr>
 
         {foreach $sitedata['log_size'] key item}
@@ -54,16 +58,15 @@
           <tr>
             <td>{$item->datakey}</td>
             <td>
-            <!--<div class="ofs-bar" style="width:{$item->relativeobjectcount}%; background: #17a5eb;">{$item->objectcount}</div>-->
-              <div class="ofs-bar-total" style="width:90%;">
-                <div class="ofs-bar-isexternal" style="width: 20%;">
-                  <div class="ofs-bar-deleted" style="width: 20%;"><35.1GB</div>
-                </div>
-              </div>
-
+              <div class="ofs-bar" style="width:{$item->relativeobjectcount}%; background: #17a5eb;">{$item->objectcount}</div>
             </td>
             <td>
-              <div class="ofs-bar" style="width:{$item->relativeobjectsum}%; background: #17a5eb;">{$item->objectsum|display_size}</div>
+              <div class="ofs-bar-total" style="width:100%;">
+                {assign var="isexternal" value="`$item->duplicated+$item->external`"}
+                <div class="ofs-bar-isexternal" style="width: {$isexternal*100/$item->objectsum|round}%;">
+                  <div class="ofs-bar-deleted" style="width: {$item->external*100/$item->objectsum|round}%;">{$item->objectsum|display_size}</div>
+                </div>
+              </div>
             </td>
           </tr>
         {/foreach}

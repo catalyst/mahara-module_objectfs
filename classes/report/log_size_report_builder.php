@@ -14,48 +14,85 @@ require_once(get_config('docroot') . 'module/objectfs/classes/report/objectfs_re
 
 defined('INTERNAL') || die();
 
-class log_size_report_builder extends objectfs_report_builder {
+class log_size_report_builder extends location_report_builder {
+
+    protected static $reporttype = 'log_size';
 
     public function build_report() {
 
-        $report = new objectfs_report('log_size');
+        $stats = array();
+        $small = array();
+        foreach ($this->files_by_location() as $location => $files) {
+            if (!$files) continue;
 
-        $sql = "SELECT log as datakey,
-                       sum(size) as objectsum,
-                       count(*) as objectcount
-                  FROM (SELECT DISTINCT artefact, size, floor(log(2,size)) AS log
-                          FROM artefact_file_files
-                         WHERE size != 0) d
-              GROUP BY log ORDER BY log";
+            foreach ($files as $f) {
+                if ($f->log <= 19) {
+                    if (isset($small[$location])) {
+                        $l = $small[$location];
+                    } else {
+                        $small[$location] = $l = new \stdClass();
+                        $l->objectcount = 0;
+                        $l->objectsum = 0;
+                    }
+                    $l->objectcount += $f->objectcount;
+                    $l->objectsum += $f->objectsum;
+                    continue;
+                }
 
-        $stats = get_records_sql_array($sql);
-
-        if (!empty($stats)) {
-            $this->compress_small_log_sizes($stats);
-
-            $report->add_rows($stats);
+                $f->datakey = implode(":", $f->log, $location);
+                $stats[] = $f;
+            }
+        }
+        foreach ($small as $location => $f) {
+            $f->datakey = implode(":", ['small', $location]);
+            // Add to the beginning of the array.
+            array_unshift($stats, $f);
         }
 
-        return $report;
+        return $stats;
     }
 
-    protected function compress_small_log_sizes(&$stats) {
-        $smallstats = new \stdClass();
-        $smallstats->datakey = 'small';
-        $smallstats->objectsum = 0;
-        $smallstats->objectcount = 0;
+    protected function format_report($rows) {
 
-        foreach ($stats as $key => $stat) {
+        $file_location_names = array_values(self::file_locations());
 
-            // Logsize of <= 19 means that files are smaller than 1 MB.
-            if ($stat->datakey <= 19) {
-                $smallstats->objectcount += $stat->objectcount;
-                $smallstats->objectsum += $stat->objectsum;
-                unset($stats[$key]);
+        $stats = array();
+        foreach ($rows as $row) {
+            list($log, $location) = explode(":", $row->datakey);
+            $datakey = $this->get_size_range_from_logsize($log); // Turn logsize into a byte range.
+            $ln = self::file_location_code_to_name($location);
+            if (isset($stats[$datakey])) {
+                $l = $stats[$datakey];
+            } else {
+                $stats[$datakey] = $l = new \stdClass();
+                $l->datakey = $datakey;
+                $l->objectsum = 0;
+                $l->objectcount = 0;
+                foreach($file_location_names as $fln) {
+                    $l->$fln = 0;
+                }
             }
-
+            $l->$ln += $row->objectsum;
+            $l->objectsum += $row->objectsum;
+            $l->objectcount += $row->objectcount;
         }
-        // Add to the beginning of the array.
-        array_unshift($stats, $smallstats);
+
+        return array_values($stats);
+    }
+
+    private function get_size_range_from_logsize($logsize) {
+
+	// Small logsizes have been compressed.
+	if ($logsize == 'small') {
+		return '< 1MB';
+	}
+
+	$floor = pow(2, $logsize);
+	$roof = ($floor * 2);
+	$floor = display_size($floor);
+	$roof = display_size($roof);
+	$sizerange = "$floor - $roof";
+
+	return $sizerange;
     }
 }

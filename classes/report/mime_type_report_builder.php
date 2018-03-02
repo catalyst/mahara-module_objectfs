@@ -16,9 +16,9 @@ defined('INTERNAL') || die();
 
 class mime_type_report_builder extends objectfs_report_builder {
 
-    public function build_report() {
+    protected static $reporttype = 'mime_type';
 
-        $report = new objectfs_report('mime_type');
+    public function build_report() {
 
         $sql = "SELECT sum(size) as objectsum, filetype as datakey, count(*) as objectcount
                   FROM (SELECT size,
@@ -49,13 +49,6 @@ class mime_type_report_builder extends objectfs_report_builder {
               GROUP BY datakey
               ORDER BY sum(size) / 1024, datakey";
 
-        $result = get_records_sql_array($sql);
-
-        if (!empty($result)) {
-
-            $report->add_rows($result);
-        }
-
-        return $report;
+        return get_records_sql_array($sql);
     }
 }
