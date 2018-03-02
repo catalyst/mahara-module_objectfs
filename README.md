@@ -4,7 +4,7 @@
 
 # mahara-module_objectfs
 
-A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. Currently supports both AWS S3 and azure blob storage.
+A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. Currently supports both AWS S3 and Azure blob storage.
 
 This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws)or[mahara-module_azure](https://github.com/catalyst/mahara-module_azure) to function.
 
@@ -48,7 +48,7 @@ Using this plugin we can configure production to have full read write to the rem
 4. Clone either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws or [mahara-module_azure](https://github.com/catalyst/mahara-module_azure) into module/azure
 5. Install the plugins through the mahara GUI.
 6. Configure the plugin. See [Mahara configuration](#mahara-configuration)
-7. Place one of the following in htdocs/config.php depending on your choice of remote storage (azure or s3):
+7. Place one of the following in htdocs/config.php depending on your choice of remote storage (Azure or s3):
 
 For AWS S3:
 ```
@@ -100,7 +100,67 @@ There is support for more object stores planed, in particular enabling Openstack
 }
 ```
 
+### Azure Blob Storage
 
+*Azure Storage container guide with the CLI*
+
+It is possible to install the Azure CLI locally to administer the storage account. [The Azure CLI can be obtained here.](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest)
+
+Visit the [Online Azure Portal](https://portal.azure.com) or use the Azure CLI to obtain the storage account keys. These keys are used to setup the container, configure an access policy and acquire a [Shared Access Signature](https://docs.microsoft.com/en-us/azure/storage/common/storage-dotnet-shared-access-signature-part-1) that has Read and Write capabilities on the container.
+
+It will be assumed at this point that a [resource group](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview) and [blob storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-introduction) exists.
+
+- Obtain the account keys.
+```
+az login
+
+az storage account keys list \
+  --resource-group <resource_group_name> \
+  --account-name <storage_account_name>
+```
+
+- Create a private container in a storage account.
+```
+az storage container create \
+    --name <container_name> \
+    --account-name <storage_account_name> \
+    --account-key <storage_account_key> \
+    --public-access off \
+    --fail-on-exist
+```
+
+- Create a stored access policy on the containing object.
+```
+az storage container policy create \
+    --account-name <storage_account_name> \
+    --account-key <storage_account_key> \
+    --container-name <container_name> \
+    --name <policy_name> \
+    --start <YYYY-MM-DD> \
+    --expiry <YYYY-MM-DD> \
+    --permissions rw
+
+# Start and Expiry are optional arguments.
+```
+
+- Generates a shared access signature for the container. This is associated with a policy.
+```
+az storage container generate-sas \
+    --account-name <storage_account_name> \
+    --account-key <storage_account_key> \
+    --name <container_name> \
+    --policy <policy_name> \
+    --output tsv
+```
+
+- If you wish to revoke access to the container, remove the policy which will invalidate the SAS.
+```
+az storage container policy delete \
+    --account-name <storage_account_name> \
+    --account-key <storage_account_key> \
+    --container-name <container_name>
+    --name <policy_name>
+```
 
 ## Mahara configuration
 Go to Administration -> Extensions -> objectfs. Descriptions for the various settings are as follows:
@@ -125,7 +185,7 @@ and `\module_objectfs\azure_file_system`
 ### Azure Blob Storage Settings
 Azure specific settings
 - **Account name**: The name of the storage account created in Azure
-- **Container name**: The name of the container in azure that will store the blobs
+- **Container name**: The name of the container in Azure that will store the blobs
 - **Share access signature**: The Shared Access Signature that you created for access to the container
 
 ### Amazon S3 settings
