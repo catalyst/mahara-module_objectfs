@@ -4,9 +4,9 @@
 
 # mahara-module_objectfs
 
-A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. Currently supports both AWS S3 and Azure blob storage.
+A remote object storage file system for Mahara. Intended to provide a plug-in that can be installed and configured to work with any supported remote object storage solution. Currently supports both AWS S3 and Azure Blob Storage.
 
-This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws)or[mahara-module_azure](https://github.com/catalyst/mahara-module_azure) to function.
+This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) or [mahara-module_azure](https://github.com/catalyst/mahara-module_azure) to function.
 
 * [Use cases](#use-cases)
   * [Offloading large and old files to save money](#offloading-large-and-old-files-to-save-money)
@@ -16,9 +16,11 @@ This plug-in requires either [mahara-module_aws](https://github.com/catalyst/mah
 * [Currently supported object stores](#currently-supported-object-stores)
   * [Roadmap](#roadmap)
   * [Amazon S3](#amazon-s3)
+  * [Azure Blob Storage](#azure-blob-storage)
 * [Mahara configuration](#mahara-configuration)
   * [General Settings](#general-settings)
   * [File Transfer settings](#file-transfer-settings)
+  * [Azure Blob Storage settings](#azure-blob-storage-settings)
   * [Amazon S3 settings](#amazon-s3-settings)
 * [Backporting](#backporting)
 * [Crafted by Catalyst IT](#crafted-by-catalyst-it)
