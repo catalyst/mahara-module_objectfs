@@ -44,7 +44,7 @@ Some of our clients maharas are truly massive. We also have multiple environment
 Using this plugin we can configure production to have full read write to the remote filesystem and store the vast bulk of content remotely. In this setup the latency and bandwidth isn't an issue as they are colocated. The local filedir on disk would only consist of small or fast churning files. A refresh of the production data back to a staging environment can be much quicker now as we skip the sitedir clone completely and stage is simple configured with readonly access to the production filesystem. Any files it creates would only be written to it's local filesystem which can then be discarded when next refreshed.
 
 ## Installation
-1. If not on Mahara 17.04, backport the file system API. See [Backporting](#backporting)
+1. If not on Mahara 18.04, backport the file system API. See [Backporting](#backporting)
 2. Setup your remote object storage. See [Remote object storage setup](#amazon-s3)
 3. Clone this repository into module/objectfs
 4. Clone either [mahara-module_aws](https://github.com/catalyst/mahara-module_aws) into module/aws or [mahara-module_azure](https://github.com/catalyst/mahara-module_azure) into module/azure
