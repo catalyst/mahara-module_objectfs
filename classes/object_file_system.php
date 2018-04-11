@@ -107,7 +107,7 @@ abstract class object_file_system {
 
         if ($contenthash) {
             // We assume it is remote, not checking if it's readable.
-            $path = $this->get_external_path_from_hash($contenthash);
+            return $this->get_external_path_from_hash($contenthash);
         }
 
         return null;
