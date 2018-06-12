@@ -119,7 +119,7 @@ abstract class object_file_system {
 
     public function is_file_readable_locally($fileartefact) {
 
-        $localpath = $fileartefact->get_local_path();
+        $localpath = $fileartefact->get_local_path(array(), false);
 
         return is_readable($localpath);
     }
