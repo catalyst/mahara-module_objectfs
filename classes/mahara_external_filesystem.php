@@ -61,6 +61,11 @@ abstract class mahara_external_filesystem extends object_file_system implements 
      */
     public function ensure_local($fileartefact) {
 
+        if (empty($fileartefact->contenthash)) {
+            // If theres no contenthash then we dont have an external path for this object
+            return;
+        }
+
         $status = $this->get_file_location_status($fileartefact);
 
         if ($status == OBJECT_LOCATION_EXTERNAL) {
