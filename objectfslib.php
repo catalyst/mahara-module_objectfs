@@ -80,7 +80,7 @@ function get_objectfs_config() {
     $config->s3_key = '';
     $config->s3_secret = '';
     $config->s3_bucket = '';
-    $config->s3_region = '';
+    $config->s3_region = 'us-east-1';
 
     $config->azure_accountname = '';
     $config->azure_container = '';
