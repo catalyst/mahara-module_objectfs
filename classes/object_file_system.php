@@ -102,7 +102,7 @@ abstract class object_file_system {
         }
 
         if ($this->is_file_readable_locally($fileartefact)) {
-            return $fileartefact->get_local_path();
+            return $fileartefact->get_local_path(array(), false);
         }
 
         if ($contenthash) {
@@ -172,8 +172,7 @@ abstract class object_file_system {
         $finallocation = $initiallocation;
 
         if ($initiallocation === OBJECT_LOCATION_EXTERNAL) {
-
-            $localpath = $fileartefact->get_local_path();
+            $localpath = $fileartefact->get_local_path(array(), false);
             $externalpath = $this->get_external_path_from_hash($contenthash);
 
             $localdirpath = get_config('dataroot')."/".$fileartefact::get_file_directory($fileartefact->get('fileid'));
