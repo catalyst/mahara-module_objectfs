@@ -71,7 +71,7 @@ abstract class object_file_system {
 
         $file = get_record('artefact_file_files', 'contenthash', $contenthash);
         $fileartefact = new \ArtefactTypeFile($file->fileid);
-        $path = $fileartefact->get_local_path();
+        $path = $fileartefact->get_local_path(array(), false);
 
         if ($fetchifnotfound && !is_readable($path)) {
 
@@ -208,7 +208,7 @@ abstract class object_file_system {
 
         if ($initiallocation === OBJECT_LOCATION_LOCAL) {
 
-            $localpath = $fileartefact->get_local_path();
+            $localpath = $fileartefact->get_local_path(array(), false);
             $externalpath = $this->get_external_path_from_hash($contenthash);
 
             $success = copy($localpath, $externalpath);
@@ -228,7 +228,7 @@ abstract class object_file_system {
 
     public function verify_external_object($fileartefact) {
         $contenthash = $fileartefact->get('contenthash');
-        $localpath = $fileartefact->get_local_path();
+        $localpath = $fileartefact->get_local_path(array(), false);
         $objectisvalid = $this->externalclient->verify_object($contenthash, $localpath);
         return $objectisvalid;
     }
@@ -239,7 +239,7 @@ abstract class object_file_system {
         $finallocation = $initiallocation;
 
         if ($initiallocation === OBJECT_LOCATION_DUPLICATED) {
-            $localpath = $fileartefact->get_local_path();
+            $localpath = $fileartefact->get_local_path(array(), false);
 
             if ($this->verify_external_object($fileartefact)) {
                 $success = unlink($localpath);
