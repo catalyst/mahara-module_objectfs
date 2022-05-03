@@ -197,6 +197,14 @@ S3 specific settings
 - **Bucket**: S3 bucket name to store files in
 - **AWS region**: AWS API endpoint region to use.
 
+## Release 2.0.0 impact
+
+A major change in this release impacts all files stored in the module_objectfs_objects table. The ID stored in this table have changed from referencing the fileid to referencing the artefactid.
+
+If you have moved files to S3 and have not deleted local files, it is recommended to delete all records in the module_objectfs_objects and initiate the upload again.
+
+If you have moved files to S3 and have deleted local files, a script will need to be written to update the IDs from fileid to artefactid based on the file hash. This script has not been written in this release. We welcome merge requests to implement this change.
+
 ## Backporting
 
 If you are on an older mahara then you can backport the necessary API's in order to support this plugin. Use with caution!
