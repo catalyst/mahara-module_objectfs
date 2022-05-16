@@ -175,8 +175,13 @@ abstract class object_file_system {
             $localpath = $fileartefact->get_local_path(array(), false);
             $externalpath = $this->get_external_path_from_hash($contenthash);
 
-            $localdirpath = get_config('dataroot')."/".$fileartefact::get_file_directory($fileartefact->get('fileid'));
-
+            $artefacttype = $fileartefact->get('artefacttype');
+            if ($artefacttype === "profileicon") {
+                $localdirpath = get_config('dataroot')."/".$fileartefact::get_profileicon_file_directory($fileartefact->get('fileid'));
+            }
+            else {
+                $localdirpath = get_config('dataroot') . "/" . $fileartefact::get_file_directory($fileartefact->get('fileid'));
+            }
             // Folder may not exist yet if pulling a file that came from another environment.
             if (!is_dir($localdirpath)) {
                 if (!mkdir($localdirpath, $this->dirpermissions, true)) {
