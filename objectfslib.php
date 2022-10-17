@@ -23,14 +23,14 @@ function update_object_record($fileartefact, $location) {
 
     $newobject = new \stdClass();
     $newobject->contenthash = $fileartefact->get('contenthash');
-    $newobject->contentid = $fileartefact->get('fileid');
+    $newobject->contentid = $fileartefact->get('id');
     $newobject->timeduplicated = time();
     $newobject->location = $location;
 
     $oldobject = get_record(
         'module_objectfs_objects',
         'contenthash', $fileartefact->get('contenthash'),
-        'contentid', $fileartefact->get('fileid')
+        'contentid', $fileartefact->get('id')
     );
 
     if ($oldobject) {
@@ -80,7 +80,7 @@ function get_objectfs_config() {
     $config->s3_key = '';
     $config->s3_secret = '';
     $config->s3_bucket = '';
-    $config->s3_region = '';
+    $config->s3_region = 'us-east-1';
 
     $config->azure_accountname = '';
     $config->azure_container = '';

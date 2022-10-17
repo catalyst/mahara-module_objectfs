@@ -71,7 +71,7 @@ abstract class object_file_system {
 
         $file = get_record('artefact_file_files', 'contenthash', $contenthash);
         $fileartefact = new \ArtefactTypeFile($file->fileid);
-        $path = $fileartefact->get_local_path();
+        $path = $fileartefact->get_local_path(array(), false);
 
         if ($fetchifnotfound && !is_readable($path)) {
 
@@ -102,7 +102,7 @@ abstract class object_file_system {
         }
 
         if ($this->is_file_readable_locally($fileartefact)) {
-            return $fileartefact->get_local_path();
+            return $fileartefact->get_local_path(array(), false);
         }
 
         if ($contenthash) {
@@ -172,12 +172,16 @@ abstract class object_file_system {
         $finallocation = $initiallocation;
 
         if ($initiallocation === OBJECT_LOCATION_EXTERNAL) {
-
-            $localpath = $fileartefact->get_local_path();
+            $localpath = $fileartefact->get_local_path(array(), false);
             $externalpath = $this->get_external_path_from_hash($contenthash);
 
-            $localdirpath = get_config('dataroot')."/".$fileartefact::get_file_directory($fileartefact->get('fileid'));
-
+            $artefacttype = $fileartefact->get('artefacttype');
+            if ($artefacttype === "profileicon") {
+                $localdirpath = get_config('dataroot')."/".$fileartefact::get_profileicon_file_directory($fileartefact->get('fileid'));
+            }
+            else {
+                $localdirpath = get_config('dataroot') . "/" . $fileartefact::get_file_directory($fileartefact->get('fileid'));
+            }
             // Folder may not exist yet if pulling a file that came from another environment.
             if (!is_dir($localdirpath)) {
                 if (!mkdir($localdirpath, $this->dirpermissions, true)) {
@@ -209,7 +213,7 @@ abstract class object_file_system {
 
         if ($initiallocation === OBJECT_LOCATION_LOCAL) {
 
-            $localpath = $fileartefact->get_local_path();
+            $localpath = $fileartefact->get_local_path(array(), false);
             $externalpath = $this->get_external_path_from_hash($contenthash);
 
             $success = copy($localpath, $externalpath);
@@ -229,7 +233,7 @@ abstract class object_file_system {
 
     public function verify_external_object($fileartefact) {
         $contenthash = $fileartefact->get('contenthash');
-        $localpath = $fileartefact->get_local_path();
+        $localpath = $fileartefact->get_local_path(array(), false);
         $objectisvalid = $this->externalclient->verify_object($contenthash, $localpath);
         return $objectisvalid;
     }
@@ -240,7 +244,7 @@ abstract class object_file_system {
         $finallocation = $initiallocation;
 
         if ($initiallocation === OBJECT_LOCATION_DUPLICATED) {
-            $localpath = $fileartefact->get_local_path();
+            $localpath = $fileartefact->get_local_path(array(), false);
 
             if ($this->verify_external_object($fileartefact)) {
                 $success = unlink($localpath);

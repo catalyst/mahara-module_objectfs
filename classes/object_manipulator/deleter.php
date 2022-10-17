@@ -93,7 +93,12 @@ class deleter extends manipulator {
         $objects = get_records_sql_array($sql, $params);
         $this->logger->end_timing();
 
-        $totalobjectsfound = count($objects);
+        // If there are no results, false is returned.
+        if ($objects === false) {
+            $totalobjectsfound = 0;
+        } else {
+            $totalobjectsfound = count($objects);
+        }
 
         $this->logger->log_object_query('get_delete_candidates', $totalobjectsfound);
 
