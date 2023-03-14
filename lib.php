@@ -244,6 +244,9 @@ class PluginModuleObjectfs extends PluginModule {
     }
 
     public static function postinst($fromversion) {
+        if (empty(get_config_plugin('module', 'objectfs', 's3_bucket'))) {
+            set_config_plugin('module', 'objectfs', 's3_bucket', '<your_bucket_name>');
+        }
     }
 
     // All these default methods need to make some sense, need them to install plugin, some mahara stuff??????????
