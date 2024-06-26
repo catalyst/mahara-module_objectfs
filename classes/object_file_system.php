@@ -92,7 +92,15 @@ abstract class object_file_system {
         return $path;
     }
 
-    protected function get_remote_path($fileartefact) {
+    /**
+     * Retrieves the remote path for a given file artefact.
+     *
+     * @param object $fileartefact The file artefact object containing file details.
+     * @param array $data Additional data to be used for retrieving the path.
+     *
+     * @return string|null The path of the file artefact, or null if not available.
+     */
+    protected function get_remote_path($fileartefact, $data = []) {
         $contenthash = $fileartefact->get('contenthash');
         if ($contenthash && $this->preferexternal) {
             $location = $this->get_object_location($fileartefact);
@@ -102,7 +110,7 @@ abstract class object_file_system {
         }
 
         if ($this->is_file_readable_locally($fileartefact)) {
-            return $fileartefact->get_local_path(array(), false);
+            return $fileartefact->get_local_path($data, false);
         }
 
         if ($contenthash) {
