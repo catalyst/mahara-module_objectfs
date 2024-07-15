@@ -103,7 +103,8 @@ class s3_client implements object_client
             'ap-southeast-2' => 'ap-southeast-2',
             'ap-northeast-1' => 'ap-northeast-1',
             'eu-central-1' => 'eu-central-1',
-            'eu-west-1' => 'eu-west-1'
+            'eu-west-1' => 'eu-west-1',
+            'eu-west-2' => 'eu-west-2',
         );
 
         $config = array(
