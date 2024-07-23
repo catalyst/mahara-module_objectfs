@@ -92,17 +92,40 @@ abstract class object_file_system {
         return $path;
     }
 
-    protected function get_remote_path($fileartefact) {
+    /**
+     * Retrieves the remote path for a given file artefact.
+     *
+     * @param object $fileartefact The file artefact object containing file details.
+     * @param array $data Additional data to be used for retrieving the path.
+     *
+     * @return string|null The path of the file artefact, or null if not available.
+     */
+    protected function get_remote_path($fileartefact, $data = []) {
         $contenthash = $fileartefact->get('contenthash');
+
+        $isresize = false;
+        if (isset($data['maxw']) || isset($data['maxh'])) {
+              $isresize = true;
+        }
+
         if ($contenthash && $this->preferexternal) {
             $location = $this->get_object_location($fileartefact);
             if ($location == OBJECT_LOCATION_DUPLICATED) {
+                // Local image needed for resizing.
+                if ($isresize) {
+                    return $fileartefact->get_local_path($data, true);
+                }
                 return $this->get_external_path_from_hash($contenthash);
             }
         }
 
+        if ($isresize) {
+            // Call function with 'true' argument to ensure image is local.
+            return $fileartefact->get_local_path($data, true);
+        }
+
         if ($this->is_file_readable_locally($fileartefact)) {
-            return $fileartefact->get_local_path(array(), false);
+            return $fileartefact->get_local_path($data, false);
         }
 
         if ($contenthash) {

@@ -21,12 +21,13 @@ abstract class mahara_external_filesystem extends object_file_system implements 
      * Return a file path
      *
      * @param stdClass $fileartefact This is the file object
+     * @param array $data Additional data to be used when retrieving path.
      *
      * @return file path
      */
-    public function get_path($fileartefact) {
+    public function get_path($fileartefact, $data = []) {
 
-        return $this->get_remote_path($fileartefact);
+        return $this->get_remote_path($fileartefact, $data);
     }
 
     /**
