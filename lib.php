@@ -258,7 +258,7 @@ class PluginModuleObjectfs extends PluginModule {
      * Is plugin deprecated - going to be obsolete / removed
      * @return bool
      */
-    public static function is_deprecated() {
+    public static function is_deprecated(): bool {
         return false;
     }
 
