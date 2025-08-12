@@ -66,9 +66,9 @@ class pusher extends manipulator {
                        o.contenthash,
                        MAX(af.size) AS filesize,
                        MIN(a.ctime) AS ctime
-                  FROM artefact_file_files af
-                  JOIN artefact a ON af.artefact = a.id
-             LEFT JOIN module_objectfs_objects o ON af.artefact = o.contentid
+                  FROM {artefact_file_files} af
+                  JOIN {artefact} a ON af.artefact = a.id
+             LEFT JOIN {module_objectfs_objects} o ON af.artefact = o.contentid
                  WHERE (o.location IS NULL OR o.location = ?)
                    AND a.artefacttype in ('" . join("','", $this->supportedartefacttypes) . "')
               GROUP BY af.artefact,
