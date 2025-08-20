@@ -44,7 +44,7 @@ class mime_type_report_builder extends objectfs_report_builder {
                       WHEN filetype like 'application/%'                                  THEN 'other'
                       ELSE         substr(filetype,0,position('/' IN filetype))
                    END AS filetype
-                  FROM artefact_file_files
+                  FROM {artefact_file_files}
                  WHERE filetype IS NOT NULL AND size > 0) stats
               GROUP BY datakey
               ORDER BY sum(size) / 1024, datakey";

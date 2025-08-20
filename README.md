@@ -205,6 +205,27 @@ If you have moved files to S3 and have not deleted local files, it is recommende
 
 If you have moved files to S3 and have deleted local files, a script will need to be written to update the IDs from fileid to artefactid based on the file hash. This script has not been written in this release. We welcome merge requests to implement this change.
 
+## Release 2.0.1 impact
+
+A major change in this release impacts following two table's:
+
+* module_objectfs_objects
+* module_objectfs_reports
+
+If these were created with DB prefix ($CFG->prefix) and the upgrade fails, you will have to manually rename these two tables with the DB prefix.
+
+e.g. If DB prefix is set to 'mah', new table will be `mah_module_objectfs_objects`
+
+For MySQL(8.0+) and Postgres:
+```
+ALTER TABLE module_objectfs_objects RENAME TO mah_module_objectfs_objects;
+```
+
+For MariaDB and MySQL:
+```
+RENAME TABLE module_objectfs_objects TO mah_module_objectfs_objects;
+```
+
 ## Backporting
 
 If you are on an older mahara then you can backport the necessary API's in order to support this plugin. Use with caution!
