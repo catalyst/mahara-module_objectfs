@@ -11,8 +11,8 @@
 defined('INTERNAL') || die();
 
 $config = new stdClass();
-$config->version   = 2025073100;      // The current plugin version (Date: YYYYMMDDXX).
-$config->release   = '2.0.1';
+$config->version   = 2025082200;      // The current plugin version (Date: YYYYMMDDXX).
+$config->release   = '2.2.0';
 
 $config->dependencies = array(
     'module_aws' => 2017030100
