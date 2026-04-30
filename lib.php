@@ -218,6 +218,7 @@ class PluginModuleObjectfs extends PluginModule {
         set_config_plugin('module', 'objectfs', 'maxtaskruntime', $values['maxtaskruntime']);
         set_config_plugin('module', 'objectfs', 'consistencydelay', $values['consistencydelay']);
         set_config_plugin('module', 'objectfs', 'filesystem', $values['filesystem']);
+        set_config_plugin('module', 'objectfs', 'batchsize', $values['batchsize']);
 
         /*
         set_config_plugin('module', 'objectfs', 's3_key', $values['s3_key']);
@@ -459,6 +460,13 @@ class PluginModuleObjectfs extends PluginModule {
                     'type' => 'text',
                     'defaultvalue' => $defaultconfig->minimumage,
                     'rules' => array('integer' => true, 'minvalue' => 0)
+                ),
+                'batchsize' => array(
+                    'title' => get_string('settings:batchsize', 'module.objectfs'),
+                    'description' => get_string('settings:batchsize_help', 'module.objectfs'),
+                    'type' => 'text',
+                    'defaultvalue' => $defaultconfig->batchsize,
+                    'rules' => array('integer' => true, 'minvalue' => 1)
                 ),
                 'deletelocal' => array(
                     'title' => get_string('settings:deletelocal', 'module.objectfs'),
