@@ -19,13 +19,6 @@ use Aws\S3\Exception\S3Exception;
 class deleter extends manipulator {
 
     /**
-     * Maximum number of candidate objects to fetch.
-     *
-     * @var int
-     */
-    protected $batchsize;
-
-    /**
      * How long file must exist after
      * duplication before it can be deleted.
      *
@@ -60,7 +53,6 @@ class deleter extends manipulator {
         $this->consistencydelay = $config->consistencydelay;
         $this->deletelocal = $config->deletelocal;
         $this->sizethreshold = $config->sizethreshold;
-        $this->batchsize = $config->batchsize;
         $this->logger = $logger;
         // Inject our logger into the filesystem.
         $this->filesystem->set_logger($this->logger);
