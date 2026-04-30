@@ -19,13 +19,6 @@ use Aws\S3\Exception\S3Exception;
 class puller extends manipulator {
 
     /**
-     * Maximum number of candidate objects to fetch.
-     *
-     * @var int
-     */
-    protected $batchsize;
-
-    /**
      * Size threshold for pulling files from remote in bytes.
      *
      * @var int
@@ -42,7 +35,6 @@ class puller extends manipulator {
     public function __construct($filesystem, $config, $logger) {
         parent::__construct($filesystem, $config);
         $this->sizethreshold = $config->sizethreshold;
-        $this->batchsize = $config->batchsize;
 
         $this->logger = $logger;
         // Inject our logger into the filesystem.

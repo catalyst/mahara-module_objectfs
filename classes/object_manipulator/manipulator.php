@@ -40,6 +40,13 @@ abstract class manipulator {
      */
     protected $finishtime;
 
+    /**
+     * Maximum number of candidate objects to fetch.
+     *
+     * @var int
+     */
+    protected $batchsize;
+
     protected $logger;
 
     /**
@@ -64,6 +71,7 @@ abstract class manipulator {
         }
         $this->finishtime = time() + $config->maxtaskruntime;
         $this->filesystem = $filesystem;
+        $this->batchsize = $config->batchsize;
     }
 
     /**

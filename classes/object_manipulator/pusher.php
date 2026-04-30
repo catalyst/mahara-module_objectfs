@@ -33,13 +33,6 @@ class pusher extends manipulator {
     private $minimumage;
 
     /**
-     * Maximum number of candidate objects to fetch.
-     *
-     * @var int
-     */
-    protected $batchsize;
-
-    /**
      * Pusher constructor.
      *
      * @param object_client $client remote object client
@@ -50,7 +43,6 @@ class pusher extends manipulator {
         parent::__construct($filesystem, $config);
         $this->sizethreshold = $config->sizethreshold;
         $this->minimumage = $config->minimumage;
-        $this->batchsize = $config->batchsize;
 
         $this->logger = $logger;
         // Inject our logger into the filesystem.
