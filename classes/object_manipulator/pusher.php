@@ -83,8 +83,10 @@ class pusher extends manipulator {
 
         $params = array(OBJECT_LOCATION_LOCAL, $maxcreatedtimestamp, $this->sizethreshold);
 
+        $config = get_objectfs_config();
+
         $this->logger->start_timing();
-        $objects = get_records_sql_array($sql, $params);
+        $objects = get_records_sql_array($sql, $params, 0, $config->batchsize);
         $this->logger->end_timing();
 
         // If there are no results, false is returned.
