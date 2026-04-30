@@ -70,12 +70,7 @@ abstract class mahara_external_filesystem extends object_file_system implements 
         $status = $this->get_file_location_status($fileartefact);
 
         if ($status == OBJECT_LOCATION_EXTERNAL) {
-
-            $this->acquire_object_lock($fileartefact);
-
             $location = $this->copy_object_from_external_to_local($fileartefact, $fileartefact->get('size'));
-
-            $this->release_object_lock($fileartefact);
 
             update_object_record($fileartefact, $location);
         }
