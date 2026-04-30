@@ -462,8 +462,8 @@ class PluginModuleObjectfs extends PluginModule {
                     'rules' => array('integer' => true, 'minvalue' => 0)
                 ),
                 'batchsize' => array(
-                    'title' => 'Batch size',
-                    'description' => get_string('settings:minimumage_help', 'module.objectfs'),
+                    'title' => get_string('settings:batchsize', 'module.objectfs'),
+                    'description' => get_string('settings:batchsize_help', 'module.objectfs'),
                     'type' => 'text',
                     'defaultvalue' => $defaultconfig->batchsize,
                     'rules' => array('integer' => true, 'minvalue' => 1)
