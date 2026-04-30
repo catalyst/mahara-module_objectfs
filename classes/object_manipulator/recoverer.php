@@ -19,6 +19,13 @@ use Aws\S3\Exception\S3Exception;
 class recoverer extends manipulator {
 
     /**
+     * Maximum number of candidate objects to fetch.
+     *
+     * @var int
+     */
+    protected $batchsize;
+
+    /**
      * recoverer constructor.
      *
      * @param s3_client $client S3 client
@@ -27,6 +34,7 @@ class recoverer extends manipulator {
      */
     public function __construct($filesystem, $config, $logger) {
         parent::__construct($filesystem, $config);
+        $this->batchsize = $config->batchsize;
 
         $this->logger = $logger;
         // Inject our logger into the filesystem.
@@ -57,7 +65,7 @@ class recoverer extends manipulator {
         $params = array(OBJECT_LOCATION_ERROR);
 
         $this->logger->start_timing();
-        $objects = get_records_sql_array($sql, $params);
+        $objects = get_records_sql_array($sql, $params, 0, $this->batchsize);
         $this->logger->end_timing();
 
         // If there are no results, false is returned.
