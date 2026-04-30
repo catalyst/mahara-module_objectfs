@@ -115,11 +115,6 @@ abstract class manipulator {
             // Prepare the file artefact, and try and fix no content hash errors here.
             $fileartefact = new $artefactclassname($objectrecord->artefact);
 
-            // Object is currently being manipulated elsewhere.
-            if (get_field('artefact', 'locked', 'id', $objectrecord->artefact)) {
-                continue;
-            }
-
             // Check to see if we have a contenthash because if not its pointless.
             if (empty($fileartefact->get('contenthash'))) {
 
@@ -129,13 +124,9 @@ abstract class manipulator {
                 continue;
             }
 
-            $this->filesystem->acquire_object_lock($fileartefact);
-
             $newlocation = $this->manipulate_object($objectrecord, $fileartefact);
 
             update_object_record($fileartefact, $newlocation);
-
-            $this->filesystem->release_object_lock($fileartefact);
         }
 
         $this->logger->end_timing();

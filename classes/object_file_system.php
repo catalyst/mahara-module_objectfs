@@ -74,19 +74,10 @@ abstract class object_file_system {
         $path = $fileartefact->get_local_path(array(), false);
 
         if ($fetchifnotfound && !is_readable($path)) {
-
             // Try and pull from remote.
-            $objectlock = $this->acquire_object_lock($fileartefact);
-
-            // While gaining lock object might have been moved locally so we recheck.
-            if ($objectlock && !is_readable($path)) {
-                $location = $this->copy_object_from_external_to_local($fileartefact, $fileartefact->get('size'));
-                // We want this file to be deleted again later.
-
-                update_object_record($fileartefact, $location);
-
-                $this->release_object_lock($fileartefact);
-            }
+            $location = $this->copy_object_from_external_to_local($fileartefact, $fileartefact->get('size'));
+            // We want this file to be deleted again later.
+            update_object_record($fileartefact, $location);
         }
 
         return $path;
@@ -175,18 +166,6 @@ abstract class object_file_system {
             update_object_record($fileartefact, OBJECT_LOCATION_ERROR);
             return OBJECT_LOCATION_ERROR;
         }
-    }
-
-    // Acquire the obect lock any time you are moving an object between locations.
-    public function acquire_object_lock($fileartefact) {
-
-        set_field_select('artefact', 'locked', 1, "locked = 0 AND id = ?", array($fileartefact->get('id')));
-    }
-
-    // Release the lock once we are done moving objects between locations.
-    public function release_object_lock($fileartefact) {
-
-        set_field_select('artefact', 'locked', 0, "locked = 1 AND id = ?", array($fileartefact->get('id')));
     }
 
     public function copy_object_from_external_to_local($fileartefact, $objectsize = 0) {
