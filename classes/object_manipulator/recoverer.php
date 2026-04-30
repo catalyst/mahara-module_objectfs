@@ -57,7 +57,7 @@ class recoverer extends manipulator {
         $params = array(OBJECT_LOCATION_ERROR);
 
         $this->logger->start_timing();
-        $objects = get_records_sql_array($sql, $params);
+        $objects = get_records_sql_array($sql, $params, 0, $this->batchsize);
         $this->logger->end_timing();
 
         // If there are no results, false is returned.

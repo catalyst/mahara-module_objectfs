@@ -76,6 +76,7 @@ function get_objectfs_config() {
     $config->maxtaskruntime = 60;
     $config->logging = 0;
     $config->preferexternal = 0;
+    $config->batchsize = 10000;
 
     $config->s3_key = '';
     $config->s3_secret = '';
