@@ -43,7 +43,9 @@ foreach ($reporttypes as $reporttype) {
 }
 
 $smarty = smarty(array('paginator','js/chartjs/Chart.min.js'));
-setpageicon($smarty, 'icon-area-chart');
+if (function_exists('setpageicon')) {
+    setpageicon($smarty, 'icon-area-chart');
+}
 
 $smarty->assign('sitedata', $sitedata);
 
